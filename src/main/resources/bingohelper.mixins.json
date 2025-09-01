@@ -1,0 +1,15 @@
+{
+	"required": true,
+	"package": "io.github.lilfroggy.bingohelper.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"ChatInterceptorMixin",
+		"HandledScreenAccessorMixin",
+		"HandledScreenClickMixin",
+		"WorldRendererMixin",
+		"MinecraftClientMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

@@ -1,0 +1,39 @@
+{
+	"schemaVersion": 1,
+	"id": "bingohelper",
+	"version": "${version}",
+	"name": "BingoHelper",
+	"description": "Helps guide you through the bingo event in hypixel skyblock",
+	"authors": [
+		"LilFroggy"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/bingohelper/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			"io.github.lilfroggy.bingohelper.BingoHelper"
+		],
+		"fabric-datagen": [
+			"io.github.lilfroggy.bingohelper.BingoHelperDataGenerator"
+		],
+		"client": [
+			"io.github.lilfroggy.bingohelper.Client"
+		]
+	},
+	"mixins": [
+		"bingohelper.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.14",
+		"minecraft": "~1.21.5",
+		"java": ">=21",
+		"fabric-api": "*",
+		"fabric-language-kotlin": "*"
+	},
+	"suggests": {}
+}

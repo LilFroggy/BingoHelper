@@ -1,0 +1,154 @@
+plugins {
+	id "fabric-loom" version "${loom_version}"
+	id "maven-publish"
+	id "com.gradleup.shadow" version "8.3.4"
+}
+
+configurations {
+    shadowImpl
+    shadowModImpl
+}
+
+configurations.implementation.extendsFrom configurations.shadowImpl
+configurations.modImplementation.extendsFrom configurations.shadowModImpl
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
+
+repositories {
+
+	mavenCentral()
+
+	// Modrinth
+
+	maven { url = "https://api.modrinth.com/maven" }
+
+	// DevAuth
+
+	maven { url = "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1" }
+
+	// Hypixel Mod API
+	
+	maven { url = "https://repo.hypixel.net/repository/Hypixel/" }
+
+	// Vigilance
+
+	maven { url = "https://repo.essential.gg/repository/maven-public" }
+
+	// Add repositories to retrieve artifacts from in here.
+	// You should only use this when depending on other mods because
+	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
+	// for more information about repositories.
+}
+
+dependencies {
+	// To change the versions see the gradle.properties file
+	minecraft("com.mojang:minecraft:${project.minecraft_version}")
+	mappings("net.fabricmc:yarn:${project.yarn_mappings}:v2")
+	modImplementation("net.fabricmc:fabric-loader:${project.loader_version}")
+	modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
+
+	// Fabric Language Kotlin
+
+	modImplementation("net.fabricmc:fabric-language-kotlin:1.13.5+kotlin.2.2.10") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+	
+	// DevAuth
+	
+	modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+	
+	// HypixelModAPI
+
+	shadowModImpl("net.hypixel:mod-api:1.0.1")
+	include("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")
+
+	// Vigilance
+
+	shadowImpl("gg.essential:vigilance:312")
+	shadowModImpl("gg.essential:universalcraft-1.21.5-fabric:427") {
+        exclude(group: "net.fabricmc")
+    }
+
+	// Json Schema Validator
+	shadowImpl("com.networknt:json-schema-validator:1.5.8")
+}
+
+tasks.named('remapJar') {
+	// Removes any classifier suffix from the output JAR name (like -dev or -sources)
+    archiveClassifier = ""
+    dependsOn shadowJar
+	// Uses the shaded JAR as input instead of the regular JAR
+    inputFile = shadowJar.archiveFile
+	// Sets where the final remapped JAR gets saved
+    destinationDirectory = rootProject.layout.buildDirectory.dir("libs")
+}
+
+tasks.named('shadowJar') {
+    configurations = [project.configurations.shadowImpl, project.configurations.shadowModImpl]
+    exclude("META-INF/versions/**")
+	mergeServiceFiles()
+	relocate("gg.essential", "io.github.lilfroggy.deps.essential")
+	relocate("com.networknt", "io.github.lilfroggy.deps.networknt")
+}
+
+processResources {
+	inputs.property "version", project.version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": inputs.properties.version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 21
+}
+
+java {
+	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+	// if it is present.
+	// If you remove this line, sources will not be generated.
+	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
+jar {
+	archiveClassifier.set('nodeps')
+	inputs.property "archivesName", project.base.archivesName
+
+	from("LICENSE") {
+		rename { "${it}_${inputs.properties.archivesName}"}
+	}
+}
+assemble.dependsOn remapJar
+
+// configure the maven publication
+publishing {
+	publications {
+		create("mavenJava", MavenPublication) {
+			artifactId = project.archives_base_name
+			from components.java
+		}
+	}
+
+	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+	repositories {
+		// Add repositories to publish to here.
+		// Notice: This block does NOT have the same function as the block in the top level.
+		// The repositories here will be used for publishing your artifact, not for
+		// retrieving dependencies.
+	}
+}
+
+loom {
+	mixin {
+		defaultRefmapName = "mixin.bingohelper.refmap.json"
+	}
+}
