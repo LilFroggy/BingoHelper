@@ -98,6 +98,7 @@ public class RenderLib {
      */
     public static void renderLineFromCursor(WorldRenderContext context, Vec3d targetPoint,
                                             float[] colorComponents, float alpha, float lineWidth) {
+
         // Get camera position for coordinate system translation
         Vec3d cameraPos = context.camera().getPos();
 
@@ -174,6 +175,25 @@ public class RenderLib {
         VertexConsumer buffer = consumers.getBuffer(throughWalls ? BingoHelperRenderLayers.FILLED_THROUGH_WALLS : BingoHelperRenderLayers.FILLED);
 
         VertexRendering.drawFilledBox(matrices, buffer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
+
+        matrices.pop();
+    }
+
+    public static void highlightBlock(WorldRenderContext context, Vec3d pos, float[] colorComponents, float alpha, boolean throughWalls) {
+       highlightBlock(context, pos.getX(), pos.getY(), pos.getZ(), colorComponents, alpha, throughWalls);
+    }
+
+    public static void highlightBlock(WorldRenderContext context, double x, double y, double z, float[] colorComponents, float alpha, boolean throughWalls) {
+        MatrixStack matrices = context.matrixStack();
+        Vec3d camera = context.camera().getPos();
+
+        matrices.push();
+        matrices.translate(-camera.x, -camera.y, -camera.z);
+
+        VertexConsumerProvider consumers = context.consumers();
+        VertexConsumer buffer = consumers.getBuffer(throughWalls ? BingoHelperRenderLayers.FILLED_THROUGH_WALLS : BingoHelperRenderLayers.FILLED);
+
+        VertexRendering.drawFilledBox(matrices, buffer, x-0.01, y-0.01, z-0.01, x+1.02, y+1.02, z+1.02, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
 
         matrices.pop();
     }

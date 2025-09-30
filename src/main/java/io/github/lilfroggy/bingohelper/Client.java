@@ -2,6 +2,7 @@ package io.github.lilfroggy.bingohelper;
 
 import io.github.lilfroggy.bingohelper.command.CommandHandler;
 import io.github.lilfroggy.bingohelper.config.Config;
+import io.github.lilfroggy.bingohelper.features.PuzzlerSolver;
 import io.github.lilfroggy.bingohelper.guide.Guide;
 import io.github.lilfroggy.bingohelper.util.Bingo;
 import io.github.lilfroggy.bingohelper.util.KeyBindings;
@@ -15,6 +16,7 @@ public class Client implements ClientModInitializer {
 
         Config.init(); // Load config before anything uses it
 
+        PuzzlerSolver.init();
         Guide.init();
         Scoreboard.init();
         Bingo.init();

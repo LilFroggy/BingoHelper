@@ -13,8 +13,6 @@ import java.util.regex.Pattern;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public class Bingo {
-    
-    // Regex patterns for parsing messages
     private static final Pattern SKILL_UNLOCK_REGEX = Pattern.compile("^SKILL LEVEL UP (.+) I$");
     private static final Pattern SKILL_LEVEL_UP_REGEX = Pattern.compile("^SKILL LEVEL UP (.+) (.+)➜(.+)$");
     private static final Pattern CATACOMBS_LEVEL_UP_REGEX = Pattern.compile("^DUNGEON LEVEL UP The Catacombs (.+)➜(.+)$");
@@ -25,120 +23,11 @@ public class Bingo {
     private static final String BINGO_JOIN_MESSAGE = "Welcome to SkyBlock Bingo!";
     private static final String CATACOMBS_UNLOCK_MESSAGE = "DUNGEON LEVEL UP The Catacombs I";
     
-    // Skill and collection data
     private static final Map<String, Integer> skills = new HashMap<>();
     private static final Map<String, Integer> collections = new HashMap<>();
-    
-    static {
-        initializeDefaultData();
-        ChatEventBus.register(Bingo::onGameMessage);
-    }
 
     public static void init() {
-        // Load
-    }
-    
-    private static void initializeDefaultData() {
-        // Initialize skills
-        skills.put("combat", null);
-        skills.put("farming", null);
-        skills.put("fishing", null);
-        skills.put("mining", null);
-        skills.put("foraging", null);
-        skills.put("enchanting", null);
-        skills.put("alchemy", null);
-        skills.put("carpentry", null);
-        skills.put("runecrafting", null);
-        skills.put("taming", null);
-        skills.put("social", null);
-        skills.put("hunting", null);
-        skills.put("catacombs", null);
-        
-        // Initialize collections - Farming
-        collections.put("cactus", null);
-        collections.put("carrot", null);
-        collections.put("cocoa_beans", null);
-        collections.put("feather", null);
-        collections.put("leather", null);
-        collections.put("melon", null);
-        collections.put("mushroom", null);
-        collections.put("mutton", null);
-        collections.put("nether_wart", null);
-        collections.put("potato", null);
-        collections.put("pumpkin", null);
-        collections.put("raw_chicken", null);
-        collections.put("raw_porkchop", null);
-        collections.put("raw_rabbit", null);
-        collections.put("seeds", null);
-        collections.put("sugar_cane", null);
-        collections.put("wheat", null);
-        
-        // Initialize collections - Mining
-        collections.put("coal", null);
-        collections.put("cobblestone", null);
-        collections.put("diamond", null);
-        collections.put("emerald", null);
-        collections.put("end_stone", null);
-        collections.put("gemstone", null);
-        collections.put("glacite", null);
-        collections.put("glowstone_dust", null);
-        collections.put("gold_ingot", null);
-        collections.put("gravel", null);
-        collections.put("hard_stone", null);
-        collections.put("ice", null);
-        collections.put("iron_ingot", null);
-        collections.put("lapis_lazuli", null);
-        collections.put("mithril", null);
-        collections.put("mycelium", null);
-        collections.put("nether_quartz", null);
-        collections.put("netherrack", null);
-        collections.put("obsidian", null);
-        collections.put("red_sand", null);
-        collections.put("redstone", null);
-        collections.put("sand", null);
-        collections.put("sulphur", null);
-        collections.put("tungsten", null);
-        collections.put("umber", null);
-        
-        // Initialize collections - Combat
-        collections.put("blaze_rod", null);
-        collections.put("bone", null);
-        collections.put("chili_pepper", null);
-        collections.put("ender_pearl", null);
-        collections.put("ghast_tear", null);
-        collections.put("gunpowder", null);
-        collections.put("magma_cream", null);
-        collections.put("rotten_flesh", null);
-        collections.put("slimeball", null);
-        collections.put("spider_eye", null);
-        collections.put("string", null);
-        
-        // Initialize collections - Foraging
-        collections.put("oak_log", null);
-        collections.put("birch_log", null);
-        collections.put("spruce_log", null);
-        collections.put("dark_oak_log", null);
-        collections.put("acacia_log", null);
-        collections.put("jungle_log", null);
-        collections.put("fig_log", null);
-        collections.put("tender_wood", null);
-        collections.put("mangrove_log", null);
-        collections.put("vinesap", null);
-        collections.put("lushlilac", null);
-        collections.put("sea_lumies", null);
-        
-        // Initialize collections - Fishing
-        collections.put("clay", null);
-        collections.put("clownfish", null);
-        collections.put("ink_sac", null);
-        collections.put("lily_pad", null);
-        collections.put("magmafish", null);
-        collections.put("prismarine_crystals", null);
-        collections.put("prismarine_shard", null);
-        collections.put("pufferfish", null);
-        collections.put("raw_fish", null);
-        collections.put("raw_salmon", null);
-        collections.put("sponge", null);
+        ChatEventBus.register(Bingo::onGameMessage);
     }
     
     public static void onGameMessage(String formattedMsg, String unformattedMsg, CallbackInfo ci) {
@@ -208,7 +97,6 @@ public class Bingo {
             //ChatLib.chat("[BH DEBUG] Skill level up detected: " + originalSkill + " (key: " + skill + ") from " + previousLevel + " to " + skillLevel);
             skills.put(skill, skillLevel);
             
-            // Fire skill update event
             SkillUpdateEventBus.fire(skill, previousLevel, skillLevel);
         }
     }
@@ -227,20 +115,11 @@ public class Bingo {
     }
     
     private static void reset() {
-        // Reset skills
-        for (String skill : skills.keySet()) {
-            skills.put(skill, null);
-        }
-        
-        // Reset collections
-        for (String collection : collections.keySet()) {
-            collections.put(collection, null);
-        }
-        
-        System.out.println("Bingo data reset");
+        skills.clear();
+        collections.clear();
+        Logger.info("Bingo data reset", true);
     }
     
-    // Getter methods
     public static Map<String, Integer> getSkills() {
         return new HashMap<>(skills);
     }

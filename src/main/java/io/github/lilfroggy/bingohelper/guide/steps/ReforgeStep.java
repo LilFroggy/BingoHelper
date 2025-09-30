@@ -2,6 +2,7 @@ package io.github.lilfroggy.bingohelper.guide.steps;
 
 import io.github.lilfroggy.bingohelper.events.ScreenRenderEventBus;
 import io.github.lilfroggy.bingohelper.events.ClientTickEventBus;
+import io.github.lilfroggy.bingohelper.events.GuiCloseEventBus;
 import io.github.lilfroggy.bingohelper.events.MouseClickEventBus;
 import io.github.lilfroggy.bingohelper.guide.Guide;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
@@ -19,6 +20,7 @@ import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -28,7 +30,8 @@ import java.util.Map;
 public class ReforgeStep extends Step implements
         ScreenRenderEventBus.ScreenRenderListener,
         ClientTickEventBus.ClientTickListener,
-        MouseClickEventBus.MouseClickListener {
+        MouseClickEventBus.MouseClickListener,
+        GuiCloseEventBus.GuiCloseListener {
 
     public Map<String, ItemInfo> items;
 
@@ -54,13 +57,12 @@ public class ReforgeStep extends Step implements
         ClientTickEventBus.register(this);
         ScreenRenderEventBus.register(this);
         MouseClickEventBus.register(this);
+        GuiCloseEventBus.register(this);
     }
 
     @Override
     protected void onDeactivate() {
         ClientTickEventBus.unregister(this);
-        ScreenRenderEventBus.unregister(this);
-        MouseClickEventBus.unregister(this);
     }
 
     @Override
@@ -249,6 +251,15 @@ public class ReforgeStep extends Step implements
         if(!isValidReforge) return;
             
         ci.cancel();
+    }
+
+    @Override
+    public void onGuiClose(Screen screen) {
+        if (!(screen instanceof GenericContainerScreen)) return;
+        if (isActive) return;
+        ScreenRenderEventBus.unregister(this);
+        MouseClickEventBus.unregister(this);
+        GuiCloseEventBus.unregister(this);
     }
 
 }

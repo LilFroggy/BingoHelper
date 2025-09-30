@@ -49,6 +49,14 @@ public class Config extends Vigilant {
     public static String visitIsland = "BingoHelper";
 
     @Property(
+        type = PropertyType.SWITCH,
+        name = "Puzzler Solver",
+        description = "Shows solution to puzzler's quest.",
+        category = "Misc"
+    )
+    public static boolean puzzlerSolver = true;
+
+    @Property(
         type = PropertyType.NUMBER,
         name = "Saved Index",
         description = "§cSubmit a bug report if you see this!",
@@ -94,7 +102,7 @@ public class Config extends Vigilant {
             new SortingBehavior() {
                 @Override
                 public Comparator<Category> getCategoryComparator() {
-                    List<String> categories = Arrays.asList("General", "Dev");
+                    List<String> categories = Arrays.asList("General", "Misc", "Dev");
                     return (a, b) -> categories.indexOf(a.getName()) - categories.indexOf(b.getName());
                 }
             }

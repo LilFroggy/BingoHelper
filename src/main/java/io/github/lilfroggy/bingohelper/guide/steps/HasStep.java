@@ -28,8 +28,9 @@ public class HasStep extends Step implements
         for (Map.Entry<String, ItemInfo> entry : items.entrySet()) {
             int count = entry.getValue().count;
             int target = entry.getValue().target;
+            boolean done = entry.getValue().done;
 
-            if (count >= target) formatted = formatted.replace("%" + (++i) + "%", "&a(✔)");
+            if (done) formatted = formatted.replace("%" + (++i) + "%", "&a(✔)");
             else formatted = formatted.replace("%" + (++i) + "%", "(" + count + "/" + target + ")");
         }
 

@@ -63,7 +63,7 @@ dependencies {
 	
 	// HypixelModAPI
 
-	shadowModImpl("net.hypixel:mod-api:1.0.1")
+	modImplementation("net.hypixel:mod-api:1.0.1")
 	include("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")
 
 	// Vigilance
@@ -79,12 +79,9 @@ dependencies {
 }
 
 tasks.named('remapJar') {
-	// Removes any classifier suffix from the output JAR name (like -dev or -sources)
-    archiveClassifier = ""
+    archiveClassifier.set("")
     dependsOn shadowJar
-	// Uses the shaded JAR as input instead of the regular JAR
     inputFile = shadowJar.archiveFile
-	// Sets where the final remapped JAR gets saved
     destinationDirectory = rootProject.layout.buildDirectory.dir("libs")
 }
 
@@ -92,8 +89,20 @@ tasks.named('shadowJar') {
     configurations = [project.configurations.shadowImpl, project.configurations.shadowModImpl]
     exclude("META-INF/versions/**")
 	mergeServiceFiles()
-	relocate("gg.essential", "io.github.lilfroggy.deps.essential")
+
+	// Vigilance
+
+	relocate("gg.essential.vigilance", "io.github.lilfroggy.deps.vigilance")
+    relocate("gg.essential.elementa", "io.github.lilfroggy.deps.elementa")
+    relocate("gg.essential.universal", "io.github.lilfroggy.deps.universal")
+
+	// Networknt
+
 	relocate("com.networknt", "io.github.lilfroggy.deps.networknt")
+	relocate("com.ethlo", "io.github.lilfroggy.deps.ethlo")
+	relocate("com.fasterxml.jackson", "io.github.lilfroggy.deps.jackson")
+	relocate("org.slf4j", "io.github.lilfroggy.deps.slf4j")
+	relocate("org.yaml", "io.github.lilfroggy.deps.yaml")
 }
 
 processResources {
