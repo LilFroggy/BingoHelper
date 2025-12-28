@@ -195,6 +195,7 @@ public class ChatLib {
         if (text == null || text.isEmpty()) return 0.0;
         
         String clean = text.replace(",", "").toLowerCase().trim();
+        if (clean.isEmpty()) return 0.0;
         
         double multiplier = 1.0;
         char lastChar = clean.charAt(clean.length() - 1);

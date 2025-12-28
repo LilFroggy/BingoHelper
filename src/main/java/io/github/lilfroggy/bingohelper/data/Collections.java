@@ -41,7 +41,7 @@ public class Collections {
     private static void set(String collection, Object level) {
         String id = ChatLib.toSnakeCase(collection);
         Integer newLevel = ChatLib.decodeNumeral(level.toString());
-        Integer oldLevel = collections.get(collection);
+        Integer oldLevel = collections.get(id);
         collections.put(id, newLevel);
 
         if (Config.debug) ChatLib.chat("[BH DEBUG] Collection updated: " + id + " " + oldLevel + " -> " + newLevel);

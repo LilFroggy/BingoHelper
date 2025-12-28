@@ -3,7 +3,6 @@ package io.github.lilfroggy.bingohelper.guide.steps;
 import io.github.lilfroggy.bingohelper.data.Skills;
 import io.github.lilfroggy.bingohelper.events.SkillUpdateEventBus;
 import io.github.lilfroggy.bingohelper.guide.Guide;
-import io.github.lilfroggy.bingohelper.util.ChatLib;
 
 public class SkillStep extends Step implements SkillUpdateEventBus.SkillUpdateListener {
     public String skill;
