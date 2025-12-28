@@ -12,7 +12,7 @@ configurations {
 configurations.implementation.extendsFrom configurations.shadowImpl
 configurations.modImplementation.extendsFrom configurations.shadowModImpl
 
-version = project.mod_version
+version = "${project.mod_version}-mc${project.minecraft_version}"
 group = project.maven_group
 
 base {

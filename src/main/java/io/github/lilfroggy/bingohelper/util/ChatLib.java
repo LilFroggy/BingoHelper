@@ -120,10 +120,19 @@ public class ChatLib {
     }
 
     /**
-     * Converts a snake_case or single word string to Title Case with spaces.
+     * Converts Title Case to snake_case.
+     * E.g. "Green Thumb" -> "green_thumb", "Zooming" -> "zooming"
+     */
+    public static String toSnakeCase(String input) {
+        if (input == null || input.isEmpty()) return input;
+        return input.toLowerCase().replaceAll(" ", "_");
+    }
+
+    /**
+     * Converts a snake_case to Title Case.
      * E.g. "green_thumb" -> "Green Thumb", "zooming" -> "Zooming"
      */
-    public static String toTitleCaseWithSpaces(String input) {
+    public static String toTitleCase(String input) {
         if (input == null || input.isEmpty()) return input;
         String[] words = input.split("_");
         StringBuilder sb = new StringBuilder();
@@ -149,12 +158,9 @@ public class ChatLib {
     public static Integer decodeNumeral(String numeral) {
         if (numeral == null) return null;
         
-        // First try to parse as an integer
         try {
             return Integer.parseInt(numeral.trim());
-        } catch (NumberFormatException e) {
-            // If not an integer, try as roman numeral
-        }
+        } catch (NumberFormatException e) {}
         
         // Check if the string contains only valid roman numeral characters
         if (!numeral.matches("^[IVXLCDM]+$")) return null;
@@ -183,6 +189,32 @@ public class ChatLib {
         }
         
         return sum;
+    }
+
+    public static double parseKMB(String text) {
+        if (text == null || text.isEmpty()) return 0.0;
+        
+        String clean = text.replace(",", "").toLowerCase().trim();
+        
+        double multiplier = 1.0;
+        char lastChar = clean.charAt(clean.length() - 1);
+        
+        if (lastChar == 'k') {
+            multiplier = 1_000.0;
+            clean = clean.substring(0, clean.length() - 1);
+        } else if (lastChar == 'm') {
+            multiplier = 1_000_000.0;
+            clean = clean.substring(0, clean.length() - 1);
+        } else if (lastChar == 'b') {
+            multiplier = 1_000_000_000.0;
+            clean = clean.substring(0, clean.length() - 1);
+        }
+
+        try {
+            return Double.parseDouble(clean) * multiplier;
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
     }
 
     public static String removeFormatting(String string) {

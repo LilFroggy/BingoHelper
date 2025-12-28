@@ -86,7 +86,7 @@ public class ReforgeStep extends Step implements
             String itemReforge = Skyblock.getReforge(stack);
             if (itemReforge == null || itemReforge.isEmpty()) continue;
 
-            itemReforge = ChatLib.toTitleCaseWithSpaces(itemReforge);
+            itemReforge = ChatLib.toTitleCase(itemReforge);
 
             boolean hasReforge = info.reforges.contains(itemReforge);
             if (hasReforge) info.done = true;
@@ -125,7 +125,7 @@ public class ReforgeStep extends Step implements
         String itemReforge = Skyblock.getReforge(reforgeItem);
         if (itemReforge == null || reforgeItem.isEmpty()) highlightUnfinishedItems(drawContext);
 
-        itemReforge = ChatLib.toTitleCaseWithSpaces(itemReforge);
+        itemReforge = ChatLib.toTitleCase(itemReforge);
         if (itemReforge != null && !itemReforge.isEmpty()) renderReforgeDisplay(screen, drawContext, reforgeItem, itemReforge);
     }
 
@@ -246,7 +246,7 @@ public class ReforgeStep extends Step implements
         ItemInfo info = items.get(itemId);
         String reforge = Skyblock.getReforge(reforgeItem);
         if (reforge == null || reforge.isEmpty()) return;
-        String formattedReforge = ChatLib.toTitleCaseWithSpaces(reforge);
+        String formattedReforge = ChatLib.toTitleCase(reforge);
         boolean isValidReforge = info.reforges.contains(formattedReforge);
         if(!isValidReforge) return;
             

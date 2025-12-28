@@ -1,8 +1,8 @@
 package io.github.lilfroggy.bingohelper.guide.steps;
 
+import io.github.lilfroggy.bingohelper.data.Collections;
 import io.github.lilfroggy.bingohelper.events.CollectionUpdateEventBus;
 import io.github.lilfroggy.bingohelper.guide.Guide;
-import io.github.lilfroggy.bingohelper.util.Bingo;
 
 public class CollectionStep extends Step implements CollectionUpdateEventBus.CollectionUpdateListener {
     public String collection;
@@ -23,7 +23,7 @@ public class CollectionStep extends Step implements CollectionUpdateEventBus.Col
         CollectionUpdateEventBus.register(this);
 
         // Need initial check
-        Integer currentLevel = Bingo.getCollectionLevel(collection);
+        Integer currentLevel = Collections.getLevel(collection);
         if (currentLevel != null && currentLevel >= level) Guide.advance();
     }
 
@@ -34,7 +34,6 @@ public class CollectionStep extends Step implements CollectionUpdateEventBus.Col
 
     @Override
     public void onCollectionUpdate(String updatedCollection, Integer previousLevel, Integer newLevel) {
-        //ChatLib.chat(updatedCollection + "\n" + previousLevel + "\n" + newLevel);
         if (!collection.equals(updatedCollection)) return;
         if (newLevel < level) return;
         Guide.advance();

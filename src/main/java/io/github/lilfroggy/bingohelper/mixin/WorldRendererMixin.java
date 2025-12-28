@@ -17,7 +17,6 @@ public class WorldRendererMixin {
     private void onRenderEntity(Entity entity, double cameraX, double cameraY, double cameraZ,
                                 float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers,
                                 CallbackInfo ci) {
-        // Fire the event to all registered listeners
         EntityRenderEventBus.fire(entity, cameraX, cameraY, cameraZ, tickDelta, matrices, vertexConsumers);
     }
 }

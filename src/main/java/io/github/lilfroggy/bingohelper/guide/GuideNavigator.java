@@ -15,6 +15,7 @@ public class GuideNavigator {
     }
 
     public static void advance() {
+        Guide.currentStep.deactivate();
         if (Guide.completed) return;
         //if (Config.exitMenus && CLIENT.player != null) CLIENT.setScreen(null);
         long currentTime = System.currentTimeMillis();

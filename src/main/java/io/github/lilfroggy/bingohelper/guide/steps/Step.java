@@ -67,7 +67,7 @@ public abstract class Step implements
 
     public final void activate() {
         if (!Config.guide) return;
-        if (!Skyblock.isInBingo) return;
+        if (!Skyblock.inBingo()) return;
         if (isActive) return;
         isActive = true;
 

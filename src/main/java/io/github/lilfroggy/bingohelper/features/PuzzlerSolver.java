@@ -9,7 +9,7 @@ import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.AreaChangeEventBus;
 import io.github.lilfroggy.bingohelper.events.ChatEventBus;
 import io.github.lilfroggy.bingohelper.events.WorldRenderEventBus;
-import io.github.lilfroggy.bingohelper.util.Location;
+import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
@@ -33,7 +33,7 @@ public class PuzzlerSolver {
     public static void onGameMessage(String formattedMsg, String unformattedMsg, CallbackInfo ci) {
         if (!MinecraftClient.getInstance().isOnThread()) return;
         if (!Config.puzzlerSolver) return;
-        if (!"Dwarven Mines".equals(Location.AREA)) return;
+        if (!"Dwarven Mines".equals(Skyblock.area())) return;
 
         if (PUZZLER_END_PATTERN.matcher(unformattedMsg).matches()) {
             clearSolution();

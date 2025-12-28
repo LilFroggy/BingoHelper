@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class ScoreboardUpdateEventBus {
     public interface ScoreboardUpdateListener {
-        void onScoreboardUpdate(ArrayList<String> newLines);
+        void onScoreboardUpdate(ArrayList<String> lines);
     }
 
     private static final EventBus<ScoreboardUpdateListener> BUS = new EventBus<>();
@@ -17,9 +17,9 @@ public class ScoreboardUpdateEventBus {
         BUS.unregister(listener);
     }
 
-    public static void fire(ArrayList<String> newLines) {
+    public static void fire(ArrayList<String> lines) {
         for (ScoreboardUpdateListener listener : BUS.getListeners()) {
-            listener.onScoreboardUpdate(newLines);
+            listener.onScoreboardUpdate(lines);
         }
     }
 }

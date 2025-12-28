@@ -31,7 +31,7 @@ public class KeyBindings {
     }
     
     public static void onClientTick(int tick) {
-        if (!Skyblock.isInBingo) return;
+        if (!Skyblock.inBingo()) return;
         if (!Config.guide) return;
         if (Guide.completed) return;
         if (Guide.currentStep == null) return;

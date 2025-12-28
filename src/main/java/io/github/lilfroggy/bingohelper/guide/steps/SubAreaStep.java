@@ -2,7 +2,7 @@ package io.github.lilfroggy.bingohelper.guide.steps;
 
 import io.github.lilfroggy.bingohelper.events.SubAreaChangeEventBus;
 import io.github.lilfroggy.bingohelper.guide.Guide;
-import io.github.lilfroggy.bingohelper.util.Location;
+import io.github.lilfroggy.bingohelper.util.Skyblock;
 
 public class SubAreaStep extends Step implements SubAreaChangeEventBus.SubAreaChangeListener {
     public String subArea;
@@ -22,7 +22,7 @@ public class SubAreaStep extends Step implements SubAreaChangeEventBus.SubAreaCh
         SubAreaChangeEventBus.register(this);
 
         // Need initial check
-        if(subArea.equals(Location.SUB_AREA)) Guide.advance();
+        if(subArea.equals(Skyblock.subArea())) Guide.advance();
     }
 
     @Override

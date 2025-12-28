@@ -3,7 +3,7 @@ package io.github.lilfroggy.bingohelper.events;
 public class SkillUpdateEventBus {
 
     public interface SkillUpdateListener {
-        void onSkillUpdate(String skill, Integer previousLevel, Integer newLevel);
+        void onSkillUpdate(String skill, double previousLevel, double newLevel);
     }
 
     private static final EventBus<SkillUpdateListener> BUS = new EventBus<>();
@@ -16,7 +16,7 @@ public class SkillUpdateEventBus {
         BUS.unregister(listener);
     }
 
-    public static void fire(String skill, Integer previousLevel, Integer newLevel) {
+    public static void fire(String skill, double previousLevel, double newLevel) {
         for (SkillUpdateListener listener : BUS.getListeners()) {
             listener.onSkillUpdate(skill, previousLevel, newLevel);
         }

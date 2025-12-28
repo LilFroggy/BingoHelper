@@ -1,6 +1,6 @@
 package io.github.lilfroggy.bingohelper;
 
-import io.github.lilfroggy.bingohelper.util.Location;
+import io.github.lilfroggy.bingohelper.util.Skyblock;
 import net.fabricmc.api.ModInitializer;
 
 import net.hypixel.modapi.HypixelModAPI;
@@ -18,7 +18,7 @@ public class BingoHelper implements ModInitializer {
 
 		HypixelModAPI hypixelModAPI = HypixelModAPI.getInstance();
 		hypixelModAPI.subscribeToEventPacket(ClientboundLocationPacket.class);
-		hypixelModAPI.createHandler(ClientboundLocationPacket.class, Location::onLocationPacket);
+		hypixelModAPI.createHandler(ClientboundLocationPacket.class, Skyblock::onLocationPacket);
 	}
 
 }

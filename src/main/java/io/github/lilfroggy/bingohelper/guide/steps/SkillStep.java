@@ -1,12 +1,13 @@
 package io.github.lilfroggy.bingohelper.guide.steps;
 
+import io.github.lilfroggy.bingohelper.data.Skills;
 import io.github.lilfroggy.bingohelper.events.SkillUpdateEventBus;
 import io.github.lilfroggy.bingohelper.guide.Guide;
-import io.github.lilfroggy.bingohelper.util.Bingo;
+import io.github.lilfroggy.bingohelper.util.ChatLib;
 
 public class SkillStep extends Step implements SkillUpdateEventBus.SkillUpdateListener {
     public String skill;
-    public Integer level;
+    public double level;
 
     @Override
     public String additionalInstructionFormatting() {
@@ -23,8 +24,8 @@ public class SkillStep extends Step implements SkillUpdateEventBus.SkillUpdateLi
         SkillUpdateEventBus.register(this);
 
         // Need initial check
-        Integer currentLevel = Bingo.getSkillLevel(skill);
-        if (currentLevel != null && currentLevel >= level) Guide.advance();
+        double currentLevel = Skills.getLevel(skill);
+        if (currentLevel >= level) Guide.advance();
     }
 
     @Override
@@ -33,8 +34,7 @@ public class SkillStep extends Step implements SkillUpdateEventBus.SkillUpdateLi
     }
 
     @Override
-    public void onSkillUpdate(String updatedSkill, Integer previousLevel, Integer newLevel) {
-        //ChatLib.chat(updatedSkill + "\n" + previousLevel + "\n" + newLevel);
+    public void onSkillUpdate(String updatedSkill, double previousLevel, double newLevel) {
         if (!skill.equals(updatedSkill)) return;
         if (newLevel < level) return;
         Guide.advance();

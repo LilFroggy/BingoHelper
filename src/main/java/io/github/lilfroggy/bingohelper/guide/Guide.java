@@ -40,7 +40,7 @@ public class Guide {
     }
 
     private static void onHudRender(DrawContext drawContext, RenderTickCounter tickDelta) {
-        if (!Config.guide || !Skyblock.isInBingo || currentStep == null) return;
+        if (!Config.guide || !Skyblock.inBingo() || currentStep == null) return;
         RenderLib.drawFormattedString(drawContext, getDisplayText(), 10, 10);
     }
 
