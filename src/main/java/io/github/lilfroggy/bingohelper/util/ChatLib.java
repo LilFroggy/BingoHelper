@@ -162,10 +162,8 @@ public class ChatLib {
             return Integer.parseInt(numeral.trim());
         } catch (NumberFormatException e) {}
         
-        // Check if the string contains only valid roman numeral characters
         if (!numeral.matches("^[IVXLCDM]+$")) return null;
         
-        // Roman numeral values mapping
         int[] values = new int[128]; // ASCII table size for character indexing
         values['I'] = 1;
         values['V'] = 5;
@@ -220,5 +218,9 @@ public class ChatLib {
 
     public static String removeFormatting(String string) {
         return string.replaceAll("§[0-9a-fk-or]", "");
+    }
+
+    public static String replaceAmpersands(String string) {
+        return string.replaceAll("&([0-9a-fk-or])", "§$1");
     }
 }

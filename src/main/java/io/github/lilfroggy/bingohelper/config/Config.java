@@ -92,6 +92,30 @@ public class Config extends Vigilant {
     )
     public static boolean debug = false;
 
+    // CREDITS
+
+    @Property(
+        type = PropertyType.BUTTON,
+        name = "Vigilance",
+        description = "Available under the LGPL 3.0 License",
+        placeholder = "Source",
+        category = "Credits"
+    )
+    public static void vigilanceSource() {
+        openLink("https://github.com/EssentialGG/Vigilance");
+    }
+
+    @Property(
+        type = PropertyType.BUTTON,
+        name = "JSON Schema Validator",
+        description = "Available under the Apache License 2.0",
+        placeholder = "Source",
+        category = "Credits"
+    )
+    public static void jsonSchemaValidatorSource() {
+        openLink("https://github.com/networknt/json-schema-validator");
+    }
+
     public static final Config INSTANCE = new Config(); // Needs to be at the bottom or the default values take priority
 
     public Config() {
@@ -102,7 +126,7 @@ public class Config extends Vigilant {
             new SortingBehavior() {
                 @Override
                 public Comparator<Category> getCategoryComparator() {
-                    List<String> categories = Arrays.asList("General", "Misc", "Dev");
+                    List<String> categories = Arrays.asList("General", "Misc", "Dev", "Credits");
                     return (a, b) -> categories.indexOf(a.getName()) - categories.indexOf(b.getName());
                 }
             }
@@ -123,5 +147,9 @@ public class Config extends Vigilant {
 
     public static void init() {
         // Load config before anything checks them
+    }
+
+    private static void openLink(String url) {
+        net.minecraft.util.Util.getOperatingSystem().open(url);
     }
 }

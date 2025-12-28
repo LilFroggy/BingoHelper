@@ -1,6 +1,7 @@
 package io.github.lilfroggy.bingohelper.util.render;
 
 import io.github.lilfroggy.bingohelper.mixin.HandledScreenAccessorMixin;
+import io.github.lilfroggy.bingohelper.util.ChatLib;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -23,7 +24,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 
 public class RenderLib {
-
     private static final MinecraftClient mc = MinecraftClient.getInstance();
     private static final BufferAllocator ALLOCATOR = new BufferAllocator(1536);
 
@@ -308,7 +308,7 @@ public class RenderLib {
         int currentY = y;
 
         for (String line : input.split("\n")) {
-            drawContext.drawTextWithShadow(textRenderer, parseFormattedText(line), x, currentY, 0xFFFFFF);
+            drawContext.drawTextWithShadow(textRenderer, ChatLib.replaceAmpersands(line), x, currentY, 0xFFFFFF);
             currentY += lineHeight;
         }
     }
@@ -324,54 +324,9 @@ public class RenderLib {
         
         int maxWidth = 0;
         for (String line : input.split("\n")) {
-            int width = textRenderer.getWidth(parseFormattedText(line));
+            int width = textRenderer.getWidth(line);
             maxWidth = Math.max(maxWidth, width);
         }
         return maxWidth;
-    }
-
-    private static Text parseFormattedText(String input) {
-        MutableText result = Text.empty();
-        EnumSet<Formatting> activeFormats = EnumSet.of(Formatting.WHITE);
-        StringBuilder segment = new StringBuilder();
-
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
-
-            if (c == '&' && i + 1 < input.length()) {
-                // Flush segment with current formatting
-                if (segment.length() > 0) {
-                    result.append(Text.literal(segment.toString()).formatted(activeFormats.toArray(new Formatting[0])));
-                    segment.setLength(0);
-                }
-
-                char code = input.charAt(i + 1);
-                Formatting format = formatMap.get(code);
-
-                if (format != null) {
-                    if (format == Formatting.RESET) {
-                        activeFormats.clear();
-                        activeFormats.add(Formatting.WHITE);
-                    } else {
-                        // If it's a color, remove previous color first
-                        if (format.isColor()) {
-                            activeFormats.removeIf(Formatting::isColor);
-                        }
-                        activeFormats.add(format);
-                    }
-                    i++; // skip the formatting code
-                    continue;
-                }
-            }
-
-            segment.append(c);
-        }
-
-        // Final flush
-        if (segment.length() > 0) {
-            result.append(Text.literal(segment.toString()).formatted(activeFormats.toArray(new Formatting[0])));
-        }
-
-        return result;
     }
 }

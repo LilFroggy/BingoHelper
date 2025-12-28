@@ -17,6 +17,7 @@ import net.minecraft.client.render.RenderPhase.LineWidth;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TriState;
 
+// Shoutout Skyblocker
 public class BingoHelperRenderLayers {
     private static final Double2ObjectMap<MultiPhase> LINES_LAYERS = new Double2ObjectOpenHashMap<>();
     private static final Double2ObjectMap<MultiPhase> LINES_THROUGH_WALLS_LAYERS = new Double2ObjectOpenHashMap<>();
