@@ -3,7 +3,6 @@ package io.github.lilfroggy.bingohelper.util;
 import net.minecraft.client.MinecraftClient;
 
 public class ClipboardUtils {
-    
     public static String getClipboard() {
         return MinecraftClient.getInstance().keyboard.getClipboard();
     }

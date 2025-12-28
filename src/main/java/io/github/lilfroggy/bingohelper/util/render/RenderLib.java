@@ -11,16 +11,13 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.Map;
-import java.util.EnumSet;
 import java.util.HashMap;
 
 public class RenderLib {
