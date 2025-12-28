@@ -116,6 +116,17 @@ public class Config extends Vigilant {
         openLink("https://github.com/networknt/json-schema-validator");
     }
 
+    @Property(
+        type = PropertyType.BUTTON,
+        name = "Skyblocker",
+        description = "Available under the LGPL 3.0 License",
+        placeholder = "Source",
+        category = "Credits"
+    )
+    public static void skyblockerSource() {
+        openLink("https://github.com/SkyblockerMod/Skyblocker");
+    }
+
     public static final Config INSTANCE = new Config(); // Needs to be at the bottom or the default values take priority
 
     public Config() {
