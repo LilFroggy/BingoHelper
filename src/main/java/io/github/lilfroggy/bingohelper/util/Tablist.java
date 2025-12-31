@@ -10,6 +10,8 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.text.Text;
 
+// Shoutout Skyblocker
+
 public class Tablist {
     private static List<String> lines = new ArrayList<>();
 

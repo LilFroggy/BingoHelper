@@ -9,10 +9,8 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
 
 // Shoutout Skyblocker
+
 public class BingoHelperRenderPipelines {
-    /**
-     * RenderPipeline for lines through walls (no depth test)
-     */
     public static final RenderPipeline LINES_THROUGH_WALLS = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.RENDERTYPE_LINES_SNIPPET)
         .withLocation(Identifier.of("bingohelper", "pipeline/lines_through_walls"))
         .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
@@ -23,9 +21,6 @@ public class BingoHelperRenderPipelines {
         .withVertexFormat(VertexFormats.POSITION_COLOR, DrawMode.TRIANGLE_STRIP)
         .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
         .build());
-
-    /**
-     * Call this to ensure pipelines are pre-compiled instead of compiled on demand
-     */
+        
     public static void init() {}
 }

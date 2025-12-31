@@ -13,6 +13,8 @@ import net.minecraft.util.Formatting;
 import net.minecraft.scoreboard.Team;
 import java.util.Collections;
 
+// Shoutout Skyblocker
+
 public class Scoreboard {
 
     public static ArrayList<Text> TEXT_LINES = new ArrayList<>();

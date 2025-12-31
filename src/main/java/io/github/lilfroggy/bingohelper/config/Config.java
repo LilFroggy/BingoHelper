@@ -119,7 +119,7 @@ public class Config extends Vigilant {
     @Property(
         type = PropertyType.BUTTON,
         name = "Skyblocker",
-        description = "Available under the LGPL 3.0 License",
+        description = "Source for some rendering, scoreboard, and tablist logic, modified as needed.",
         placeholder = "Source",
         category = "Credits"
     )

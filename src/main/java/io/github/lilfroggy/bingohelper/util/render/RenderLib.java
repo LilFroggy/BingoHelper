@@ -41,6 +41,8 @@ public class RenderLib {
     public static final int MINECRAFT_YELLOW = 0xFFFFFF55;
     public static final int MINECRAFT_WHITE = 0xFFFFFFFF;
 
+    // Shoutout Skyblocker
+
     /**
      * Renders text in the world space.
      *
@@ -81,6 +83,8 @@ public class RenderLib {
         textRenderer.draw(text, xOffset, anchoredYOffset, 0xFFFFFFFF, true, positionMatrix, consumers, throughWalls ? TextRenderer.TextLayerType.SEE_THROUGH : TextRenderer.TextLayerType.NORMAL, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
         consumers.draw();
     }
+
+    // Shoutout Skyblocker
 
     /**
      * Renders a line from the camera position to a target point in the world.
