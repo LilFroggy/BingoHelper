@@ -3,6 +3,7 @@ package io.github.lilfroggy.bingohelper.data;
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.ChatEventBus;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
+import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.events.CollectionUpdateEventBus;
 import io.github.lilfroggy.bingohelper.events.CreateBingoProfileEventBus;
 import net.minecraft.client.MinecraftClient;
@@ -33,6 +34,7 @@ public class Collections {
     
     public static void onGameMessage(String formattedMsg, String unformattedMsg, CallbackInfo ci) {
         if (!MinecraftClient.getInstance().isOnThread()) return;
+        if (!Skyblock.inBingo()) return;
 
         String msg = unformattedMsg.trim();
 

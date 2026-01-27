@@ -6,6 +6,7 @@ import io.github.lilfroggy.bingohelper.events.ChatEventBus;
 import io.github.lilfroggy.bingohelper.events.CreateBingoProfileEventBus;
 import io.github.lilfroggy.bingohelper.events.SkillUpdateEventBus;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
+import io.github.lilfroggy.bingohelper.util.Skyblock;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.HashMap;
@@ -39,6 +40,8 @@ public class Skills {
     
     public static void onGameMessage(String formattedMsg, String unformattedMsg, CallbackInfo ci) {
         if (!MinecraftClient.getInstance().isOnThread()) return;
+        if (!Skyblock.inBingo()) return;
+
         String msg = unformattedMsg.trim();
         
         Matcher skillUnlock = SKILL_UNLOCK_REGEX.matcher(msg);
@@ -52,6 +55,8 @@ public class Skills {
     }
 
     public static void onActionBarMessage(String formattedMsg, String unformattedMsg, CallbackInfo ci) {
+        if (!Skyblock.inBingo()) return;
+        
         Matcher percentage = SKILL_PERCENTAGE_PROGRESS_REGEX.matcher(unformattedMsg);
         Matcher normal = SKILL_NORMAL_PROGRESS_REGEX.matcher(unformattedMsg);
     
