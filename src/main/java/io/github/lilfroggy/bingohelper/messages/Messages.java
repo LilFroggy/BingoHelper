@@ -1,6 +1,10 @@
 package io.github.lilfroggy.bingohelper.messages;
 
 public final class Messages {
+    /* == Mod Update */
+    public static final String MOD_UPDATE_AVAILABLE = "§eBingoHelper requires an update: %s. §b§lCLICK HERE §r§efor more info.";
+    public static final String UNSUPPORTED_MINECRAFT_VERSION = "§eYour Minecraft version is no longer supported. Update to %s to continue using BingoHelper. §b§lCLICK HERE §r§efor more info.";
+
     /* == Guide == */
     public static final String GUIDE_UPDATE_AVAILABLE = "§aNew guide available: %s v%s! Run §b/%s§r §ato import it!";
     public static final String GUIDE_IMPORT = "§aImported guide: %s v%s ➜ %s v%s";

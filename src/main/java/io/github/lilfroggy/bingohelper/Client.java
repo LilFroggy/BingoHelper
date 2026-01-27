@@ -6,6 +6,7 @@ import io.github.lilfroggy.bingohelper.data.Collections;
 import io.github.lilfroggy.bingohelper.data.Skills;
 import io.github.lilfroggy.bingohelper.features.PuzzlerSolver;
 import io.github.lilfroggy.bingohelper.guide.Guide;
+import io.github.lilfroggy.bingohelper.update.UpdateManager;
 import io.github.lilfroggy.bingohelper.util.KeyBindings;
 import io.github.lilfroggy.bingohelper.util.Scoreboard;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
@@ -16,9 +17,9 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 public class Client implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-
         Config.init(); // Load config before anything uses it
 
+        UpdateManager.init();
         PuzzlerSolver.init();
         Guide.init();
         Tablist.init();

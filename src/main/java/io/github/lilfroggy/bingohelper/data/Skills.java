@@ -3,6 +3,7 @@ package io.github.lilfroggy.bingohelper.data;
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.ActionBarEventBus;
 import io.github.lilfroggy.bingohelper.events.ChatEventBus;
+import io.github.lilfroggy.bingohelper.events.CreateBingoProfileEventBus;
 import io.github.lilfroggy.bingohelper.events.SkillUpdateEventBus;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
 import net.minecraft.client.MinecraftClient;
@@ -26,8 +27,14 @@ public class Skills {
     private static final Map<String, Double> skills = new HashMap<>();
 
     public static void init() {
+        CreateBingoProfileEventBus.register(Skills::onCreateBingoProfile);
         ChatEventBus.register(Skills::onGameMessage);
         ActionBarEventBus.register(Skills::onActionBarMessage);
+    }
+
+    public static void onCreateBingoProfile() {
+        reset();
+        if (Config.debug) ChatLib.chat("[BH DEBUG] Skills reset");
     }
     
     public static void onGameMessage(String formattedMsg, String unformattedMsg, CallbackInfo ci) {

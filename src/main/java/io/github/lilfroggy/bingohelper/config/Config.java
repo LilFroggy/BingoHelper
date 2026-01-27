@@ -1,19 +1,138 @@
 package io.github.lilfroggy.bingohelper.config;
 
+import gg.essential.universal.UScreen;
 import gg.essential.vigilance.Vigilant;
 import gg.essential.vigilance.data.Category;
 import gg.essential.vigilance.data.JVMAnnotationPropertyCollector;
 import gg.essential.vigilance.data.Property;
+import gg.essential.vigilance.data.PropertyData;
 import gg.essential.vigilance.data.PropertyType;
 import gg.essential.vigilance.data.SortingBehavior;
+import gg.essential.vigilance.gui.SettingsGui;
 import io.github.lilfroggy.bingohelper.guide.Guide;
+import io.github.lilfroggy.bingohelper.update.UpdateManager;
+import net.minecraft.client.MinecraftClient;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 public class Config extends Vigilant {
+    private static MinecraftClient mc = MinecraftClient.getInstance();
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "showCheckButton",
+        category = "About",
+        hidden = true
+    )
+    public static boolean showCheckButton = false;
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "showDownloadButton",
+        category = "About",
+        hidden = true
+    )
+    public static boolean showDownloadButton = false;
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "showRestartButton",
+        category = "About",
+        hidden = true
+    )
+    public static boolean showRestartButton = false;
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "showGitHubButton",
+        category = "About",
+        hidden = true
+    )
+    public static boolean showGitHubButton = false;
+
+    @Property(
+        type = PropertyType.BUTTON,
+        name = "Check for update",
+        category = "About",
+        placeholder = "§fCheck for update"
+    )
+    public static void checkForUpdate() {
+        UpdateManager.checkForUpdate();
+    }
+
+    @Property(
+        type = PropertyType.BUTTON,
+        name = "Download update",
+        category = "About",
+        placeholder = "§fClick to download"
+    )
+    public static void downloadUpdate() {
+        UpdateManager.downloadUpdate();
+    }
+
+    @Property(
+        type = PropertyType.BUTTON,
+        name = "Restart required",
+        category = "About",
+        placeholder = "§fClick to close Minecraft"
+    )
+    public static void quitGame() {
+        mc.scheduleStop();
+    }
+
+    @Property(
+        type = PropertyType.BUTTON,
+        name = "More info",
+        category = "About",
+        placeholder = "§fClick to open GitHub"
+    )
+    public static void openGitHub() {
+        openLink("https://github.com/LilFroggy/BingoHelper/releases/latest/");
+    }
+
+    // CREDITS
+
+    @Property(
+        type = PropertyType.BUTTON,
+        name = "§7Vigilance",
+        description = "Available under the LGPL 3.0 License",
+        placeholder = "Source",
+        category = "About",
+        subcategory = "Credits"
+    )
+    public static void vigilanceSource() {
+        openLink("https://github.com/EssentialGG/Vigilance");
+    }
+
+    @Property(
+        type = PropertyType.BUTTON,
+        name = "§7JSON Schema Validator",
+        description = "Available under the Apache License 2.0",
+        placeholder = "Source",
+        category = "About",
+        subcategory = "Credits"
+    )
+    public static void jsonSchemaValidatorSource() {
+        openLink("https://github.com/networknt/json-schema-validator");
+    }
+
+    @Property(
+        type = PropertyType.BUTTON,
+        name = "§7Skyblocker",
+        description = "Source for some rendering, scoreboard, and tablist logic, modified as needed.",
+        placeholder = "Source",
+        category = "About",
+        subcategory = "Credits"
+    )
+    public static void skyblockerSource() {
+        openLink("https://github.com/SkyblockerMod/Skyblocker");
+    }
+
+    // FEATURES
 
     @Property(
         type = PropertyType.SWITCH,
@@ -92,41 +211,6 @@ public class Config extends Vigilant {
     )
     public static boolean debug = false;
 
-    // CREDITS
-
-    @Property(
-        type = PropertyType.BUTTON,
-        name = "Vigilance",
-        description = "Available under the LGPL 3.0 License",
-        placeholder = "Source",
-        category = "Credits"
-    )
-    public static void vigilanceSource() {
-        openLink("https://github.com/EssentialGG/Vigilance");
-    }
-
-    @Property(
-        type = PropertyType.BUTTON,
-        name = "JSON Schema Validator",
-        description = "Available under the Apache License 2.0",
-        placeholder = "Source",
-        category = "Credits"
-    )
-    public static void jsonSchemaValidatorSource() {
-        openLink("https://github.com/networknt/json-schema-validator");
-    }
-
-    @Property(
-        type = PropertyType.BUTTON,
-        name = "Skyblocker",
-        description = "Source for some rendering, scoreboard, and tablist logic, modified as needed.",
-        placeholder = "Source",
-        category = "Credits"
-    )
-    public static void skyblockerSource() {
-        openLink("https://github.com/SkyblockerMod/Skyblocker");
-    }
-
     public static final Config INSTANCE = new Config(); // Needs to be at the bottom or the default values take priority
 
     public Config() {
@@ -137,18 +221,28 @@ public class Config extends Vigilant {
             new SortingBehavior() {
                 @Override
                 public Comparator<Category> getCategoryComparator() {
-                    List<String> categories = Arrays.asList("General", "Misc", "Dev", "Credits");
+                    List<String> categories = Arrays.asList("About", "General", "Misc", "Dev", "Credits");
                     return (a, b) -> categories.indexOf(a.getName()) - categories.indexOf(b.getName());
+                }
+                @Override
+                public Comparator<? super Map.Entry<String,? extends List<PropertyData>>> getSubcategoryComparator() {
+                    List<String> order = Arrays.asList("Updates", "Changelog", "Credits");
+                    return (a, b) -> order.indexOf(a.getKey()) - order.indexOf(b.getKey());
                 }
             }
         );
-
+        
         initialize();
 
         registerListener("guide", (state) -> {
             if ((boolean) state) Guide.currentStep.activate();
             else Guide.currentStep.deactivate();
         });
+
+        addDependency("checkForUpdate", "showCheckButton");
+        addDependency("downloadUpdate", "showDownloadButton");
+        addDependency("quitGame", "showRestartButton");
+        addDependency("openGitHub", "showGitHubButton");
     }
 
     public static void save() {
@@ -156,9 +250,15 @@ public class Config extends Vigilant {
         INSTANCE.writeData();
     }
 
-    public static void init() {
-        // Load config before anything checks them
+    public static void open() {
+        mc.send(() -> UScreen.displayScreen(Config.INSTANCE.gui()));
     }
+
+    public static void refreshUI() {
+        if (mc.currentScreen instanceof SettingsGui) open();
+    }
+
+    public static void init() {}
 
     private static void openLink(String url) {
         net.minecraft.util.Util.getOperatingSystem().open(url);

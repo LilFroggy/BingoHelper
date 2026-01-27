@@ -4,6 +4,7 @@ import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.ChatEventBus;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.events.CollectionUpdateEventBus;
+import io.github.lilfroggy.bingohelper.events.CreateBingoProfileEventBus;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.HashMap;
@@ -21,7 +22,13 @@ public class Collections {
     private static final Map<String, Integer> collections = new HashMap<>();
 
     public static void init() {
+        CreateBingoProfileEventBus.register(Collections::onCreateBingoProfile);
         ChatEventBus.register(Collections::onGameMessage);
+    }
+
+    public static void onCreateBingoProfile() {
+        reset();
+        if (Config.debug) ChatLib.chat("[BH DEBUG] Collections reset");
     }
     
     public static void onGameMessage(String formattedMsg, String unformattedMsg, CallbackInfo ci) {

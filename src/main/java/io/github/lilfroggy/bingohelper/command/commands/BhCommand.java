@@ -1,11 +1,9 @@
 package io.github.lilfroggy.bingohelper.command.commands;
 
-import gg.essential.universal.UScreen;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.client.MinecraftClient;
 import io.github.lilfroggy.bingohelper.command.ClientCommand;
 import io.github.lilfroggy.bingohelper.config.Config;
 
@@ -24,8 +22,7 @@ public class BhCommand implements ClientCommand {
     }
 
     private int executeNoArgs(CommandContext<FabricClientCommandSource> context) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        mc.send(() -> UScreen.displayScreen(Config.INSTANCE.gui()));
+        Config.open();
         return 1;
     }
 
