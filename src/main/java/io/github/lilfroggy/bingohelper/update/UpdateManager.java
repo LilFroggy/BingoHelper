@@ -74,7 +74,7 @@ public class UpdateManager {
                 JsonObject release = JsonParser.parseString(json).getAsJsonObject();
 
                 JsonArray assets = release.getAsJsonArray("assets");
-                if (!(assets.size() > 0)) return;
+                if (assets.isEmpty()) return;
                 JsonObject asset = assets.get(0).getAsJsonObject();
                 
                 String latestChangelog = release.get("body").getAsString();

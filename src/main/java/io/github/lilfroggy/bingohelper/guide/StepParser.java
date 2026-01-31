@@ -26,6 +26,7 @@ class StepParser {
                 .registerSubtype(ExperienceStep.class, "experience")
                 .registerSubtype(SkillStep.class, "skill")
                 .registerSubtype(CollectionStep.class, "collection")
+                .registerSubtype(UpgradeMinionStep.class, "upgradeMinion")
         )
     .create();
 

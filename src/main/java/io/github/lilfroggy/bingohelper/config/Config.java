@@ -211,6 +211,13 @@ public class Config extends Vigilant {
     )
     public static boolean debug = false;
 
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Validate Guides",
+        category = "Dev"
+    )
+    public static boolean validateGuides = true;
+
     public static final Config INSTANCE = new Config(); // Needs to be at the bottom or the default values take priority
 
     public Config() {
