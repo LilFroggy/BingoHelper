@@ -132,12 +132,14 @@ public class UpgradeMinionStep extends Step implements
     }
     
     private boolean isUpgradeScreen(Screen screen) {
+        if (desiredName == null) return false;
         return screen.getTitle().getString().equals(desiredName + " Recipe");
     }
 
     private boolean isMissingIngredients(DefaultedList<ItemStack> items) {
         if (items.size() <= SLOT_SUPERCRAFT) return false;
-        return Skyblock.getLore(items.get(SLOT_SUPERCRAFT)).contains("Missing ingredients!");
+        String lore = Skyblock.getLore(items.get(SLOT_SUPERCRAFT));
+        return lore != null && lore.contains("Missing ingredients!");
     }
 
     private boolean isNextPage(DefaultedList<ItemStack> items) {
@@ -147,7 +149,8 @@ public class UpgradeMinionStep extends Step implements
 
     private boolean isInventorySpace(DefaultedList<ItemStack> items) {
         if (items.size() <= SLOT_SUPERCRAFT) return false;
-        return !Skyblock.getLore(items.get(SLOT_SUPERCRAFT)).contains("No inventory space!");
+        String lore = Skyblock.getLore(items.get(SLOT_SUPERCRAFT));
+        return lore != null && !lore.contains("No inventory space!");
     }
 
     private OptionalInt findSlotByItemId(DefaultedList<ItemStack> items, String id) {
