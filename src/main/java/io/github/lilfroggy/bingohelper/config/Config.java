@@ -8,7 +8,6 @@ import gg.essential.vigilance.data.Property;
 import gg.essential.vigilance.data.PropertyData;
 import gg.essential.vigilance.data.PropertyType;
 import gg.essential.vigilance.data.SortingBehavior;
-import gg.essential.vigilance.gui.SettingsGui;
 import io.github.lilfroggy.bingohelper.guide.Guide;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Util;
@@ -207,13 +206,9 @@ public class Config extends Vigilant {
         CLIENT.send(() -> UScreen.displayScreen(Config.INSTANCE.gui()));
     }
 
-    public static void refreshUI() {
-        if (CLIENT.currentScreen instanceof SettingsGui) open();
-    }
-
-    public static void init() {}
-
     public static void openLink(String url) {
         Util.getOperatingSystem().open(url);
     }
+
+    public static void init() {}
 }
