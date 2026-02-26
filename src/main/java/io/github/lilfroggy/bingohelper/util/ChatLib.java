@@ -2,6 +2,8 @@ package io.github.lilfroggy.bingohelper.util;
 
 import java.net.URI;
 
+import org.jetbrains.annotations.Nullable;
+
 import io.github.lilfroggy.bingohelper.BingoHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.ClickEvent;
@@ -162,6 +164,7 @@ public class ChatLib {
      * Converts Title Case to snake_case.
      * E.g. "Green Thumb" -> "green_thumb", "Zooming" -> "zooming"
      */
+    @Nullable
     public static String toSnakeCase(String input) {
         if (input == null || input.isEmpty()) return input;
         return input.toLowerCase().replaceAll(" ", "_");
@@ -171,6 +174,7 @@ public class ChatLib {
      * Converts a snake_case to Title Case.
      * E.g. "green_thumb" -> "Green Thumb", "zooming" -> "Zooming"
      */
+    @Nullable
     public static String toTitleCase(String input) {
         if (input == null) return null;
         String[] words = input.split("_");

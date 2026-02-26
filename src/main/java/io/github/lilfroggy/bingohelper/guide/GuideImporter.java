@@ -27,7 +27,6 @@ public class GuideImporter {
         setGuideData(data);
         GuideNavigator.goToStep(Config.savedIndex);
         Logger.info(importMessage(old, data), true);
-        ChatLib.chat(importMessage(old, data));
     }
 
     public static void importFromClipboard() {

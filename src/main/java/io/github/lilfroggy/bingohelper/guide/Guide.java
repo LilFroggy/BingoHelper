@@ -14,7 +14,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
 
 public class Guide {
-    private static final Step EXAMPLE_STEP = StepParser.stepFromJson("{\"type\": \"message\",\"instruction\": \"&cRun &e/bhupdateguide &cto import guide\",\"criteria\": \"kdasndlqwdn\"}");
+    private static final Step EXAMPLE_STEP = StepParser.stepFromJson("{\"type\": \"message\",\"instruction\": \"&cRun &e/"+ GuideUpdater.UPDATE_COMMAND + " &cto import guide\",\"criteria\": \"kdasndlqwdn\"}");
     private static final GuideData EXAMPLE_GUIDE = new GuideData("Example", 1, 0, new Step[] {EXAMPLE_STEP}, "");
     private static final String COMPLETED_DISPLAY_FORMAT = "&b&l%s&r\n&aYou completed the guide!";
     private static final String ACTIVE_DISPLAY_FORMAT = "&b&l%s&r &7Step %s of %s\n%s";

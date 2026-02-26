@@ -16,6 +16,7 @@ import java.util.Collections;
 // Shoutout Skyblocker
 
 public class Scoreboard {
+    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 
     public static ArrayList<Text> TEXT_LINES = new ArrayList<>();
     public static ArrayList<String> STRING_LINES = new ArrayList<>();
@@ -34,10 +35,9 @@ public class Scoreboard {
     }
 
     public static void update() {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc.player == null || mc.world == null) return;
+        if (CLIENT.player == null || CLIENT.world == null) return;
 
-        net.minecraft.scoreboard.Scoreboard scoreboard = mc.world.getScoreboard();
+        net.minecraft.scoreboard.Scoreboard scoreboard = CLIENT.world.getScoreboard();
         ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
         TEXT_LINES.clear();
         STRING_LINES.clear();

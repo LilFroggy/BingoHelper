@@ -11,7 +11,7 @@ public class Version {
     public final String MC;
 
     public Version(String version) {
-        this.FULL = (version == null) ? "UNKNOWN" : version;
+        this.FULL = version != null ? version : "UNKNOWN";
         this.MOD = parseModVersion(this.FULL);
         this.MC = parseMcVersion(this.FULL);
     }

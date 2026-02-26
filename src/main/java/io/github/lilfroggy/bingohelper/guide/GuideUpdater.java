@@ -8,7 +8,7 @@ import io.github.lilfroggy.bingohelper.util.FileLib;
 
 public class GuideUpdater {
     private static final String GUIDE_URL = "https://raw.githubusercontent.com/LilFroggy/BingoHelper-REPO/master/guides/latest.json";
-    private static final String UPDATE_COMMAND = "bhupdateguide";
+    public static final String UPDATE_COMMAND = "bhupdateguide";
 
     public static void onJoinHypixel(boolean isAlpha) {
         check(Config.autoImport);

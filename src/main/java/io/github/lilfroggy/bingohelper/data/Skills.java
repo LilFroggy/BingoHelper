@@ -83,7 +83,7 @@ public class Skills {
         double oldLevel = skills.getOrDefault(id, 0.0);
         if (oldLevel == level) return;
         skills.put(id, level);
-        if (Config.debug) Logger.info(id + ": " + oldLevel + " -> " + level);
+        if (Config.debug) Logger.info("Skill updated: " + id + ": " + oldLevel + " -> " + level);
         SkillUpdateEventBus.fire(id, oldLevel, level);
     }
 
