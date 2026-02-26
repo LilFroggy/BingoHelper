@@ -12,7 +12,7 @@ import net.minecraft.util.Identifier;
 public class BingoHelper implements ModInitializer {
 	public static final String MOD_ID = "bingohelper";
 	public static final String PREFIX = "§b[BH]§r ";
-	public static final Version VERSION = new Version("0.4.0-mc1.21.5"); //new Version(FabricLoader.getInstance().getModContainer(MOD_ID).get().getMetadata().getVersion().getFriendlyString());
+	public static final Version VERSION = new Version(FabricLoader.getInstance().getModContainer(MOD_ID).get().getMetadata().getVersion().getFriendlyString());
 	 // new Version("0.4.0-mc1.21.5"); //
 
 	@Override
