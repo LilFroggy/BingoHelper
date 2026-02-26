@@ -30,13 +30,13 @@ public class BhSkipCommand implements ClientCommand {
     }
 
     private int skipOne(CommandContext<FabricClientCommandSource> context) {
-        ChatLib.chatWithPrefix(Guide.skip());
+        ChatLib.chat(Guide.skip());
         return 1;
     }
 
     private int skipAmount(CommandContext<FabricClientCommandSource> context) {
         int amount = IntegerArgumentType.getInteger(context, "amount");
-        ChatLib.chatWithPrefix(Guide.skip(amount));
+        ChatLib.chat(Guide.skip(amount));
         return 1;
     }
 }

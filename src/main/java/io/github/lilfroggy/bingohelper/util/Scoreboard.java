@@ -37,7 +37,7 @@ public class Scoreboard {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.player == null || mc.world == null) return;
 
-        net.minecraft.scoreboard.Scoreboard scoreboard = mc.player.getScoreboard();
+        net.minecraft.scoreboard.Scoreboard scoreboard = mc.world.getScoreboard();
         ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
         TEXT_LINES.clear();
         STRING_LINES.clear();

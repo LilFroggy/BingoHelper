@@ -6,9 +6,12 @@ import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.AreaChangeEventBus;
 import io.github.lilfroggy.bingohelper.events.ClientTickEventBus;
 import io.github.lilfroggy.bingohelper.events.JoinBingoEventBus;
+import io.github.lilfroggy.bingohelper.events.JoinHypixelEventBus;
 import io.github.lilfroggy.bingohelper.events.LeaveBingoEventBus;
 import io.github.lilfroggy.bingohelper.events.ScoreboardUpdateEventBus;
 import io.github.lilfroggy.bingohelper.events.SubAreaChangeEventBus;
+import net.hypixel.data.region.Environment;
+import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
@@ -37,6 +40,12 @@ public class Skyblock {
     public static void init() {
         ScoreboardUpdateEventBus.register(Skyblock::onScoreboardUpdate);
         ClientTickEventBus.register(Skyblock::onClientTick);
+    }
+
+    public static void onHelloPacket(ClientboundHelloPacket packet) {
+        if (Config.debug) Logger.info("packet received: " + packet.toString());
+        var isAlpha = packet.getEnvironment() != Environment.PRODUCTION;
+       JoinHypixelEventBus.fire(isAlpha);
     }
 
     public static void onLocationPacket(ClientboundLocationPacket packet) {
@@ -83,7 +92,7 @@ public class Skyblock {
         if (inBingo) JoinBingoEventBus.fire();
         else LeaveBingoEventBus.fire();
         
-        if (Config.debug) ChatLib.chat("In Bingo: " + (inBingo ? "§a" : "§c") + inBingo);
+        if (Config.debug) Logger.info("In Bingo: " + (inBingo ? "§a" : "§c") + inBingo);
     }
 
     private static boolean alwaysBingo() {
@@ -169,7 +178,7 @@ public class Skyblock {
 
         NbtCompound nbt = nbtComponent.copyNbt();
 
-        return nbt.getString("modifier").orElse(null);
+        return ChatLib.toTitleCase(nbt.getString("modifier").orElse(null));
     }
 
     /**

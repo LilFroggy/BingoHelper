@@ -3,15 +3,16 @@ package io.github.lilfroggy.bingohelper.guide.steps;
 import io.github.lilfroggy.bingohelper.events.WorldRenderEventBus;
 import io.github.lilfroggy.bingohelper.guide.Guide;
 import io.github.lilfroggy.bingohelper.config.Config;
-import io.github.lilfroggy.bingohelper.events.EntityRenderEventBus;
+import io.github.lilfroggy.bingohelper.events.EntityStateUpdateEventBus;
 import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
-import io.github.lilfroggy.bingohelper.util.render.Outline;
+import io.github.lilfroggy.bingohelper.util.render.GlowingEntities;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
 
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
@@ -20,15 +21,16 @@ import net.minecraft.util.math.Vec3d;
 import java.util.List;
 
 public abstract class Step implements
-        EntityRenderEventBus.EntityRenderListener,
+        EntityStateUpdateEventBus.EntityStateUpdateListener,
         WorldRenderEventBus.WorldRenderListener {
+    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final float[] WAYPOINT_COLOR = {0.0f, 1.0f, 1.0f};
 
     public abstract String additionalInstructionFormatting();
     protected abstract void onReset();
     protected abstract void onActivate();
     protected abstract void onDeactivate();
     public Boolean isActive = false;
-    public Boolean outlineEntityExists = false;
 
     public String type;
     public String instruction;
@@ -42,21 +44,49 @@ public abstract class Step implements
         public int index;
 
         public static class WaypointEntry {
+            // Provided
             public String text;
             public List<Double> position;
             public int radius;
+
+            // Internal
+            public transient Vec3d cachedPos;
+
+            public Vec3d getPos() {
+                if (cachedPos == null) cachedPos = new Vec3d(
+                    position.get(0),
+                    position.get(1),
+                    position.get(2)
+                );
+                return cachedPos;
+            }
         }
     }
 
     public static class OutlineEntity {
+        // Provided
         public String entityType;
         public List<Double> position;
+
+        // Internal
+        public transient Entity mcEntity;
+        public transient Vec3d cachedPos;
+        public transient boolean exists;
+
+        public Vec3d getPos() {
+            if (cachedPos == null) cachedPos = new Vec3d(
+                position.get(0),
+                position.get(1),
+                position.get(2)
+            );
+            return cachedPos;
+        }
     }
 
     public final String formattedInstruction() {
         String formatted = "" + additionalInstructionFormatting();
         return formatted.replaceAll("%visitIsland%", Config.visitIsland);
-    };
+    }
 
     public final void reset() {
         if (waypoint != null) waypoint.index = 0;
@@ -71,7 +101,7 @@ public abstract class Step implements
         if (isActive) return;
         isActive = true;
 
-        if (outlineEntity != null) EntityRenderEventBus.register(this);
+        if (outlineEntity != null) EntityStateUpdateEventBus.register(this);
         if (waypoint != null) WorldRenderEventBus.register(this);
 
         Guide.stepStartTime = System.currentTimeMillis();
@@ -85,10 +115,9 @@ public abstract class Step implements
         if (!isActive) return;
         isActive = false;
 
-        EntityRenderEventBus.unregister(this);
+        EntityStateUpdateEventBus.unregister(this);
         WorldRenderEventBus.unregister(this);
-
-        Outline.clearEntities();
+        GlowingEntities.clear();
 
         // Call subclass logic
         onDeactivate();
@@ -96,65 +125,62 @@ public abstract class Step implements
     }
 
     @Override
-    public void onEntityRender(Entity entity, double cameraX, double cameraY, double cameraZ,
-                               float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers) {
-        OutlineEntity e = outlineEntity;
-        if(e == null) return;
-        if(!entity.getType().getName().getString().equals(e.entityType)) return;
-        Vec3d pos = new Vec3d(e.position.get(0), e.position.get(1), e.position.get(2));
-        if(!entity.getPos().equals(pos)) return;
-        outlineEntityExists = true;
-        Outline.outlineEntity(entity, vertexConsumers, 0, 255, 255, 255);
+    public void onUpdateEntityState(Entity entity, EntityRenderState state) {
+        if (waypoint != null && waypoint.index != waypoint.list.size() - 1) return;
+        if (outlineEntity == null) return;
+
+        boolean typeMatches = entity.getType().getName().getString().equals(outlineEntity.entityType);
+        boolean posMatches = entity.getEntityPos().equals(outlineEntity.getPos());
+
+        if (!typeMatches || !posMatches) return;
+
+        outlineEntity.mcEntity = entity;
+        outlineEntity.exists = true;
+        GlowingEntities.add(entity, state, 0, 255, 255, 255);
     }
 
     @Override
     public void onWorldRender(MatrixStack matrices, VertexConsumerProvider vertexConsumers, WorldRenderContext context) {
-        if (waypoint == null || waypoint.list == null || waypoint.list.isEmpty() || waypoint.index >= waypoint.list.size()) return;
-        
-        // Get current waypoint
-        Waypoint.WaypointEntry currentWaypoint = waypoint.list.get(waypoint.index);
-        
-        // Get player position
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc.player == null) return;
-        
-        Vec3d playerPos = mc.player.getPos();
-        Vec3d waypointPos = new Vec3d(currentWaypoint.position.get(0) + 0.5, currentWaypoint.position.get(1) + 1.5, currentWaypoint.position.get(2) + 0.5);
-        Vec3d linePos = new Vec3d(currentWaypoint.position.get(0) + 0.5, currentWaypoint.position.get(1) + 0.5, currentWaypoint.position.get(2) + 0.5);
-        
-        // Calculate distance to waypoint
-        double distance = playerPos.distanceTo(waypointPos);
-        
-        // Check if player is within radius
-        if (distance <= currentWaypoint.radius) {
-            // Player is within radius, advance to next waypoint
-            if (waypoint.index < waypoint.list.size() - 1) {
-                waypoint.index++;
-            }
-        } else {
-            // Player is outside radius, draw line to waypoint
-            if (outlineEntity == null || waypoint.index < waypoint.list.size() - 1) {
-                double x = currentWaypoint.position.get(0);
-                double y = currentWaypoint.position.get(1);
-                double z = currentWaypoint.position.get(2);
-                float[] fillColor = {0.0f, 1.0f, 1.0f};
-                RenderLib.renderFilled(context, x, y, z, x + 1, y + 1, z + 1, fillColor, 0.5f, false);
-                RenderLib.renderOutline(context, x, y, z, x + 1, y + 1, z + 1, fillColor, 1.0f, 5.0f, true);
+        try {
+            if (waypoint == null) return;
+            
+            boolean onLastWaypoint = waypoint.index == waypoint.list.size() - 1;
+
+            if (onLastWaypoint && outlineEntity != null && outlineEntity.exists && outlineEntity.mcEntity != null) {
+                Vec3d entityMid = outlineEntity.mcEntity.getEntityPos().add(0, outlineEntity.mcEntity.getHeight() / 2, 0);
+                RenderLib.renderLineFromCursor(context, entityMid, WAYPOINT_COLOR, 1.0f, 3.0f);
+                return;
             }
 
-            float[] colorComponents = {0.0f, 1.0f, 1.0f};
-            float alpha = 1.0f;
-            float lineWidth = 2.0f;
-            
-            RenderLib.renderLineFromCursor(context, linePos, colorComponents, alpha, lineWidth);
-            
-            // Render waypoint text only when outside radius and text is not null/empty
-            if (!outlineEntityExists && currentWaypoint.text != null && !currentWaypoint.text.trim().isEmpty()) {
-                Text waypointText = Text.literal(currentWaypoint.text);
-                RenderLib.renderText(context, waypointText.asOrderedText(), waypointPos, 0.2f, 0.0f, true);
+            if (CLIENT.player == null) return;
+
+            Waypoint.WaypointEntry wp = waypoint.list.get(waypoint.index);
+            Vec3d wpPos = wp.getPos();
+            Vec3d targetCenter = wpPos.add(0.5, 1.5, 0.5);
+            double distance = CLIENT.player.getEntityPos().distanceTo(targetCenter);
+
+            if (distance <= wp.radius) {
+                if (waypoint.index < waypoint.list.size() - 1) {
+                    waypoint.index++;
+                }
+                return;
             }
+
+            if (outlineEntity == null || !onLastWaypoint) {
+                double x = wpPos.x, y = wpPos.y, z = wpPos.z;
+                RenderLib.renderFilled(context, x, y, z, x + 1, y + 1, z + 1, WAYPOINT_COLOR, 0.5f, false);
+                RenderLib.renderOutline(context, x, y, z, x + 1, y + 1, z + 1, WAYPOINT_COLOR, 1.0f, 5.0f, true);
+            }
+
+            RenderLib.renderLineFromCursor(context, wpPos.add(0.5, 0.5, 0.5), WAYPOINT_COLOR, 1.0f, 3.0f);
+
+            if (wp.text != null) {
+                RenderLib.renderText(Text.literal(wp.text).asOrderedText(), wpPos.add(0.5, 0.5, 0.5), 0.2f, 0.0f, true);
+            }
+        } catch (Exception e) {
+            Logger.error("Error rendering waypoint", e);
+        } finally {
+            if (outlineEntity != null) outlineEntity.exists = false;
         }
-        outlineEntityExists = false;
     }
-
 }

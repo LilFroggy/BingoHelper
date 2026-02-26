@@ -35,22 +35,22 @@ public class BhSkillsCommand implements ClientCommand {
         Map<String, Double> allSkills = Skills.getSkills();
 
         if (allSkills.isEmpty()) {
-            ChatLib.chatWithPrefix("§cNo skills tracked yet!");
+            ChatLib.chat("§cNo skills tracked yet!");
             return 1;
         }
 
-        ChatLib.chat("§6--- Tracked Skills ---");
+        ChatLib.chatNoPrefix("§6--- Tracked Skills ---");
         allSkills.forEach((id, level) -> {
-            ChatLib.chat("§e" + id + ": §f" + level);
+            ChatLib.chatNoPrefix("§e" + id + ": §f" + level);
         });
-        ChatLib.chat("§6----------------------");
+        ChatLib.chatNoPrefix("§6----------------------");
 
         return 1;
     }
 
     private int resetSkills(CommandContext<FabricClientCommandSource> context) {
         Skills.reset();
-        ChatLib.chatWithPrefix("§aAll skill data has been reset.");
+        ChatLib.chat("§aAll skill data has been reset.");
         return 1;
     }
 }

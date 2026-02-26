@@ -8,7 +8,6 @@ import io.github.lilfroggy.bingohelper.util.FileLib;
 import io.github.lilfroggy.bingohelper.util.Logger;
 
 public class GuideImporter {
-    private static final String SAVE_FILE_PATH = "config/bingohelper/guide.json";
 
     public static void importGuide(String guide) {
         GuideData data = GuideParser.toGuideData(guide);
@@ -16,23 +15,31 @@ public class GuideImporter {
         GuideInfo old = new GuideInfo(Guide.name, Guide.version);
         setGuideData(data);
         GuideNavigator.reset();
-        GuideSaver.save(data.raw());
-        ChatLib.chatWithPrefix(importMessage(old, data));
+        GuideSaver.saveActiveGuide(data.raw());
+        ChatLib.chat(importMessage(old, data));
     }
 
-    public static void importFromSaveFile() {
-        String saved = FileLib.read(SAVE_FILE_PATH);
+    public static void importFromSave() {
+        String saved = FileLib.read(GuideSaver.ACTIVE_SAVE_PATH);
         GuideData data = GuideParser.toGuideData(saved);
         if (data == null) return;
         GuideInfo old = new GuideInfo(Guide.name, Guide.version);
         setGuideData(data);
         GuideNavigator.goToStep(Config.savedIndex);
-        GuideSaver.save(data.raw());
         Logger.info(importMessage(old, data), true);
+        ChatLib.chat(importMessage(old, data));
     }
 
     public static void importFromClipboard() {
-        importGuide(ClipboardUtils.getClipboard());
+        String clipboard = ClipboardUtils.getClipboard();
+        if (!GuideValidator.isValidGuide(clipboard)) return;
+        importGuide(clipboard);
+        Config.latestGuideETag = ""; // Clear ETag so we still receive updates
+        Config.save();
+        if (!Config.autoImport) return;
+        Config.autoImport = false;
+        Config.save();
+        ChatLib.chat(Messages.GUIDE_AUTO_IMPORT_DISABLED);
     }
 
     private static void setGuideData(GuideData data) {

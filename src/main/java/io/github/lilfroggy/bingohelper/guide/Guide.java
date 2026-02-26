@@ -2,7 +2,7 @@ package io.github.lilfroggy.bingohelper.guide;
 
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.CreateBingoProfileEventBus;
-import io.github.lilfroggy.bingohelper.events.FirstJoinServerEventBus;
+import io.github.lilfroggy.bingohelper.events.JoinHypixelEventBus;
 import io.github.lilfroggy.bingohelper.events.HudRenderEventBus;
 import io.github.lilfroggy.bingohelper.events.JoinBingoEventBus;
 import io.github.lilfroggy.bingohelper.events.LeaveBingoEventBus;
@@ -14,7 +14,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
 
 public class Guide {
-    private static final Step EXAMPLE_STEP = StepParser.stepFromJson("{\"type\": \"message\",\"instruction\": \"&cRun &e/bhupdate &cto import guide\",\"criteria\": \"kdasndlqwdn\"}");
+    private static final Step EXAMPLE_STEP = StepParser.stepFromJson("{\"type\": \"message\",\"instruction\": \"&cRun &e/bhupdateguide &cto import guide\",\"criteria\": \"kdasndlqwdn\"}");
     private static final GuideData EXAMPLE_GUIDE = new GuideData("Example", 1, 0, new Step[] {EXAMPLE_STEP}, "");
     private static final String COMPLETED_DISPLAY_FORMAT = "&b&l%s&r\n&aYou completed the guide!";
     private static final String ACTIVE_DISPLAY_FORMAT = "&b&l%s&r &7Step %s of %s\n%s";
@@ -35,8 +35,8 @@ public class Guide {
     }
 
     public static void init() {
-        FirstJoinServerEventBus.register(GuideUpdater::onFirstJoinServer);
-        GuideImporter.importFromSaveFile();
+        JoinHypixelEventBus.register(GuideUpdater::onJoinHypixel);
+        GuideImporter.importFromSave();
     }
 
     private static void onHudRender(DrawContext drawContext, RenderTickCounter tickDelta) {
@@ -46,6 +46,7 @@ public class Guide {
 
     private static void onCreateBingoProfile() {
         if (Config.debug) Logger.info("Created bingo profile");
+        GuideUpdater.check(Config.autoImport);
         Guide.reset();
     }
 

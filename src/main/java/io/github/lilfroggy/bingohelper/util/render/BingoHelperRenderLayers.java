@@ -2,28 +2,21 @@ package io.github.lilfroggy.bingohelper.util.render;
 
 import java.util.OptionalDouble;
 import java.util.function.DoubleFunction;
-import java.util.function.Function;
 
 import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayer.MultiPhase;
 import net.minecraft.client.render.RenderLayer.MultiPhaseParameters;
 import net.minecraft.client.render.RenderPhase;
 import net.minecraft.client.render.RenderPhase.LineWidth;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.TriState;
 
 // Shoutout Skyblocker
 
 public class BingoHelperRenderLayers {
     private static final Double2ObjectMap<MultiPhase> LINES_LAYERS = new Double2ObjectOpenHashMap<>();
     private static final Double2ObjectMap<MultiPhase> LINES_THROUGH_WALLS_LAYERS = new Double2ObjectOpenHashMap<>();
-    private static final Object2ObjectMap<Identifier, MultiPhase> TEXTURE_LAYERS = new Object2ObjectOpenHashMap<>();
-    private static final Object2ObjectMap<Identifier, MultiPhase> TEXTURE_THROUGH_WALLS_LAYERS = new Object2ObjectOpenHashMap<>();
 
     public static final MultiPhase FILLED = RenderLayer.of("filled", RenderLayer.DEFAULT_BUFFER_SIZE, false, true, RenderPipelines.DEBUG_FILLED_BOX, MultiPhaseParameters.builder()
             .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
@@ -51,16 +44,6 @@ public class BingoHelperRenderLayers {
             .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
             .build(false));
 
-    private static final Function<Identifier, MultiPhase> TEXTURE = texture -> RenderLayer.of("texture", RenderLayer.DEFAULT_BUFFER_SIZE, false, true, RenderPipelines.GUI_TEXTURED, MultiPhaseParameters.builder()
-            .texture(new RenderPhase.Texture(texture, TriState.FALSE, false))
-            .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
-            .build(false));
-
-    private static final Function<Identifier, MultiPhase> TEXTURE_THROUGH_WALLS = texture -> RenderLayer.of("texture_through_walls", RenderLayer.DEFAULT_BUFFER_SIZE, false, true, BingoHelperRenderPipelines.LINES_THROUGH_WALLS, MultiPhaseParameters.builder()
-            .texture(new RenderPhase.Texture(texture, TriState.FALSE, false))
-            .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
-            .build(false));
-
     public static final MultiPhase CYLINDER = RenderLayer.of("cylinder", RenderLayer.DEFAULT_BUFFER_SIZE, false, true, BingoHelperRenderPipelines.LINES_THROUGH_WALLS, MultiPhaseParameters.builder()
             .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
             .build(false));
@@ -71,13 +54,5 @@ public class BingoHelperRenderLayers {
 
     public static MultiPhase getLinesThroughWalls(double lineWidth) {
         return LINES_THROUGH_WALLS_LAYERS.computeIfAbsent(lineWidth, LINES_THROUGH_WALLS);
-    }
-
-    public static MultiPhase getTexture(Identifier texture) {
-        return TEXTURE_LAYERS.computeIfAbsent(texture, TEXTURE);
-    }
-
-    public static MultiPhase getTextureThroughWalls(Identifier texture) {
-        return TEXTURE_THROUGH_WALLS_LAYERS.computeIfAbsent(texture, TEXTURE_THROUGH_WALLS);
     }
 }

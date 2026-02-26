@@ -7,26 +7,26 @@ import io.github.lilfroggy.bingohelper.guide.GuideUpdater;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 
-public class BhUpdateCommand implements ClientCommand {
+public class BhUpdateGuideCommand implements ClientCommand {
 
     @Override
     public void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
-        dispatcher.register(ClientCommandManager.literal("bhupdate")
+        dispatcher.register(ClientCommandManager.literal("bhupdateguide")
                 .executes(this::updateGuide));
     }
 
     @Override
     public String getName() {
-        return "bhupdate";
+        return "bhupdateguide";
     }
 
     @Override
     public String getDescription() {
-        return "Fetches latest repo guide";
+        return "Imports latest official guide";
     }
 
     private int updateGuide(CommandContext<FabricClientCommandSource> context) {
-        GuideUpdater.update();
+        GuideUpdater.check(true);
         return 1;
     }
 } 

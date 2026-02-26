@@ -30,13 +30,13 @@ public class BhBackCommand implements ClientCommand {
     }
 
     private int backOne(CommandContext<FabricClientCommandSource> context) {
-        ChatLib.chatWithPrefix(Guide.back());
+        ChatLib.chat(Guide.back());
         return 1;
     }
 
     private int backAmount(CommandContext<FabricClientCommandSource> context) {
         int amount = IntegerArgumentType.getInteger(context, "amount");
-        ChatLib.chatWithPrefix(Guide.back(amount));
+        ChatLib.chat(Guide.back(amount));
         return 1;
     }
 }

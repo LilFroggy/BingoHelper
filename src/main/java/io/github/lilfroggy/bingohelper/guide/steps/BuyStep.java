@@ -1,18 +1,15 @@
 package io.github.lilfroggy.bingohelper.guide.steps;
 
 import io.github.lilfroggy.bingohelper.events.ChatEventBus;
-import io.github.lilfroggy.bingohelper.events.ScreenRenderEventBus;
+import io.github.lilfroggy.bingohelper.events.SlotRenderEventBus;
 import io.github.lilfroggy.bingohelper.guide.Guide;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.PlayerScreenHandler;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.screen.slot.Slot;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -22,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public class BuyStep extends Step implements
         ChatEventBus.GameMessageListener,
-        ScreenRenderEventBus.ScreenRenderListener {
+        SlotRenderEventBus.SlotRenderListener {
 
     public Map<String, ItemInfo> items;
 
@@ -60,13 +57,13 @@ public class BuyStep extends Step implements
     @Override
     protected void onActivate() {
         ChatEventBus.register(this);
-        ScreenRenderEventBus.register(this);
+        SlotRenderEventBus.register(this);
     }
 
     @Override
     protected void onDeactivate() {
         ChatEventBus.unregister(this);
-        ScreenRenderEventBus.unregister(this);
+        SlotRenderEventBus.unregister(this);
     }
 
     private static final Pattern BUY_SINGLE_REGEX = Pattern.compile("^You bought (.+?) for (.+?) Coins!$");
@@ -88,58 +85,42 @@ public class BuyStep extends Step implements
             int count = Integer.parseInt(countStr);
             boughtName = name;
             boughtCount = count;
-            //ChatLib.chat("Bought: " + boughtName + " - " + boughtCount);
+            //Logger.info("Bought: " + boughtName + " - " + boughtCount);
             return;
         }
         if (singleMatcher.find()) {
             String name = singleMatcher.group(1);
             boughtName = name;
             boughtCount = 1;
-            //ChatLib.chat("Bought: " + boughtName + " - " + boughtCount);
+            //Logger.info("Bought: " + boughtName + " - " + boughtCount);
             return;
         }
     }
 
     @Override
-    public void onScreenRender(Screen screen, DrawContext drawContext, int mouseX, int mouseY, float tickDelta) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        PlayerEntity player = mc.player;
+    public void onSlotRender(DrawContext context, Slot slot) {
+        if (slot.inventory instanceof PlayerInventory) return;
+        ItemStack item = slot.getStack();
+        if (item.isEmpty()) return;
+        String id = Skyblock.getID(item);
+        if (id == null) return;
+        if (!items.containsKey(id)) return;
+        ItemInfo itemInfo = items.get(id);
 
-        if (player == null || player.currentScreenHandler == null) return;
-        ScreenHandler screenHandler = player.currentScreenHandler;
+        if (!itemInfo.done) RenderLib.highlightSlot(context, slot, RenderLib.MINECRAFT_GREEN);
 
-        // Check if it's a container (not the player's inventory)
-        if (screenHandler instanceof PlayerScreenHandler) return;
+        if (boughtName == null || boughtCount == null) return;
 
-        DefaultedList<ItemStack> containerItems = screenHandler.getStacks();
+        String itemName = item.getName().getString();
+        if (itemName == null) return;
+        itemName = itemName.replaceAll("x\\d+", "").trim();
+        if (!itemName.equals(boughtName)) return;
 
-        for (int i = 0; i < containerItems.size() - 36; i++) {
-            ItemStack item = containerItems.get(i);
-            if (item.isEmpty()) continue;
+        itemInfo.count += boughtCount;
+        if (itemInfo.count >= itemInfo.target) itemInfo.done = true;
 
-            String itemId = Skyblock.getID(item);
-
-            if (itemId == null) continue;
-
-            if (!items.containsKey(itemId)) continue;
-
-            ItemInfo itemInfo = items.get(itemId);
-            if (!itemInfo.done) RenderLib.highlightContainerSlot(drawContext, i, RenderLib.MINECRAFT_GREEN);
-
-            if (boughtName == null || boughtCount == null) continue;
-
-            String itemName = item.getName().getString();
-            if (itemName == null) continue;
-            itemName = itemName.replaceAll("x\\d+", "").trim();
-            if (!itemName.equals(boughtName)) continue;
-
-            itemInfo.count += boughtCount;
-            if (itemInfo.count >= itemInfo.target) itemInfo.done = true;
-
-            boughtName = null;
-            boughtCount = null;
-        }
-
+        boughtName = null;
+        boughtCount = null;
         if (items.values().stream().allMatch(info -> info.done)) Guide.advance();
     }
 }

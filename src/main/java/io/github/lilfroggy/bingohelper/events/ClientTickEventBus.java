@@ -3,7 +3,6 @@ package io.github.lilfroggy.bingohelper.events;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
 public class ClientTickEventBus {
-
     public static int currentTick = 0;
 
     public interface ClientTickListener {

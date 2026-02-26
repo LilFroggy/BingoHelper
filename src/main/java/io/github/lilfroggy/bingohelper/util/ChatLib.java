@@ -1,39 +1,80 @@
 package io.github.lilfroggy.bingohelper.util;
 
+import java.net.URI;
+
+import io.github.lilfroggy.bingohelper.BingoHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
 
 public class ChatLib {
-    public static void chatClickableWithPrefix(String message, String command, String hoverText) {
-        Text msg = Text.literal(Constants.PREFIX)
-            .formatted(Formatting.BLUE, Formatting.BOLD)
+    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+
+    // Command Overloads
+    public static void chatClickableCommand(String message, String command) {
+        chatClickableCommand(message, command, "/" + command, true);
+    }
+
+    public static void chatClickableCommand(String message, String command, boolean withPrefix) {
+        chatClickableCommand(message, command, "/" + command, withPrefix);
+    }
+
+    public static void chatClickableCommand(String message, String command, String hoverText) {
+        chatClickableCommand(message, command, hoverText, true);
+    }
+
+    public static void chatClickableCommand(String message, String command, String hoverText, boolean withPrefix) {
+        chatClickable(message, new ClickEvent.RunCommand(command), hoverText, withPrefix);
+    }
+
+    // URL Overloads
+    public static void chatClickableUrl(String message, String url) {
+        chatClickableUrl(message, url, url, true);
+    }
+
+    public static void chatClickableUrl(String message, String url, boolean withPrefix) {
+        chatClickableUrl(message, url, url, withPrefix);
+    }
+
+    public static void chatClickableUrl(String message, String url, String hoverText) {
+        chatClickableUrl(message, url, hoverText, true);
+    }
+
+    public static void chatClickableUrl(String message, String url, String hoverText, boolean withPrefix) {
+        chatClickable(message, new ClickEvent.OpenUrl(URI.create(url)), hoverText, withPrefix);
+    }
+
+    // Clickable Helper
+    private static void chatClickable(String message, ClickEvent clickEvent, String hoverText, boolean withPrefix) {
+        Text msg = Text.literal(message)
             .styled(style -> style
-                .withClickEvent(new ClickEvent.RunCommand(command))
+                .withClickEvent(clickEvent)
                 .withHoverEvent(new HoverEvent.ShowText(Text.literal(hoverText)))
-            )
-            .append(Text.literal(message).formatted(Formatting.WHITE));
-
-        ChatLib.chat(msg);
+            );
+        chat(msg, withPrefix);
     }
 
-    public static void chatWithPrefix(String msg) {
-        ChatLib.chat(Constants.PREFIX + msg);
+    // Main Chat Methods
+    public static void chatNoPrefix(String message) { chat(message, false); }
+    public static void chatNoPrefix(Text message) { chat(message, false); }
+    public static void chat(String message) { chat(message, true); }
+    public static void chat(Text message) { chat(message, true); }
+
+    public static void chat(String message, boolean withPrefix) {
+        chat(Text.literal(message), withPrefix);
     }
 
-    public static void chat(String msg) {
-        chat(Text.of(msg));
-    }
+    public static void chat(Text message, boolean withPrefix) {
+        if (CLIENT.inGameHud == null) return;
+        final Text FINAL = withPrefix ? Text.literal(BingoHelper.PREFIX).append(message) : message;
 
-    public static void chat(Text msg) {
         try {
-            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(msg);
+            CLIENT.send(() -> CLIENT.inGameHud.getChatHud().addMessage(FINAL));
         } catch (Exception e) {
             Logger.error("Error sending chat message", e, true);
         }
@@ -51,10 +92,8 @@ public class ChatLib {
         if (player == null) return;
         
         if (clientSide) {
-            // Execute as client-side command
-            client.getNetworkHandler().sendCommand(command);
+            chat("yell at frog for not implementing client command support");
         } else {
-            // Send to server
             player.networkHandler.sendChatMessage(command);
         }
     }
@@ -76,12 +115,12 @@ public class ChatLib {
         
         // Show main title
         if (title != null) {
-            client.getNetworkHandler().onTitle(new TitleS2CPacket(Text.of(title)));
+            client.getNetworkHandler().onTitle(new TitleS2CPacket(Text.literal(title)));
         }
         
         // Show subtitle
         if (subtitle != null) {
-            client.getNetworkHandler().onSubtitle(new SubtitleS2CPacket(Text.of(subtitle)));
+            client.getNetworkHandler().onSubtitle(new SubtitleS2CPacket(Text.literal(subtitle)));
         }
     }
 
@@ -133,7 +172,7 @@ public class ChatLib {
      * E.g. "green_thumb" -> "Green Thumb", "zooming" -> "Zooming"
      */
     public static String toTitleCase(String input) {
-        if (input == null || input.isEmpty()) return input;
+        if (input == null) return null;
         String[] words = input.split("_");
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < words.length; i++) {

@@ -1,7 +1,6 @@
 package io.github.lilfroggy.bingohelper.events;
 
 public class SkillUpdateEventBus {
-
     public interface SkillUpdateListener {
         void onSkillUpdate(String skill, double previousLevel, double newLevel);
     }

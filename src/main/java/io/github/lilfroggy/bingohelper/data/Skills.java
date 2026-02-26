@@ -6,6 +6,7 @@ import io.github.lilfroggy.bingohelper.events.ChatEventBus;
 import io.github.lilfroggy.bingohelper.events.CreateBingoProfileEventBus;
 import io.github.lilfroggy.bingohelper.events.SkillUpdateEventBus;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
+import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import net.minecraft.client.MinecraftClient;
 
@@ -35,7 +36,7 @@ public class Skills {
 
     public static void onCreateBingoProfile() {
         reset();
-        if (Config.debug) ChatLib.chat("[BH DEBUG] Skills reset");
+        if (Config.debug) Logger.info("Skills reset");
     }
     
     public static void onGameMessage(String formattedMsg, String unformattedMsg, CallbackInfo ci) {
@@ -82,7 +83,7 @@ public class Skills {
         double oldLevel = skills.getOrDefault(id, 0.0);
         if (oldLevel == level) return;
         skills.put(id, level);
-        if (Config.debug) ChatLib.chat("[BH DEBUG] " + id + ": " + oldLevel + " -> " + level);
+        if (Config.debug) Logger.info(id + ": " + oldLevel + " -> " + level);
         SkillUpdateEventBus.fire(id, oldLevel, level);
     }
 

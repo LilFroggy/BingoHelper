@@ -5,16 +5,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public class MouseClickEventBus {
-
     public interface MouseClickListener {
-        /**
-         * Called when a mouse click occurs on a slot in a HandledScreen
-         * @param slot The slot that was clicked
-         * @param slotId The ID of the slot
-         * @param button The mouse button that was clicked
-         * @param actionType The type of slot action
-         * @param ci The callback info for cancelling the click
-         */
         void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci);
     }
 

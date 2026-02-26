@@ -1,13 +1,14 @@
 package io.github.lilfroggy.bingohelper.messages;
 
 public final class Messages {
-    /* == Mod Update */
-    public static final String MOD_UPDATE_AVAILABLE = "§eBingoHelper requires an update: %s. §b§lCLICK HERE §r§efor more info.";
-    public static final String UNSUPPORTED_MINECRAFT_VERSION = "§eYour Minecraft version is no longer supported. Update to %s to continue using BingoHelper. §b§lCLICK HERE §r§efor more info.";
+    /* == Update */
+    public static final String UPDATE_AVAILABLE = "§cBingoHelper %s is no longer supported. Please update to BingoHelper %s. §b§lCLICK HERE §r§cto take action.";
+    public static final String MANUAL_UPDATE_REQUIRED = "§cBingoHelper no longer supports Minecraft %s. Please update to Minecraft %s. §b§lCLICK HERE §r§cfor more info.";
 
     /* == Guide == */
-    public static final String GUIDE_UPDATE_AVAILABLE = "§aNew guide available: %s v%s! Run §b/%s§r §ato import it!";
-    public static final String GUIDE_IMPORT = "§aImported guide: %s v%s ➜ %s v%s";
+    public static final String GUIDE_UPDATE_AVAILABLE = "§aNew guide available: %s v%s. §b§lCLICK HERE §r§ato import it!";
+    public static final String GUIDE_IMPORT = "§aImported guide: %s v%s ➜ %s v%s.";
+    public static final String GUIDE_AUTO_IMPORT_DISABLED = "§eDisabled auto importing guides.";
     public static final String GUIDE_ADVANCE = "§aCompleted §r%s§a in §f%s§a seconds!";
     public static final String GUIDE_RESET = "§aReset guide!";
     public static final String GUIDE_SKIP_NONE = "§6Already at end of guide!";

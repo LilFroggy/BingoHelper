@@ -10,8 +10,8 @@ import gg.essential.vigilance.data.PropertyType;
 import gg.essential.vigilance.data.SortingBehavior;
 import gg.essential.vigilance.gui.SettingsGui;
 import io.github.lilfroggy.bingohelper.guide.Guide;
-import io.github.lilfroggy.bingohelper.update.UpdateManager;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.Util;
 
 import java.io.File;
 import java.util.Arrays;
@@ -20,79 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Config extends Vigilant {
-    private static MinecraftClient mc = MinecraftClient.getInstance();
-
-    @Property(
-        type = PropertyType.SWITCH,
-        name = "showCheckButton",
-        category = "About",
-        hidden = true
-    )
-    public static boolean showCheckButton = false;
-
-    @Property(
-        type = PropertyType.SWITCH,
-        name = "showDownloadButton",
-        category = "About",
-        hidden = true
-    )
-    public static boolean showDownloadButton = false;
-
-    @Property(
-        type = PropertyType.SWITCH,
-        name = "showRestartButton",
-        category = "About",
-        hidden = true
-    )
-    public static boolean showRestartButton = false;
-
-    @Property(
-        type = PropertyType.SWITCH,
-        name = "showGitHubButton",
-        category = "About",
-        hidden = true
-    )
-    public static boolean showGitHubButton = false;
-
-    @Property(
-        type = PropertyType.BUTTON,
-        name = "Check for update",
-        category = "About",
-        placeholder = "§fCheck for update"
-    )
-    public static void checkForUpdate() {
-        UpdateManager.checkForUpdate();
-    }
-
-    @Property(
-        type = PropertyType.BUTTON,
-        name = "Download update",
-        category = "About",
-        placeholder = "§fClick to download"
-    )
-    public static void downloadUpdate() {
-        UpdateManager.downloadUpdate();
-    }
-
-    @Property(
-        type = PropertyType.BUTTON,
-        name = "Restart required",
-        category = "About",
-        placeholder = "§fClick to close Minecraft"
-    )
-    public static void quitGame() {
-        mc.scheduleStop();
-    }
-
-    @Property(
-        type = PropertyType.BUTTON,
-        name = "More info",
-        category = "About",
-        placeholder = "§fClick to open GitHub"
-    )
-    public static void openGitHub() {
-        openLink("https://github.com/LilFroggy/BingoHelper/releases/latest/");
-    }
+    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 
     // CREDITS
 
@@ -101,8 +29,7 @@ public class Config extends Vigilant {
         name = "§7Vigilance",
         description = "Available under the LGPL 3.0 License",
         placeholder = "Source",
-        category = "About",
-        subcategory = "Credits"
+        category = "Credits"
     )
     public static void vigilanceSource() {
         openLink("https://github.com/EssentialGG/Vigilance");
@@ -113,8 +40,7 @@ public class Config extends Vigilant {
         name = "§7JSON Schema Validator",
         description = "Available under the Apache License 2.0",
         placeholder = "Source",
-        category = "About",
-        subcategory = "Credits"
+        category = "Credits"
     )
     public static void jsonSchemaValidatorSource() {
         openLink("https://github.com/networknt/json-schema-validator");
@@ -123,10 +49,9 @@ public class Config extends Vigilant {
     @Property(
         type = PropertyType.BUTTON,
         name = "§7Skyblocker",
-        description = "Source for some rendering, scoreboard, and tablist logic, modified as needed.",
+        description = "Source for some rendering, scoreboard, and tablist logic, modified as needed",
         placeholder = "Source",
-        category = "About",
-        subcategory = "Credits"
+        category = "Credits"
     )
     public static void skyblockerSource() {
         openLink("https://github.com/SkyblockerMod/Skyblocker");
@@ -137,16 +62,16 @@ public class Config extends Vigilant {
     @Property(
         type = PropertyType.SWITCH,
         name = "Guide",
-        description = "Display a step-by-step guide for bingo.",
-        category = "General"
+        description = "Display bingo guide",
+        category = "Guide"
     )
     public static boolean guide = true;
 
     @Property(
         type = PropertyType.SWITCH,
         name = "Auto Import",
-        description = "Import latest official guide when joining Hypixel.",
-        category = "General"
+        description = "Automatically import official guides",
+        category = "Guide"
     )
     public static boolean autoImport = true;
 
@@ -154,15 +79,15 @@ public class Config extends Vigilant {
         type = PropertyType.SWITCH,
         name = "Exit Menus",
         description = "Close gui menus on step completion.",
-        category = "General"
+        category = "Guide"
     )
     public static boolean exitMenus = false;*/
 
     @Property(
         type = PropertyType.TEXT,
         name = "Visit Island",
-        description = "Player to visit for cakes and other buffs.",
-        category = "General",
+        description = "Player to visit for cakes and other buffs",
+        category = "Guide",
         placeholder = "Empty :("
     )
     public static String visitIsland = "BingoHelper";
@@ -170,21 +95,56 @@ public class Config extends Vigilant {
     @Property(
         type = PropertyType.SWITCH,
         name = "Puzzler Solver",
-        description = "Shows solution to puzzler's quest.",
-        category = "Misc"
+        description = "Show solution to puzzler's quest",
+        category = "Other"
     )
     public static boolean puzzlerSolver = true;
+
+    // PERSISTENT DATA
 
     @Property(
         type = PropertyType.NUMBER,
         name = "Saved Index",
-        description = "§cSubmit a bug report if you see this!",
         category = "Dev",
         min = 0,
         max = Integer.MAX_VALUE,
         hidden = true
     )
     public static int savedIndex = 0;
+
+    @Property(
+        type = PropertyType.TEXT,
+        name = "Latest Release ETag",
+        category = "Dev",
+        hidden = true
+    )
+    public static String latestReleaseETag = "";
+
+    @Property(
+        type = PropertyType.TEXT,
+        name = "Latest Guide ETag",
+        category = "Dev",
+        hidden = true
+    )
+    public static String latestGuideETag = "";
+
+    @Property(
+        type = PropertyType.TEXT,
+        name = "Update Info",
+        category = "Dev",
+        hidden = true
+    )
+    public static String updateInfo = "";
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Performed Last Minute Check",
+        category = "Dev",
+        hidden = true
+    )
+    public static boolean performedLastMinuteCheck = true;
+
+    // DEV STUFF
 
     @Property(
         type = PropertyType.SELECTOR,
@@ -194,15 +154,6 @@ public class Config extends Vigilant {
         options = {"On Bingo", "On Ironman", "Always"}
     )
     public static int gamemodeIndex = 0;
-
-    @Property(
-        type = PropertyType.TEXT,
-        name = "Guide URL",
-        description = "§cProceed with caution!",
-        category = "Dev",
-        placeholder = "Empty :("
-    )
-    public static String guideUrl = "https://raw.githubusercontent.com/LilFroggy/BingoHelper-REPO/master/guides/carries.json";
 
     @Property(
         type = PropertyType.SWITCH,
@@ -228,7 +179,7 @@ public class Config extends Vigilant {
             new SortingBehavior() {
                 @Override
                 public Comparator<Category> getCategoryComparator() {
-                    List<String> categories = Arrays.asList("About", "General", "Misc", "Dev", "Credits");
+                    List<String> categories = Arrays.asList("Guide", "Other", "Dev", "Credits");
                     return (a, b) -> categories.indexOf(a.getName()) - categories.indexOf(b.getName());
                 }
                 @Override
@@ -245,11 +196,6 @@ public class Config extends Vigilant {
             if ((boolean) state) Guide.currentStep.activate();
             else Guide.currentStep.deactivate();
         });
-
-        addDependency("checkForUpdate", "showCheckButton");
-        addDependency("downloadUpdate", "showDownloadButton");
-        addDependency("quitGame", "showRestartButton");
-        addDependency("openGitHub", "showGitHubButton");
     }
 
     public static void save() {
@@ -258,16 +204,16 @@ public class Config extends Vigilant {
     }
 
     public static void open() {
-        mc.send(() -> UScreen.displayScreen(Config.INSTANCE.gui()));
+        CLIENT.send(() -> UScreen.displayScreen(Config.INSTANCE.gui()));
     }
 
     public static void refreshUI() {
-        if (mc.currentScreen instanceof SettingsGui) open();
+        if (CLIENT.currentScreen instanceof SettingsGui) open();
     }
 
     public static void init() {}
 
-    private static void openLink(String url) {
-        net.minecraft.util.Util.getOperatingSystem().open(url);
+    public static void openLink(String url) {
+        Util.getOperatingSystem().open(url);
     }
 }

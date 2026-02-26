@@ -1,29 +1,19 @@
 package io.github.lilfroggy.bingohelper.events;
 
-import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.collection.DefaultedList;
 
 public class ScreenRenderEventBus {
-    private static final EventBus<ScreenRenderListener> BUS = new EventBus<>();
+    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 
-    static {
-        ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-            if (screen instanceof HandledScreen<?>) {
-                ScreenEvents.afterRender(screen).register((currentScreen, drawContext, mouseX, mouseY, tickDelta) -> {
-                    for (ScreenRenderListener listener : BUS.getListeners()) {
-                        try {
-                            listener.onScreenRender(currentScreen, drawContext, mouseX, mouseY, tickDelta);
-                        } catch (Exception e) {
-                            System.err.println("Error in screen render listener: " + e.getMessage());
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            }
-        });
+    public interface ScreenRenderListener {
+        void onScreenRender(DrawContext context, Screen screen, String title, DefaultedList<Slot> slots);
     }
+
+    private static final EventBus<ScreenRenderListener> BUS = new EventBus<>();
 
     public static void register(ScreenRenderListener listener) {
         BUS.register(listener);
@@ -33,16 +23,18 @@ public class ScreenRenderEventBus {
         BUS.unregister(listener);
     }
 
-    @FunctionalInterface
-    public interface ScreenRenderListener {
-        /**
-         * Called during screen rendering (after background, before tooltips)
-         * @param screen The current screen being rendered
-         * @param drawContext The drawing context for rendering
-         * @param mouseX Mouse X position
-         * @param mouseY Mouse Y position
-         * @param tickDelta Partial tick time (0.0 to 1.0)
-         */
-        void onScreenRender(Screen screen, DrawContext drawContext, int mouseX, int mouseY, float tickDelta);
+    public static void fire(DrawContext context) {
+        if (BUS.getListeners().isEmpty()) return;
+        
+        Screen screen = CLIENT.currentScreen;
+        if (screen == null || screen.getTitle() == null) return;
+        String title = screen.getTitle().getString();
+
+        if (CLIENT.player == null || CLIENT.player.currentScreenHandler == null) return;
+        var slots = CLIENT.player.currentScreenHandler.slots;
+
+        for (ScreenRenderListener listener : BUS.getListeners()) {
+            listener.onScreenRender(context, screen, title, slots);
+        }
     }
 }

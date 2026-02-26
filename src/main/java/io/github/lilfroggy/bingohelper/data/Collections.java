@@ -3,6 +3,7 @@ package io.github.lilfroggy.bingohelper.data;
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.ChatEventBus;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
+import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.events.CollectionUpdateEventBus;
 import io.github.lilfroggy.bingohelper.events.CreateBingoProfileEventBus;
@@ -29,7 +30,7 @@ public class Collections {
 
     public static void onCreateBingoProfile() {
         reset();
-        if (Config.debug) ChatLib.chat("[BH DEBUG] Collections reset");
+        if (Config.debug) Logger.info("Collections reset");
     }
     
     public static void onGameMessage(String formattedMsg, String unformattedMsg, CallbackInfo ci) {
@@ -53,7 +54,7 @@ public class Collections {
         Integer oldLevel = collections.get(id);
         collections.put(id, newLevel);
 
-        if (Config.debug) ChatLib.chat("[BH DEBUG] Collection updated: " + id + " " + oldLevel + " -> " + newLevel);
+        if (Config.debug) Logger.info("Collection updated: " + id + " " + oldLevel + " -> " + newLevel);
         
         CollectionUpdateEventBus.fire(id, oldLevel, newLevel);
     }

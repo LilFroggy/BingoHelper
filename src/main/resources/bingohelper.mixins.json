@@ -5,9 +5,11 @@
 	"mixins": [
 		"ChatInterceptorMixin",
 		"HandledScreenAccessorMixin",
-		"HandledScreenClickMixin",
-		"WorldRendererMixin",
-		"MinecraftClientMixin"
+		"HandledScreenMixin",
+		"EntityRendererMixin",
+		"EntityMixin",
+
+		"SettingsTitleBarMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

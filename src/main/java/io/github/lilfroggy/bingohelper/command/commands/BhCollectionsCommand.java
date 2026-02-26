@@ -35,22 +35,22 @@ public class BhCollectionsCommand implements ClientCommand {
         Map<String, Integer> allCollections = Collections.getCollections();
 
         if (allCollections.isEmpty()) {
-            ChatLib.chatWithPrefix("§cNo collections tracked yet!");
+            ChatLib.chat("§cNo collections tracked yet!");
             return 1;
         }
 
-        ChatLib.chat("§6--- Tracked Collections ---");
+        ChatLib.chatNoPrefix("§6--- Tracked Collections ---");
         allCollections.forEach((id, level) -> {
-            ChatLib.chat("§e" + id + ": §f" + level);
+            ChatLib.chatNoPrefix("§e" + id + ": §f" + level);
         });
-        ChatLib.chat("§6----------------------");
+        ChatLib.chatNoPrefix("§6----------------------");
 
         return 1;
     }
 
     private int resetCollections(CommandContext<FabricClientCommandSource> context) {
         Collections.reset();
-        ChatLib.chatWithPrefix("§aAll collection data has been reset.");
+        ChatLib.chat("§aAll collection data has been reset.");
         return 1;
     }
 }

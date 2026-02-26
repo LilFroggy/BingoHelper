@@ -23,7 +23,7 @@ public class Logger {
         if (consoleOnly) return;
         String error = e.toString().split("\n")[0];
         if (error.length() > MAX_ERROR_LENGTH) error = error.substring(0, MAX_ERROR_LENGTH) + "...";
-        ChatLib.chat(ERROR_PREFIX + "%s: %s".formatted(msg, error));
+        ChatLib.chatNoPrefix(ERROR_PREFIX + "%s: %s".formatted(msg, error));
     }
 
     /* === Warn === */
@@ -33,7 +33,7 @@ public class Logger {
 
     public static void warn(String msg, boolean consoleOnly) {
         LOGGER.warn(ChatLib.removeFormatting(msg));
-        if (!consoleOnly) ChatLib.chat(WARN_PREFIX + msg);
+        if (!consoleOnly) ChatLib.chatNoPrefix(WARN_PREFIX + msg);
     }
 
     /* === Info === */
@@ -43,6 +43,6 @@ public class Logger {
 
     public static void info(String msg, boolean consoleOnly) {
         LOGGER.info(ChatLib.removeFormatting(msg));
-        if (!consoleOnly) ChatLib.chat(INFO_PREFIX + msg);
+        if (!consoleOnly) ChatLib.chatNoPrefix(INFO_PREFIX + msg);
     }
 }

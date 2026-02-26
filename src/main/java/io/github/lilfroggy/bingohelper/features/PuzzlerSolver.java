@@ -6,15 +6,16 @@ import java.util.regex.Pattern;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import io.github.lilfroggy.bingohelper.config.Config;
-import io.github.lilfroggy.bingohelper.events.AreaChangeEventBus;
 import io.github.lilfroggy.bingohelper.events.ChatEventBus;
+import io.github.lilfroggy.bingohelper.events.WorldChangeEventBus;
 import io.github.lilfroggy.bingohelper.events.WorldRenderEventBus;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.Vec3d;
 
 public class PuzzlerSolver {
@@ -27,7 +28,7 @@ public class PuzzlerSolver {
 
     public static void init() {
         ChatEventBus.register(PuzzlerSolver::onGameMessage);
-        AreaChangeEventBus.register(PuzzlerSolver::onAreaChange);
+        WorldChangeEventBus.register(PuzzlerSolver::onWorldChange);
     }
 
     public static void onGameMessage(String formattedMsg, String unformattedMsg, CallbackInfo ci) {
@@ -56,7 +57,7 @@ public class PuzzlerSolver {
             else if (c == '▶') x--;
         }
         solution = new Vec3d(x, 195, z);
-        tracePos = new Vec3d(x+0.5, 196.01, z+0.5);
+        tracePos = new Vec3d(x + 0.5, 196.01, z + 0.5);
         WorldRenderEventBus.register(PuzzlerSolver::onWorldRender);
     }
 
@@ -72,7 +73,7 @@ public class PuzzlerSolver {
         RenderLib.renderLineFromCursor(context, tracePos, SOLUTION_COLOR, 1.0f, 2);
     }
 
-    public static void onAreaChange(String newArea, String oldArea) {
+    public static void onWorldChange(MinecraftClient client, ClientWorld world) {
         clearSolution();
     }
 }

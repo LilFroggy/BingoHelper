@@ -1,7 +1,6 @@
 package io.github.lilfroggy.bingohelper.events;
 
 public class CollectionUpdateEventBus {
-
     public interface CollectionUpdateListener {
         void onCollectionUpdate(String collection, Integer previousLevel, Integer newLevel);
     }

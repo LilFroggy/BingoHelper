@@ -3,7 +3,6 @@ package io.github.lilfroggy.bingohelper.events;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public class ChatEventBus {
-
     public interface GameMessageListener {
         void onGameMessage(String formattedMsg, String unformattedMsg, CallbackInfo ci);
     }

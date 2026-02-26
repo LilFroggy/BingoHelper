@@ -28,7 +28,7 @@ public class BhResetCommand implements ClientCommand {
 
     private int execute(CommandContext<FabricClientCommandSource> context) {
         Guide.reset();
-        ChatLib.chatWithPrefix("§aReset guide!");
+        ChatLib.chat("§aReset guide!");
         return 1;
     }
 }

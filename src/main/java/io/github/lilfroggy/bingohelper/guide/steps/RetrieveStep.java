@@ -1,21 +1,21 @@
 package io.github.lilfroggy.bingohelper.guide.steps;
 
 import io.github.lilfroggy.bingohelper.events.ClientTickEventBus;
-import io.github.lilfroggy.bingohelper.events.ScreenRenderEventBus;
+import io.github.lilfroggy.bingohelper.events.SlotRenderEventBus;
 import io.github.lilfroggy.bingohelper.guide.Guide;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.slot.Slot;
 
 import java.util.List;
 
 public class RetrieveStep extends Step implements
         ClientTickEventBus.ClientTickListener,
-        ScreenRenderEventBus.ScreenRenderListener {
+        SlotRenderEventBus.SlotRenderListener {
 
     public List<String> items;
 
@@ -32,13 +32,13 @@ public class RetrieveStep extends Step implements
     @Override
     protected void onActivate() {
         ClientTickEventBus.register(this);
-        ScreenRenderEventBus.register(this);
+        SlotRenderEventBus.register(this);
     }
 
     @Override
     protected void onDeactivate() {
         ClientTickEventBus.unregister(this);
-        ScreenRenderEventBus.unregister(this);
+        SlotRenderEventBus.unregister(this);
     }
 
     @Override
@@ -73,19 +73,12 @@ public class RetrieveStep extends Step implements
     }
 
     @Override
-    public void onScreenRender(Screen screen, DrawContext drawContext, int mouseX, int mouseY, float tickDelta) {
-        if (!(screen instanceof HandledScreen<?>)) return;
-        if (screen.getTitle() == null || screen.getTitle().getString() == null || screen.getTitle().getString().isEmpty()) return;
-        if (!screen.getTitle().getString().contains("Ender Chest")) return;
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc.player == null || mc.player.currentScreenHandler == null) return;
-
-        for (int i = 0; i < mc.player.currentScreenHandler.getStacks().size() - 36; i++) {
-            ItemStack item = mc.player.currentScreenHandler.getStacks().get(i);
-            if (item.isEmpty()) continue;
-            String itemId = Skyblock.getID(item);
-            if (itemId == null || !items.contains(itemId)) continue;
-            RenderLib.highlightContainerSlot(drawContext, i, RenderLib.MINECRAFT_AQUA);
-        }
+    public void onSlotRender(DrawContext context, Slot slot) {
+        if (slot.inventory instanceof PlayerInventory) return;
+        ItemStack item = slot.getStack();
+        if (item.isEmpty()) return;
+        String itemId = Skyblock.getID(item);
+        if (itemId == null || !items.contains(itemId)) return;
+        RenderLib.highlightSlot(context, slot, RenderLib.MINECRAFT_AQUA);
     }
 }

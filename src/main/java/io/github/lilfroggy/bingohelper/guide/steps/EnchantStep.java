@@ -5,15 +5,14 @@ import io.github.lilfroggy.bingohelper.events.ClientTickEventBus;
 import io.github.lilfroggy.bingohelper.guide.Guide;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
-import io.github.lilfroggy.bingohelper.mixin.HandledScreenAccessorMixin;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.PlayerScreenHandler;
-import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.collection.DefaultedList;
 
 import java.util.List;
@@ -23,6 +22,8 @@ import java.util.regex.Pattern;
 public class EnchantStep extends Step implements
         ScreenRenderEventBus.ScreenRenderListener,
         ClientTickEventBus.ClientTickListener {
+
+    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 
     public Map<String, ItemInfo> items;
 
@@ -57,14 +58,13 @@ public class EnchantStep extends Step implements
 
     @Override
     public void onClientTick(int tick) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc.player == null) return;
+        if (CLIENT.player == null) return;
 
         // Track if all items are done
         boolean allDone = true;
 
         // Check player inventory
-        for (ItemStack stack : mc.player.getInventory()) {
+        for (ItemStack stack : CLIENT.player.getInventory()) {
             if (stack == null || stack.isEmpty()) continue;
 
             String itemId = Skyblock.getID(stack);
@@ -81,8 +81,8 @@ public class EnchantStep extends Step implements
         }
 
         // Check container items (double chest)
-        if (mc.player.currentScreenHandler != null && !(mc.player.currentScreenHandler instanceof PlayerScreenHandler)) {
-            DefaultedList<ItemStack> containerItems = mc.player.currentScreenHandler.getStacks();
+        if (CLIENT.player.currentScreenHandler != null && !(CLIENT.player.currentScreenHandler instanceof PlayerScreenHandler)) {
+            DefaultedList<ItemStack> containerItems = CLIENT.player.currentScreenHandler.getStacks();
             // Only check container slots (exclude player inventory slots which are the last 36 slots)
             int containerSlots = containerItems.size() - 36;
             for (int i = 0; i < containerSlots; i++) {
@@ -113,35 +113,18 @@ public class EnchantStep extends Step implements
     }
 
     @Override
-    public void onScreenRender(Screen screen, DrawContext drawContext, int mouseX, int mouseY, float tickDelta) {
-        if (screen.getTitle() == null || screen.getTitle().getString().isEmpty()) return;
-        if (!screen.getTitle().getString().contains("Enchant Item")) return;
+    public void onScreenRender(DrawContext context, Screen screen, String title, DefaultedList<Slot> slots) {
+        if (!title.contains("Enchant Item")) return;
 
-        renderEnchantOverlay(screen, drawContext);
+        renderMissingEnchantList(screen, context);
+        
+        ItemStack enchantItem = slots.get(19).getStack();
 
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc.player == null || mc.player.currentScreenHandler == null) return;
-        ScreenHandler screenHandler = mc.player.currentScreenHandler;
-
-        // Check if it's a container (not the player's inventory)
-        if (screenHandler instanceof PlayerScreenHandler) return;
-
-        DefaultedList<ItemStack> containerItems = screenHandler.getStacks();
-        ItemStack enchantItem = containerItems.get(19);
-        if (enchantItem.isEmpty()) highlightUnfinishedItems(drawContext);
-        else highlightMissingEnchants(drawContext, enchantItem, containerItems, drawContext);
+        if (enchantItem.isEmpty()) highlightUnfinishedItems(context, slots);
+        else highlightMissingEnchants(context, enchantItem, slots);
     }
 
-    public void renderEnchantOverlay(Screen screen, DrawContext drawContext) {
-        // Check if we have a double chest open
-        if (!(screen instanceof HandledScreen<?>)) return;
-        HandledScreenAccessorMixin accessor = (HandledScreenAccessorMixin) screen;
-        
-        // Get double chest position and dimensions
-        int chestX = accessor.getScreenX();
-        int chestY = accessor.getScreenY();
-        
-        // Build status text first to calculate its width
+    public void renderMissingEnchantList(Screen screen, DrawContext drawContext) {
         StringBuilder statusText = new StringBuilder("&cMissing:\n\n");
         for (Map.Entry<String, ItemInfo> entry : items.entrySet()) {
             String itemName = entry.getKey();
@@ -158,32 +141,34 @@ public class EnchantStep extends Step implements
         int textWidth = RenderLib.getFormattedStringWidth(statusText.toString());
         
         // Position text to the left of the double chest with 10-pixel gap
-        int textX = chestX - textWidth - 10; // 10 pixels gap between text and chest
-        int textY = chestY + 10; // Align with top of chest with small offset
+        int x = -textWidth - 10; // 10 pixels gap between text and chest
+        int y = 10; // Align with top of chest with small offset
         
-        RenderLib.drawFormattedString(drawContext, statusText.toString(), textX, textY);
+        RenderLib.drawFormattedString(drawContext, statusText.toString(), x, y);
     }
 
-    public void highlightUnfinishedItems(DrawContext drawContext) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc.player == null) return;
-        for (int i = 0; i < mc.player.getInventory().getMainStacks().size(); i++) {
-            ItemStack item = mc.player.getInventory().getMainStacks().get(i);
+    public void highlightUnfinishedItems(DrawContext drawContext, DefaultedList<Slot> slots) {
+        for (int i = 0; i < slots.size(); i++) {
+            Slot slot = slots.get(i);
+            if (!(slot.inventory instanceof PlayerInventory)) continue;
+            ItemStack item = slot.getStack();
             if (item.isEmpty()) continue;
             String itemId = Skyblock.getID(item);
             if (itemId == null) continue;
             if (!items.containsKey(itemId)) continue;
             if (items.get(itemId).done) continue;
-            RenderLib.highlightPlayerSlot(drawContext, i, RenderLib.MINECRAFT_GOLD);
+            RenderLib.highlightSlot(drawContext, slot, RenderLib.MINECRAFT_GOLD);
         }
     }
 
-    public void highlightMissingEnchants(DrawContext drawContext, ItemStack enchantItem, DefaultedList<ItemStack> containerItems, DrawContext ctx) {
+    public void highlightMissingEnchants(DrawContext drawContext, ItemStack enchantItem, DefaultedList<Slot> slots) {
         String enchantItemId = Skyblock.getID(enchantItem);
         if (!items.containsKey(enchantItemId)) return;
         List<String> requiredEnchants = items.get(enchantItemId).enchants;
-        for (int i = 0; i < containerItems.size() - 36; i++) {
-            ItemStack item = containerItems.get(i);
+        for (int i = 0; i < slots.size(); i++) {
+            Slot slot = slots.get(i);
+            if (slot.inventory instanceof PlayerInventory) continue;
+            ItemStack item = slot.getStack();
             if (item.isEmpty()) continue;
             if (item.getCustomName() == null) continue;
             String itemName = item.getCustomName().getString();
@@ -191,7 +176,7 @@ public class EnchantStep extends Step implements
             String enchantItemLore = Skyblock.getLore(enchantItem);
             boolean required = requiredEnchants.stream().anyMatch(e -> !enchantItemLore.contains(e) && e.matches(Pattern.quote(itemName) + "\\b.*"));
             if (!required) continue;
-            RenderLib.highlightContainerSlot(drawContext, i, RenderLib.MINECRAFT_GREEN);
+            RenderLib.highlightSlot(drawContext, slot, RenderLib.MINECRAFT_GREEN);
         }
     }
 

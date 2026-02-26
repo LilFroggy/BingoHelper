@@ -1,7 +1,7 @@
 plugins {
 	id "fabric-loom" version "${loom_version}"
 	id "maven-publish"
-	id "com.gradleup.shadow" version "8.3.4"
+	id "com.gradleup.shadow" version "9.3.1"
 }
 
 configurations {
@@ -55,7 +55,7 @@ dependencies {
 
 	// Fabric Language Kotlin
 
-	modImplementation("net.fabricmc:fabric-language-kotlin:1.13.4+kotlin.2.2.0")
+	modImplementation("net.fabricmc:fabric-language-kotlin:1.13.7+kotlin.2.2.21")
 	
 	// DevAuth
 	
@@ -69,7 +69,7 @@ dependencies {
 	// Vigilance
 
 	shadowImpl("gg.essential:vigilance:312")
-	shadowModImpl("gg.essential:universalcraft-1.21.5-fabric:427") {
+	shadowModImpl("gg.essential:universalcraft-1.21.9-fabric:436") {
         exclude(group: "net.fabricmc")
 		exclude(group: "org.jetbrains.kotlin")
     }
@@ -156,7 +156,9 @@ publishing {
 }
 
 loom {
-	mixin {
-		defaultRefmapName = "mixin.bingohelper.refmap.json"
-	}
+	runs {
+        client {
+            vmArgs "-Ddevauth.enabled=true"
+        }
+    }
 }

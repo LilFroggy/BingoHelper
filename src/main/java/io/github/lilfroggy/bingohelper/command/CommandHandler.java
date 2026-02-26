@@ -18,7 +18,7 @@ public class CommandHandler {
         registerCommand(new BhBackCommand());
         registerCommand(new BhResetCommand());
         registerCommand(new BhWailaCommand());
-        registerCommand(new BhUpdateCommand());
+        registerCommand(new BhUpdateGuideCommand());
 
         registerCommand(new BhSkillsCommand());
         registerCommand(new BhCollectionsCommand());

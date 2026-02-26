@@ -24,7 +24,7 @@ public class GuideNavigator {
         String message = Messages.GUIDE_ADVANCE.formatted(Guide.currentStep.formattedInstruction().replaceAll("\n", " ").replaceAll("&", "§"), ChatLib.formatDuration(seconds));
         Scheduler.SCHEDULER.schedule(() -> {
             CLIENT.execute(() -> {
-                ChatLib.chatWithPrefix(message);
+                ChatLib.chat(message);
             });
         }, 250, TimeUnit.MILLISECONDS);
         skip();
@@ -68,7 +68,7 @@ public class GuideNavigator {
 
     private static void setCurrentStep(int index) {
         Guide.stepIndex = isIndexToolarge(index) ? lastStepIndex() : isIndexTooSmall(index) ? 0 : index;
-        GuideSaver.saveProgress();
+        GuideSaver.saveUserProgress();
         Guide.currentStep = Guide.steps[index];
         Guide.currentStep.reset();
         if (Guide.completed) return;

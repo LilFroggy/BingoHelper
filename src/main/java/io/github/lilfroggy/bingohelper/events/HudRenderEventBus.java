@@ -1,11 +1,11 @@
 package io.github.lilfroggy.bingohelper.events;
 
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import io.github.lilfroggy.bingohelper.BingoHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
 
 public class HudRenderEventBus {
-
     public interface HudRenderListener {
         void onHudRender(DrawContext drawContext, RenderTickCounter tickDelta);
     }
@@ -13,9 +13,9 @@ public class HudRenderEventBus {
     private static final EventBus<HudRenderListener> BUS = new EventBus<>();
 
     static {
-        HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
+        HudElementRegistry.addLast(BingoHelper.id("hud"), (context, tickCounter) -> {
             for (HudRenderListener listener : BUS.getListeners()) {
-                listener.onHudRender(drawContext, tickDelta);
+                listener.onHudRender(context, tickCounter);
             }
         });
     }

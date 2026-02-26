@@ -1,27 +1,30 @@
 package io.github.lilfroggy.bingohelper.util.render;
 
-import io.github.lilfroggy.bingohelper.mixin.HandledScreenAccessorMixin;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderLayer.MultiPhase;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexRendering;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.OrderedText;
-import net.minecraft.util.Formatting;
+import net.minecraft.util.Colors;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import java.util.Map;
-import java.util.HashMap;
-
 public class RenderLib {
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
+    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final Camera CAMERA = CLIENT.gameRenderer.getCamera();
     private static final BufferAllocator ALLOCATOR = new BufferAllocator(1536);
 
     public static final int MINECRAFT_BLACK = 0xFF000000;
@@ -46,18 +49,16 @@ public class RenderLib {
     /**
      * Renders text in the world space.
      *
-     * @param context The world render context
      * @param text The text to render as OrderedText
      * @param pos The position in world coordinates to render the text
      * @param scale The scale factor for the text size
      * @param yOffset The vertical offset from the position
      * @param throughWalls whether the text should be able to be seen through walls or not.
      */
-    public static void renderText(WorldRenderContext context, OrderedText text, Vec3d pos, float scale, float yOffset, boolean throughWalls) {
+    public static void renderText(OrderedText text, Vec3d pos, float scale, float yOffset, boolean throughWalls) {
         Matrix4f positionMatrix = new Matrix4f();
-        Camera camera = context.camera();
-        Vec3d cameraPos = camera.getPos();
-        TextRenderer textRenderer = mc.textRenderer;
+        Vec3d cameraPos = CAMERA.getPos();
+        TextRenderer textRenderer = CLIENT.textRenderer;
 
         // Calculate distance from camera to text position
         double distance = cameraPos.distanceTo(pos);
@@ -71,7 +72,7 @@ public class RenderLib {
         // Translate to the base position, then scale, then move up so the base is at y=0
         positionMatrix
             .translate((float) (pos.getX() - cameraPos.getX()), (float) (pos.getY() - cameraPos.getY()), (float) (pos.getZ() - cameraPos.getZ()))
-            .rotate(camera.getRotation())
+            .rotate(CAMERA.getRotation())
             .scale(consistentScale, -consistentScale, consistentScale)
             .translate(0, -textHeight, 0); // Anchor base
 
@@ -97,14 +98,12 @@ public class RenderLib {
      * @param alpha The transparency/alpha value [0.0-1.0] where 1.0 is fully opaque
      * @param lineWidth The thickness of the line in pixels
      */
-    public static void renderLineFromCursor(WorldRenderContext context, Vec3d targetPoint,
-                                            float[] colorComponents, float alpha, float lineWidth) {
-
+    public static void renderLineFromCursor(WorldRenderContext context, Vec3d targetPoint, float[] colorComponents, float alpha, float lineWidth) {
         // Get camera position for coordinate system translation
-        Vec3d cameraPos = context.camera().getPos();
+        Vec3d cameraPos = CAMERA.getPos();
 
         // Get matrix stack for transformations
-        MatrixStack matrices = context.matrixStack();
+        MatrixStack matrices = context.matrices();
         matrices.push();
 
         // Translate to world coordinates (subtract camera position)
@@ -112,15 +111,13 @@ public class RenderLib {
         MatrixStack.Entry matrixEntry = matrices.peek();
 
         // Get vertex consumer for drawing
-        VertexConsumerProvider.Immediate consumers = (VertexConsumerProvider.Immediate) context.consumers();
+        VertexConsumerProvider.Immediate consumers = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
 
-        // Use your custom render layer that allows lines through walls
-        // Note: You'll need to replace this with your actual render layer
-        RenderLayer lineLayer = RenderLayer.getLines(); // Replace with SkyblockerRenderLayers.getLinesThroughWalls(lineWidth)
+        MultiPhase lineLayer = BingoHelperRenderLayers.getLines(lineWidth);
         VertexConsumer vertexBuffer = consumers.getBuffer(lineLayer);
 
         // Calculate starting point slightly in front of camera based on camera rotation
-        Vec3d startPoint = cameraPos.add(Vec3d.fromPolar(context.camera().getPitch(), context.camera().getYaw()));
+        Vec3d startPoint = cameraPos.add(Vec3d.fromPolar(CAMERA.getPitch(), CAMERA.getYaw()));
 
         // Calculate normal vector for lighting (direction from start to end point)
         Vector3f normal = targetPoint.toVector3f()
@@ -148,8 +145,8 @@ public class RenderLib {
 
     public static void renderOutline(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha, float lineWidth, boolean throughWalls) {
         //if (FrustumUtils.isVisible(minX, minY, minZ, maxX, maxY, maxZ)) {
-            MatrixStack matrices = context.matrixStack();
-            Vec3d camera = context.camera().getPos();
+            MatrixStack matrices = context.matrices();
+            Vec3d camera = CAMERA.getPos();
 
             matrices.push();
             matrices.translate(-camera.getX(), -camera.getY(), -camera.getZ());
@@ -158,7 +155,7 @@ public class RenderLib {
             RenderLayer layer = throughWalls ? BingoHelperRenderLayers.getLinesThroughWalls(lineWidth) : BingoHelperRenderLayers.getLines(lineWidth);
             VertexConsumer buffer = consumers.getBuffer(layer);
 
-            VertexRendering.drawBox(matrices, buffer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
+            VertexRendering.drawBox(matrices.peek(), buffer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
             consumers.draw(layer);
 
             matrices.pop();
@@ -166,8 +163,8 @@ public class RenderLib {
     }
 
     public static void renderFilled(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha, boolean throughWalls) {
-        MatrixStack matrices = context.matrixStack();
-        Vec3d camera = context.camera().getPos();
+        MatrixStack matrices = context.matrices();
+        Vec3d camera = CAMERA.getPos();
 
         matrices.push();
         matrices.translate(-camera.x, -camera.y, -camera.z);
@@ -185,8 +182,8 @@ public class RenderLib {
     }
 
     public static void highlightBlock(WorldRenderContext context, double x, double y, double z, float[] colorComponents, float alpha, boolean throughWalls) {
-        MatrixStack matrices = context.matrixStack();
-        Vec3d camera = context.camera().getPos();
+        MatrixStack matrices = context.matrices();
+        Vec3d camera = CAMERA.getPos();
 
         matrices.push();
         matrices.translate(-camera.x, -camera.y, -camera.z);
@@ -199,117 +196,29 @@ public class RenderLib {
         matrices.pop();
     }
 
+    public static void highlightSlot(DrawContext context, Slot slot, int color) {
+        if (!(CLIENT.currentScreen instanceof GenericContainerScreen)) return;
 
-
-
-    /**
-     * Highlights a specific slot temporarily with a pulsing effect (alpha goes from 0.5 to 1.0 and back)
-     * @param drawContext The DrawContext from the render event
-     * @param slotIndex The slot to highlight
-     * @param color The highlight color in ARGB format (only RGB is used, alpha is ignored)
-     */
-    public static void highlightSlot(DrawContext drawContext, int slotIndex, int color) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (!(mc.currentScreen instanceof GenericContainerScreen screen)) return;
-
-        HandledScreenAccessorMixin accessor = (HandledScreenAccessorMixin) screen;
-
-        if (slotIndex >= screen.getScreenHandler().slots.size()) return;
-
-        Slot slot = screen.getScreenHandler().getSlot(slotIndex);
-        int x = accessor.getScreenX() + slot.x;
-        int y = accessor.getScreenY() + slot.y;
+        int x = slot.x;
+        int y = slot.y;
 
         // Calculate pulsing alpha (0.5 to 1.0)
         long time = System.currentTimeMillis();
         float alpha = 0.75f + 0.25f * (float)Math.cos(time * 0.004); // oscillates between 0.5 and 1.0
         int baseRGB = color & 0x00FFFFFF;
         int pulsingColor = ((int)(alpha * 255) << 24) | baseRGB;
-
-        drawContext.fill(x, y, x + 16, y + 16, pulsingColor);
-    }
-
-    /**
-     * Highlights a player inventory slot (0-35) in the current container GUI.
-     * @param drawContext The DrawContext from the render event
-     * @param playerInventoryIndex The index in the player's inventory (0-35)
-     * @param color The highlight color in ARGB format
-     */
-    public static void highlightPlayerSlot(DrawContext drawContext, int playerInventoryIndex, int color) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (!(mc.currentScreen instanceof GenericContainerScreen screen)) return;
-
-        int totalSlots = screen.getScreenHandler().slots.size();
-        int containerSlots = totalSlots - 36; // 36 = player inventory slots
-
-        // Convert player inventory index to screen slot index
-        int screenSlotIndex;
-        if (playerInventoryIndex < 9) {
-            // Hotbar slots
-            screenSlotIndex = containerSlots + 27 + playerInventoryIndex;
-        } else {
-            // Main inventory slots
-            screenSlotIndex = containerSlots + (playerInventoryIndex - 9);
-        }
-
-        highlightSlot(drawContext, screenSlotIndex, color);
-    }
-
-    /**
-     * Highlights a container slot (0-N) in the current container GUI.
-     * @param drawContext The DrawContext from the render event
-     * @param containerSlotIndex The index in the container (0-N)
-     * @param color The highlight color in ARGB format
-     */
-    public static void highlightContainerSlot(DrawContext drawContext, int containerSlotIndex, int color) {
-        highlightSlot(drawContext, containerSlotIndex, color);
-    }
-
-
-
-
-
-
-
-
-
-
-    private static final Map<Character, Formatting> formatMap = new HashMap<>();
-
-    static {
-        formatMap.put('0', Formatting.BLACK);
-        formatMap.put('1', Formatting.DARK_BLUE);
-        formatMap.put('2', Formatting.DARK_GREEN);
-        formatMap.put('3', Formatting.DARK_AQUA);
-        formatMap.put('4', Formatting.DARK_RED);
-        formatMap.put('5', Formatting.DARK_PURPLE);
-        formatMap.put('6', Formatting.GOLD);
-        formatMap.put('7', Formatting.GRAY);
-        formatMap.put('8', Formatting.DARK_GRAY);
-        formatMap.put('9', Formatting.BLUE);
-        formatMap.put('a', Formatting.GREEN);
-        formatMap.put('b', Formatting.AQUA);
-        formatMap.put('c', Formatting.RED);
-        formatMap.put('d', Formatting.LIGHT_PURPLE);
-        formatMap.put('e', Formatting.YELLOW);
-        formatMap.put('f', Formatting.WHITE);
-        formatMap.put('l', Formatting.BOLD);
-        formatMap.put('n', Formatting.UNDERLINE);
-        formatMap.put('o', Formatting.ITALIC);
-        formatMap.put('m', Formatting.STRIKETHROUGH);
-        formatMap.put('k', Formatting.OBFUSCATED);
-        formatMap.put('r', Formatting.RESET);
+        context.fill(x, y, x + 16, y + 16, pulsingColor);
     }
 
     public static void drawFormattedString(DrawContext drawContext, String input, int x, int y) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        TextRenderer textRenderer = mc.textRenderer;
+        input = ChatLib.replaceAmpersands(input);
+        TextRenderer textRenderer = CLIENT.textRenderer;
         
         int lineHeight = textRenderer.fontHeight + 2;
         int currentY = y;
 
         for (String line : input.split("\n")) {
-            drawContext.drawTextWithShadow(textRenderer, ChatLib.replaceAmpersands(line), x, currentY, 0xFFFFFF);
+            drawContext.drawTextWithShadow(textRenderer, line, x, currentY, Colors.WHITE);
             currentY += lineHeight;
         }
     }
@@ -320,8 +229,8 @@ public class RenderLib {
      * @return The width in pixels
      */
     public static int getFormattedStringWidth(String input) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        TextRenderer textRenderer = mc.textRenderer;
+        input = ChatLib.replaceAmpersands(input);
+        TextRenderer textRenderer = CLIENT.textRenderer;
         
         int maxWidth = 0;
         for (String line : input.split("\n")) {
