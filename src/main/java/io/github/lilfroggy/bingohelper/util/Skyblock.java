@@ -16,9 +16,11 @@ import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacke
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.component.type.NbtComponent;
+import net.minecraft.entity.player.PlayerInventory;
 
 public class Skyblock {
     private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
@@ -208,11 +210,14 @@ public class Skyblock {
      */
     public static int getItemCount(String id) {
         if (id == null) return 0;
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc.player == null) return 0;
         int count = 0;
 
-        for (ItemStack stack : mc.player.getInventory().getMainStacks()) {
+        if (CLIENT.player == null || CLIENT.player.currentScreenHandler == null) return 0;
+        var slots = CLIENT.player.currentScreenHandler.slots;
+
+        for (Slot slot : slots) {
+            if (!(slot.inventory instanceof PlayerInventory)) continue;
+            ItemStack stack = slot.getStack();
             if (stack == null || stack.isEmpty()) continue;
             String itemId = getID(stack);
             if (id.equals(itemId)) {
@@ -221,5 +226,4 @@ public class Skyblock {
         }
         return count;
     }
-
 }
