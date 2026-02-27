@@ -66,7 +66,7 @@ public class BuyStep extends Step implements
         SlotRenderEventBus.unregister(this);
     }
 
-    private static final Pattern BUY_SINGLE_REGEX = Pattern.compile("^You bought (.+?) for (.+?) Coins!$");
+    private static final Pattern BUY_SINGLE_REGEX = Pattern.compile("^You bought (.+?)!$");
     private static final Pattern BUY_MULTIPLE_REGEX = Pattern.compile("^You bought (.+?) x(.+?) for (.+?) Coins!$");
 
     private String boughtName = null;

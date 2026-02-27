@@ -78,7 +78,7 @@ public class BhWailaCommand implements ClientCommand {
             targetLabel = entity.getDisplayName().getString();
         } else if (hitResult instanceof BlockHitResult blockHit && !includeOutline) {
             BlockPos pos = blockHit.getBlockPos();
-            x = pos.getX(); y = pos.getY(); z = pos.getZ();
+            x = pos.getX(); y = pos.getY() + 1; z = pos.getZ();
             targetLabel = CLIENT.world.getBlockState(pos).getBlock().getName().getString();
         } else {
             ChatLib.chat("§cYou must be looking at an entity for outlines!");
