@@ -1,5 +1,7 @@
 package io.github.lilfroggy.bingohelper.command.commands;
 
+import java.util.Locale;
+
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import io.github.lilfroggy.bingohelper.command.ClientCommand;
@@ -87,7 +89,7 @@ public class BhWailaCommand implements ClientCommand {
         if (includeWaypoint) {
             if (includeOutline) {
                 dataFormat = "outline waypoint";
-                json.append(String.format(
+                json.append(String.format(Locale.ROOT,
                     "\"waypoint\": {\n" +
                     "    \"type\": \"list\",\n" +
                     "    \"beam\": true,\n" +
@@ -108,7 +110,7 @@ public class BhWailaCommand implements ClientCommand {
                 json.append(",\n");
             } else {
                 dataFormat = "waypoint";
-                json.append(String.format(
+                json.append(String.format(Locale.ROOT,
                     "{\n" +
                     "    \"text\": \"\",\n" +
                     "    \"position\": [\n" +
@@ -123,7 +125,7 @@ public class BhWailaCommand implements ClientCommand {
     
         if (includeOutline) {
             if (!includeWaypoint) dataFormat = "outline";
-            json.append(String.format(
+            json.append(String.format(Locale.ROOT,
                 "\"outlineEntity\": {\n" +
                 "    \"entityType\": \"%s\",\n" +
                 "    \"position\": [\n" +
