@@ -1,12 +1,13 @@
 package io.github.lilfroggy.bingohelper.command.commands;
 
-import java.util.Locale;
-
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import io.github.lilfroggy.bingohelper.command.ClientCommand;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.ClipboardUtils;
+import io.github.lilfroggy.bingohelper.util.JsonUtils;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
@@ -70,7 +71,7 @@ public class BhWailaCommand implements ClientCommand {
     
         if (hitResult instanceof EntityHitResult entityHit) {
             Entity entity = entityHit.getEntity();
-            Vec3d pos = entity.getEntityPos(); 
+            Vec3d pos = entity.getEntityPos();
             x = pos.x; y = pos.y; z = pos.z;
             entityType = entity.getType().getName().getString();
             hitType = " entity";
@@ -83,60 +84,55 @@ public class BhWailaCommand implements ClientCommand {
             ChatLib.chat("§cYou must be looking at an entity for outlines!");
             return 0;
         }
-    
-        StringBuilder json = new StringBuilder();
-    
+
+        JsonObject root = new JsonObject();
+
         if (includeWaypoint) {
+            JsonObject waypoint = new JsonObject();
+            waypoint.addProperty("text", "");
+            
+            JsonArray posArray = new JsonArray();
+            posArray.add(x);
+            posArray.add(y);
+            posArray.add(z);
+            waypoint.add("position", posArray);
+            waypoint.addProperty("radius", 0);
+
             if (includeOutline) {
                 dataFormat = "outline waypoint";
-                json.append(String.format(Locale.ROOT,
-                    "\"waypoint\": {\n" +
-                    "    \"type\": \"list\",\n" +
-                    "    \"beam\": true,\n" +
-                    "    \"list\": [\n" +
-                    "        {\n" +
-                    "            \"text\": \"\",\n" +
-                    "            \"position\": [\n" +
-                    "                %.1f,\n" +
-                    "                %.1f,\n" +
-                    "                %.1f\n" +
-                    "            ],\n" +
-                    "            \"radius\": 0\n" +
-                    "        }\n" +
-                    "    ],\n" +
-                    "    \"index\": 0\n" +
-                    "}", x, y, z));
-
-                json.append(",\n");
+                JsonObject waypointListWrapper = new JsonObject();
+                waypointListWrapper.addProperty("type", "list");
+                waypointListWrapper.addProperty("beam", true);
+                
+                JsonArray list = new JsonArray();
+                list.add(waypoint);
+                
+                waypointListWrapper.add("list", list);
+                waypointListWrapper.addProperty("index", 0);
+                root.add("waypoint", waypointListWrapper);
             } else {
                 dataFormat = "waypoint";
-                json.append(String.format(Locale.ROOT,
-                    "{\n" +
-                    "    \"text\": \"\",\n" +
-                    "    \"position\": [\n" +
-                    "        %.1f,\n" +
-                    "        %.1f,\n" +
-                    "        %.1f\n" +
-                    "    ],\n" +
-                    "    \"radius\": 0\n" +
-                    "}", x, y, z));
+                root = waypoint; // If ONLY waypoint, the root is the waypoint object itself
             }
         }
     
         if (includeOutline) {
             if (!includeWaypoint) dataFormat = "outline";
-            json.append(String.format(Locale.ROOT,
-                "\"outlineEntity\": {\n" +
-                "    \"entityType\": \"%s\",\n" +
-                "    \"position\": [\n" +
-                "        %.1f,\n" +
-                "        %.1f,\n" +
-                "        %.1f\n" +
-                "    ]\n" +
-                "}", entityType, x, y, z));
+            JsonObject outline = new JsonObject();
+            outline.addProperty("entityType", entityType);
+            
+            JsonArray posArray = new JsonArray();
+            posArray.add(x);
+            posArray.add(y);
+            posArray.add(z);
+            outline.add("position", posArray);
+            
+            root.add("outlineEntity", outline);
         }
     
-        ClipboardUtils.setClipboard(json.toString());
+        String json = JsonUtils.toPretty(root);
+
+        ClipboardUtils.setClipboard(json);
         ChatLib.chat("§aCopied §b" + targetLabel + "§a" + hitType + " " + dataFormat + " data to clipboard!");
         return 1;
     }

@@ -162,6 +162,13 @@ public class Config extends Vigilant {
     public static boolean debug = false;
 
     @Property(
+        type = PropertyType.TEXT,
+        name = "Json Indent",
+        category = "Dev"
+    )
+    public static String jsonIndent = "\\t";
+
+    @Property(
         type = PropertyType.SWITCH,
         name = "Validate Guides",
         category = "Dev"
