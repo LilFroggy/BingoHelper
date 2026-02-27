@@ -68,7 +68,7 @@ public class BhWailaCommand implements ClientCommand {
     
         if (hitResult instanceof EntityHitResult entityHit) {
             Entity entity = entityHit.getEntity();
-            Vec3d pos = entity.getEntityPos();
+            Vec3d pos = entity.getEntityPos(); 
             x = pos.x; y = pos.y; z = pos.z;
             entityType = entity.getType().getName().getString();
             hitType = " entity";
@@ -85,29 +85,40 @@ public class BhWailaCommand implements ClientCommand {
         StringBuilder json = new StringBuilder();
     
         if (includeWaypoint) {
-            dataFormat = "waypoint";
-            json.append(String.format(
-                "\"waypoint\": {\n" +
-                "    \"type\": \"list\",\n" +
-                "    \"beam\": true,\n" +
-                "    \"list\": [\n" +
-                "        {\n" +
-                "            \"text\": \"\",\n" +
-                "            \"position\": [\n" +
-                "                %.1f,\n" +
-                "                %.1f,\n" +
-                "                %.1f\n" +
-                "            ],\n" +
-                "            \"radius\": 0\n" +
-                "        }\n" +
-                "    ],\n" +
-                "    \"index\": 0\n" +
-                "}", x, y, z));
-        }
-    
-        if (includeWaypoint && includeOutline) {
-            dataFormat = "outline waypoint";
-            json.append(",\n");
+            if (includeOutline) {
+                dataFormat = "outline waypoint";
+                json.append(String.format(
+                    "\"waypoint\": {\n" +
+                    "    \"type\": \"list\",\n" +
+                    "    \"beam\": true,\n" +
+                    "    \"list\": [\n" +
+                    "        {\n" +
+                    "            \"text\": \"\",\n" +
+                    "            \"position\": [\n" +
+                    "                %.1f,\n" +
+                    "                %.1f,\n" +
+                    "                %.1f\n" +
+                    "            ],\n" +
+                    "            \"radius\": 0\n" +
+                    "        }\n" +
+                    "    ],\n" +
+                    "    \"index\": 0\n" +
+                    "}", x, y, z));
+
+                json.append(",\n");
+            } else {
+                dataFormat = "waypoint";
+                json.append(String.format(
+                    "{\n" +
+                    "    \"text\": \"\",\n" +
+                    "    \"position\": [\n" +
+                    "        %.1f,\n" +
+                    "        %.1f,\n" +
+                    "        %.1f\n" +
+                    "    ],\n" +
+                    "    \"radius\": 0\n" +
+                    "}", x, y, z));
+            }
         }
     
         if (includeOutline) {
