@@ -1,8 +1,10 @@
 package io.github.lilfroggy.bingohelper.guide.steps;
 
+import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.ChatEventBus;
 import io.github.lilfroggy.bingohelper.events.SlotRenderEventBus;
 import io.github.lilfroggy.bingohelper.guide.Guide;
+import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import net.minecraft.client.MinecraftClient;
@@ -66,8 +68,8 @@ public class BuyStep extends Step implements
         SlotRenderEventBus.unregister(this);
     }
 
-    private static final Pattern BUY_SINGLE_REGEX = Pattern.compile("^You bought (.+)!$");
-    private static final Pattern BUY_MULTIPLE_REGEX = Pattern.compile("^You bought (.+) x(\\d+)(?: for (?:\\d+) Coins)?!$");
+    private static final Pattern BUY_SINGLE_REGEX = Pattern.compile("^You bought (.+?)(?: for (?:.+) Coins)?!$");
+    private static final Pattern BUY_MULTIPLE_REGEX = Pattern.compile("^You bought (.+) x(\\d+)(?: for (?:.+) Coins)?!$");
 
     private String boughtName = null;
     private Integer boughtCount = null;
@@ -85,14 +87,14 @@ public class BuyStep extends Step implements
             int count = Integer.parseInt(countStr);
             boughtName = name;
             boughtCount = count;
-            //Logger.info("Bought: " + boughtName + " - " + boughtCount);
+            if (Config.debug) Logger.info("Bought: " + boughtName + " - " + boughtCount);
             return;
         }
         if (singleMatcher.find()) {
             String name = singleMatcher.group(1);
             boughtName = name;
             boughtCount = 1;
-            //Logger.info("Bought: " + boughtName + " - " + boughtCount);
+            if (Config.debug) Logger.info("Bought: " + boughtName + " - " + boughtCount);
             return;
         }
     }
