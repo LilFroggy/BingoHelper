@@ -2,16 +2,18 @@ package io.github.lilfroggy.bingohelper.guide.steps;
 
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.ChatEventBus;
-import io.github.lilfroggy.bingohelper.events.SlotRenderEventBus;
+import io.github.lilfroggy.bingohelper.events.ScreenRenderEventBus;
 import io.github.lilfroggy.bingohelper.guide.Guide;
 import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.collection.DefaultedList;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -21,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public class BuyStep extends Step implements
         ChatEventBus.GameMessageListener,
-        SlotRenderEventBus.SlotRenderListener {
+        ScreenRenderEventBus.ScreenRenderListener {
 
     public Map<String, ItemInfo> items;
 
@@ -59,13 +61,13 @@ public class BuyStep extends Step implements
     @Override
     protected void onActivate() {
         ChatEventBus.register(this);
-        SlotRenderEventBus.register(this);
+        ScreenRenderEventBus.register(this);
     }
 
     @Override
     protected void onDeactivate() {
         ChatEventBus.unregister(this);
-        SlotRenderEventBus.unregister(this);
+        ScreenRenderEventBus.unregister(this);
     }
 
     private static final Pattern BUY_SINGLE_REGEX = Pattern.compile("^You bought (.+?)(?: for (?:.+) Coins)?!$");
@@ -100,29 +102,53 @@ public class BuyStep extends Step implements
     }
 
     @Override
-    public void onSlotRender(DrawContext context, Slot slot) {
-        if (slot.inventory instanceof PlayerInventory) return;
-        ItemStack item = slot.getStack();
-        if (item.isEmpty()) return;
-        String id = Skyblock.getID(item);
-        if (id == null) return;
-        if (!items.containsKey(id)) return;
-        ItemInfo itemInfo = items.get(id);
+    public void onScreenRender(DrawContext context, Screen screen, String title, DefaultedList<Slot> slots) {
+        int lowest = Integer.MAX_VALUE;
+        int highest = 0;
+        Slot best = null;
+        Slot bestFallback = null;
 
-        if (!itemInfo.done) RenderLib.highlightSlot(context, slot, RenderLib.MINECRAFT_GREEN);
+        for (Slot slot : slots) {
+            if (slot.inventory instanceof PlayerInventory) continue;
+            ItemStack item = slot.getStack();
+            if (item.isEmpty()) continue;
+            String id = Skyblock.getID(item);
+            if (id == null) continue;
+            if (!items.containsKey(id)) continue;
+            ItemInfo itemInfo = items.get(id);
 
-        if (boughtName == null || boughtCount == null) return;
+            if (!itemInfo.done) {
+                if (title.equals("Shop Trading Options")) {
+                    int amount = item.getCount();
+                    boolean isBetter = amount > highest && amount <= itemInfo.target - itemInfo.count;
+                    if (isBetter) {
+                        highest = amount;
+                        best = slot;
+                    }
+                    if (amount < lowest) {
+                        lowest = amount;
+                        bestFallback = slot;
+                    }
+                }
+                else RenderLib.highlightSlot(context, slot, RenderLib.MINECRAFT_GREEN);
+            }
 
-        String itemName = item.getName().getString();
-        if (itemName == null) return;
-        itemName = itemName.replaceAll("x\\d+", "").trim();
-        if (!itemName.equals(boughtName)) return;
+            if (boughtName == null || boughtCount == null) continue;
 
-        itemInfo.count += boughtCount;
-        if (itemInfo.count >= itemInfo.target) itemInfo.done = true;
+            String itemName = item.getName().getString();
+            if (itemName == null) continue;
+            itemName = itemName.replaceAll("x\\d+", "").trim();
+            if (!itemName.equals(boughtName)) continue;
 
-        boughtName = null;
-        boughtCount = null;
+            itemInfo.count += boughtCount;
+            if (itemInfo.count >= itemInfo.target) itemInfo.done = true;
+
+            boughtName = null;
+            boughtCount = null;
+        }
+
+        if (best == null) best = bestFallback;
+        if (best != null) RenderLib.highlightSlot(context, best, RenderLib.MINECRAFT_GREEN);
         if (items.values().stream().allMatch(info -> info.done)) Guide.advance();
     }
 }

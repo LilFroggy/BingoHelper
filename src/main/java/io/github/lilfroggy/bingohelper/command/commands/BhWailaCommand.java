@@ -131,6 +131,7 @@ public class BhWailaCommand implements ClientCommand {
         }
     
         String json = JsonUtils.toPretty(root);
+        if (includeOutline) json = json.substring(1, json.length() - 1).trim();
 
         ClipboardUtils.setClipboard(json);
         ChatLib.chat("§aCopied §b" + targetLabel + "§a" + hitType + " " + dataFormat + " data to clipboard!");
