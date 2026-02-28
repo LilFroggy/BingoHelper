@@ -204,7 +204,7 @@ public class RenderLib {
 
         // Calculate pulsing alpha (0.5 to 1.0)
         long time = System.currentTimeMillis();
-        float alpha = 0.75f + 0.25f * (float)Math.cos(time * 0.004); // oscillates between 0.5 and 1.0
+        float alpha = 0.45f + 0.10f * (float)Math.cos(time * 0.004); // oscillates between 0.5 and 1.0
         int baseRGB = color & 0x00FFFFFF;
         int pulsingColor = ((int)(alpha * 255) << 24) | baseRGB;
         context.fill(x, y, x + 16, y + 16, pulsingColor);
