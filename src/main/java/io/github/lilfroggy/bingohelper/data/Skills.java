@@ -1,14 +1,10 @@
 package io.github.lilfroggy.bingohelper.data;
 
 import io.github.lilfroggy.bingohelper.config.Config;
-import io.github.lilfroggy.bingohelper.events.ActionBarEventBus;
-import io.github.lilfroggy.bingohelper.events.ChatEventBus;
-import io.github.lilfroggy.bingohelper.events.CreateBingoProfileEventBus;
-import io.github.lilfroggy.bingohelper.events.SkillUpdateEventBus;
+import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
-import net.minecraft.client.MinecraftClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,9 +25,9 @@ public class Skills {
     private static final Map<String, Double> skills = new HashMap<>();
 
     public static void init() {
-        CreateBingoProfileEventBus.register(Skills::onCreateBingoProfile);
-        ChatEventBus.register(Skills::onGameMessage);
-        ActionBarEventBus.register(Skills::onActionBarMessage);
+        Events.CREATE_BINGO_PROFILE.register(Skills::onCreateBingoProfile);
+        Events.MESSAGE.register(Skills::onGameMessage);
+        Events.ACTION_BAR_MESSAGE.register(Skills::onActionBarMessage);
     }
 
     public static void onCreateBingoProfile() {
@@ -40,7 +36,6 @@ public class Skills {
     }
     
     public static void onGameMessage(String formattedMsg, String unformattedMsg, CallbackInfo ci) {
-        if (!MinecraftClient.getInstance().isOnThread()) return;
         if (!Skyblock.inBingo()) return;
 
         String msg = unformattedMsg.trim();
@@ -84,7 +79,7 @@ public class Skills {
         if (oldLevel == level) return;
         skills.put(id, level);
         if (Config.debug) Logger.info("Skill updated: " + id + ": " + oldLevel + " -> " + level);
-        SkillUpdateEventBus.fire(id, oldLevel, level);
+        Events.LEVEL_SKILL.invoke(listener -> listener.onLevelSkill(id, oldLevel, level));
     }
 
     private static void set(String skill, String level) {

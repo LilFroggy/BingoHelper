@@ -6,26 +6,22 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderLayer.MultiPhase;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexRendering;
-import net.minecraft.client.util.BufferAllocator;
+import net.minecraft.client.render.DrawStyle;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.text.OrderedText;
-import net.minecraft.util.Colors;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Vec3d;
-import org.joml.Matrix4f;
+import net.minecraft.world.debug.gizmo.GizmoDrawing;
+
 import org.joml.Vector3f;
 
 public class RenderLib {
+    private static final float LINE_THICKNESS = 3.0f;
+    private static final float TEXT_SCALE = 0.005f;
+
     private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
-    private static final Camera CAMERA = CLIENT.gameRenderer.getCamera();
-    private static final BufferAllocator ALLOCATOR = new BufferAllocator(1536);
 
     public static final int MINECRAFT_BLACK = 0xFF000000;
     public static final int MINECRAFT_DARK_BLUE = 0xFF0000AA;
@@ -44,156 +40,107 @@ public class RenderLib {
     public static final int MINECRAFT_YELLOW = 0xFFFFFF55;
     public static final int MINECRAFT_WHITE = 0xFFFFFFFF;
 
-    // Shoutout Skyblocker
+    // Shoutout Blade-Addons
 
-    /**
-     * Renders text in the world space.
-     *
-     * @param text The text to render as OrderedText
-     * @param pos The position in world coordinates to render the text
-     * @param scale The scale factor for the text size
-     * @param yOffset The vertical offset from the position
-     * @param throughWalls whether the text should be able to be seen through walls or not.
-     */
-    public static void renderText(OrderedText text, Vec3d pos, float scale, float yOffset, boolean throughWalls) {
-        Matrix4f positionMatrix = new Matrix4f();
-        Vec3d cameraPos = CAMERA.getPos();
-        TextRenderer textRenderer = CLIENT.textRenderer;
+    public static void renderText(WorldRenderContext context, String text, Vec3d pos, float scale) {
+        renderText(context, Text.literal(ChatLib.replaceAmpersands(text)), pos.x, pos.y, pos.z, scale);
+    }
+    
+    public static void renderText(WorldRenderContext context, Text text, Vec3d pos, float scale) {
+        renderText(context, text, pos.x, pos.y, pos.z, scale);
+    }
 
-        // Calculate distance from camera to text position
-        double distance = cameraPos.distanceTo(pos);
+    public static void renderText(WorldRenderContext context, String text, double x, double y, double z, float scale) {
+        renderText(context, Text.literal(ChatLib.replaceAmpersands(text)), x, y, z, scale);
+    }
 
-        // Create a consistent scale that maintains visual size regardless of distance
-        float consistentScale = (float) (distance * 0.025f * scale);
-        consistentScale = Math.max(0.01f, Math.min(consistentScale, 2.0f));
+    public static void renderText(WorldRenderContext context, Text text, double x, double y, double z, float scale) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        TextRenderer textRenderer = client.textRenderer;
+        if (client.player == null) return;
 
+        MatrixStack matrices = context.matrices();
+    
+        // 1. Get camera position from the modern context
+        Vec3d cameraPos = context.worldState().cameraRenderState.pos;
+    
+        double distance = Math.sqrt(cameraPos.squaredDistanceTo(x, y, z));
+    
+        // 3. Replicate your old consistent scale logic (preserves visual size at a distance)
+        float consistentScale = (float) (distance * TEXT_SCALE * scale);
+        consistentScale = Math.max(0.01f, consistentScale);
+    
+        matrices.push();
+        
+        // 4. Translate to the target coordinates relative to the camera
+        matrices.translate(x, y, z);
+        
+        // 5. Face the camera
+        matrices.multiply(context.worldState().cameraRenderState.orientation);
+        
+        // 6. Apply distance scale (flipping Y like your old matrix did)
+        matrices.scale(consistentScale, -consistentScale, consistentScale);
+    
+        // 7. Anchor the base: Push the text up by its own height so (x, y, z) is the center-bottom
         float textHeight = textRenderer.fontHeight;
-
-        // Translate to the base position, then scale, then move up so the base is at y=0
-        positionMatrix
-            .translate((float) (pos.getX() - cameraPos.getX()), (float) (pos.getY() - cameraPos.getY()), (float) (pos.getZ() - cameraPos.getZ()))
-            .rotate(CAMERA.getRotation())
-            .scale(consistentScale, -consistentScale, consistentScale)
-            .translate(0, -textHeight, 0); // Anchor base
-
-        float xOffset = -textRenderer.getWidth(text) / 2f;
-        float anchoredYOffset = 0 + yOffset; // yOffset is now from the base
-
-        VertexConsumerProvider.Immediate consumers = VertexConsumerProvider.immediate(ALLOCATOR);
-
-        textRenderer.draw(text, xOffset, anchoredYOffset, 0xFFFFFFFF, true, positionMatrix, consumers, throughWalls ? TextRenderer.TextLayerType.SEE_THROUGH : TextRenderer.TextLayerType.NORMAL, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
-        consumers.draw();
-    }
-
-    // Shoutout Skyblocker
-
-    /**
-     * Renders a line from the camera position to a target point in the world.
-     * This method draws a line that can be seen through walls and properly handles
-     * world-to-screen coordinate transformations.
-     *
-     * @param context The world render context containing camera, matrices, and consumers
-     * @param targetPoint The 3D world position to draw the line to
-     * @param colorComponents RGB color values as floats [0.0-1.0] in format [r, g, b]
-     * @param alpha The transparency/alpha value [0.0-1.0] where 1.0 is fully opaque
-     * @param lineWidth The thickness of the line in pixels
-     */
-    public static void renderLineFromCursor(WorldRenderContext context, Vec3d targetPoint, float[] colorComponents, float alpha, float lineWidth) {
-        // Get camera position for coordinate system translation
-        Vec3d cameraPos = CAMERA.getPos();
-
-        // Get matrix stack for transformations
-        MatrixStack matrices = context.matrices();
-        matrices.push();
-
-        // Translate to world coordinates (subtract camera position)
-        matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
-        MatrixStack.Entry matrixEntry = matrices.peek();
-
-        // Get vertex consumer for drawing
-        VertexConsumerProvider.Immediate consumers = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
-
-        MultiPhase lineLayer = BingoHelperRenderLayers.getLines(lineWidth);
-        VertexConsumer vertexBuffer = consumers.getBuffer(lineLayer);
-
-        // Calculate starting point slightly in front of camera based on camera rotation
-        Vec3d startPoint = cameraPos.add(Vec3d.fromPolar(CAMERA.getPitch(), CAMERA.getYaw()));
-
-        // Calculate normal vector for lighting (direction from start to end point)
-        Vector3f normal = targetPoint.toVector3f()
-                .sub((float) startPoint.x, (float) startPoint.y, (float) startPoint.z)
-                .normalize();
-
-        // Draw first vertex (start point - near camera)
-        vertexBuffer
-                .vertex(matrixEntry, (float) startPoint.x, (float) startPoint.y, (float) startPoint.z)
-                .color(colorComponents[0], colorComponents[1], colorComponents[2], alpha)
-                .normal(matrixEntry, normal);
-
-        // Draw second vertex (end point - target location)
-        vertexBuffer
-                .vertex(matrixEntry, (float) targetPoint.getX(), (float) targetPoint.getY(), (float) targetPoint.getZ())
-                .color(colorComponents[0], colorComponents[1], colorComponents[2], alpha)
-                .normal(matrixEntry, normal);
-
-        // Actually draw the line
-        consumers.draw(lineLayer);
-
-        // Restore matrix stack
+        matrices.translate(0, -textHeight, 0);
+    
+        // 8. Center alignment (X-axis offset)
+        float halfWidth = textRenderer.getWidth(text) / 2f;
+    
+        // 9. Submit text to the command queue (using modern max light coordinates)
+        context.commandQueue().submitText(
+            matrices, 
+            -halfWidth,                       // Centered horizontally
+            0,                                // 0 is now cleanly anchored at the bottom
+            text.asOrderedText(), 
+            true,                             // Drop shadow
+            TextRenderer.TextLayerType.SEE_THROUGH, 
+            15728880,                         // Max light (0xF000F0)
+            0xFFFFFFFF,                       // White text color
+            0, 
+            0
+        );
+        
         matrices.pop();
     }
 
-    public static void renderOutline(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha, float lineWidth, boolean throughWalls) {
-        //if (FrustumUtils.isVisible(minX, minY, minZ, maxX, maxY, maxZ)) {
-            MatrixStack matrices = context.matrices();
-            Vec3d camera = CAMERA.getPos();
-
-            matrices.push();
-            matrices.translate(-camera.getX(), -camera.getY(), -camera.getZ());
-
-            VertexConsumerProvider.Immediate consumers = (VertexConsumerProvider.Immediate) context.consumers();
-            RenderLayer layer = throughWalls ? BingoHelperRenderLayers.getLinesThroughWalls(lineWidth) : BingoHelperRenderLayers.getLines(lineWidth);
-            VertexConsumer buffer = consumers.getBuffer(layer);
-
-            VertexRendering.drawBox(matrices.peek(), buffer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
-            consumers.draw(layer);
-
-            matrices.pop();
-        //}
+    public static void renderLineFromCursor(WorldRenderContext context, Vec3d pos, int color) {
+        renderLineFromCursor(context, pos.x, pos.y, pos.z, color, LINE_THICKNESS);
     }
 
-    public static void renderFilled(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha, boolean throughWalls) {
-        MatrixStack matrices = context.matrices();
-        Vec3d camera = CAMERA.getPos();
-
-        matrices.push();
-        matrices.translate(-camera.x, -camera.y, -camera.z);
-
-        VertexConsumerProvider consumers = context.consumers();
-        VertexConsumer buffer = consumers.getBuffer(throughWalls ? BingoHelperRenderLayers.FILLED_THROUGH_WALLS : BingoHelperRenderLayers.FILLED);
-
-        VertexRendering.drawFilledBox(matrices, buffer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
-
-        matrices.pop();
+    public static void renderLineFromCursor(WorldRenderContext context, Vec3d pos, int color, float width) {
+        renderLineFromCursor(context, pos.x, pos.y, pos.z, color, width);
     }
 
-    public static void highlightBlock(WorldRenderContext context, Vec3d pos, float[] colorComponents, float alpha, boolean throughWalls) {
-       highlightBlock(context, pos.getX(), pos.getY(), pos.getZ(), colorComponents, alpha, throughWalls);
+    public static void renderLineFromCursor(WorldRenderContext context, double x, double y, double z, int color, float width) {
+        Vec3d cameraPos = context.worldState().cameraRenderState.pos;
+        Vector3f lookAt = new Vector3f(0, 0, -1f).rotate(context.worldState().cameraRenderState.orientation);
+        Vec3d startPos = cameraPos.add(lookAt.x * 0.1, lookAt.y * 0.1, lookAt.z * 0.1);
+        GizmoDrawing.line(startPos, new Vec3d(x, y, z), color, width);
     }
 
-    public static void highlightBlock(WorldRenderContext context, double x, double y, double z, float[] colorComponents, float alpha, boolean throughWalls) {
-        MatrixStack matrices = context.matrices();
-        Vec3d camera = CAMERA.getPos();
+    public static void renderOutline(Box box, float[] rgba) {
+        renderOutline(box, rgba, LINE_THICKNESS);
+    }
 
-        matrices.push();
-        matrices.translate(-camera.x, -camera.y, -camera.z);
+    public static void renderOutline(Box box, float[] rgba, float width) {
+        int stroke = ColorHelper.fromFloats(rgba[3], rgba[0], rgba[1], rgba[2]);
+        GizmoDrawing.box(box, DrawStyle.stroked(stroke, width));
+    }
 
-        VertexConsumerProvider consumers = context.consumers();
-        VertexConsumer buffer = consumers.getBuffer(throughWalls ? BingoHelperRenderLayers.FILLED_THROUGH_WALLS : BingoHelperRenderLayers.FILLED);
+    public static void renderFilled(Box box, float[] rgba) {
+        GizmoDrawing.box(box, DrawStyle.filled(ColorHelper.fromFloats(rgba[3], rgba[0], rgba[1], rgba[2])));
+    }
 
-        VertexRendering.drawFilledBox(matrices, buffer, x-0.01, y-0.01, z-0.01, x+1.02, y+1.02, z+1.02, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
+    public static void renderFilledAndOutline(Box box, float[] strokeRGBA, float[] fillRGBA) {
+        renderFilledAndOutline(box, strokeRGBA, fillRGBA, LINE_THICKNESS);
+    }
 
-        matrices.pop();
+    public static void renderFilledAndOutline(Box box, float[] strokeRGBA, float[] fillRGBA, float outlineWidth) {
+        int stroke = ColorHelper.fromFloats(strokeRGBA[3], strokeRGBA[0], strokeRGBA[1], strokeRGBA[2]);
+        int fill = ColorHelper.fromFloats(fillRGBA[3], fillRGBA[0], fillRGBA[1], fillRGBA[2]);
+        GizmoDrawing.box(box, DrawStyle.filledAndStroked(stroke, outlineWidth, fill));
     }
 
     public static void highlightSlot(DrawContext context, Slot slot, int color) {
@@ -210,24 +157,6 @@ public class RenderLib {
         context.fill(x, y, x + 16, y + 16, pulsingColor);
     }
 
-    public static void drawFormattedString(DrawContext drawContext, String input, int x, int y) {
-        input = ChatLib.replaceAmpersands(input);
-        TextRenderer textRenderer = CLIENT.textRenderer;
-        
-        int lineHeight = textRenderer.fontHeight + 2;
-        int currentY = y;
-
-        for (String line : input.split("\n")) {
-            drawContext.drawTextWithShadow(textRenderer, line, x, currentY, Colors.WHITE);
-            currentY += lineHeight;
-        }
-    }
-
-    /**
-     * Calculate the width of formatted text
-     * @param input The formatted text string
-     * @return The width in pixels
-     */
     public static int getFormattedStringWidth(String input) {
         input = ChatLib.replaceAmpersands(input);
         TextRenderer textRenderer = CLIENT.textRenderer;

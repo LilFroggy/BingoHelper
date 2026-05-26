@@ -7,14 +7,16 @@ import org.lwjgl.glfw.GLFW;
 
 import io.github.lilfroggy.bingohelper.BingoHelper;
 import io.github.lilfroggy.bingohelper.config.Config;
-import io.github.lilfroggy.bingohelper.events.ClientTickEventBus;
+import io.github.lilfroggy.bingohelper.events.Events;
+import io.github.lilfroggy.bingohelper.guide.ActiveSteps;
 import io.github.lilfroggy.bingohelper.guide.Guide;
+import io.github.lilfroggy.bingohelper.guide.step.Step;
 
 public class KeyBindings {
     public static final KeyBinding.Category BINGO_HELPER_CATEGORY = KeyBinding.Category.create(BingoHelper.id("main"));
     
     static {
-        ClientTickEventBus.register(KeyBindings::onClientTick);
+        Events.CLIENT_TICK_END.register(KeyBindings::onClientTickEnd);
     }
     
     public static KeyBinding BINGO_GUIDE_ACTION;
@@ -27,20 +29,22 @@ public class KeyBindings {
         ));
     }
     
-    public static void onClientTick(int tick) {
+    public static void onClientTickEnd(int tick) {
         if (!Skyblock.inBingo()) return;
         if (!Config.guide) return;
-        if (Guide.completed) return;
-        if (Guide.currentStep == null) return;
-        if (Guide.currentStep.command == null) return;
+        if (Guide.isCompleted()) return;
+
+        Step blockingStep = ActiveSteps.getBlockingStepWithCommand();
+        if (blockingStep == null) return;
+
+        String command = blockingStep.command.replaceAll("%visitIsland%", Config.visitIsland);
         
-        String commandName = Guide.currentStep.command.replaceAll("%visitIsland%", Config.visitIsland);
-        if (commandName == null || commandName.isEmpty() || !commandName.startsWith("/")) return;
+        if (command.isEmpty() || !command.startsWith("/")) return;
         String keybindName = BINGO_GUIDE_ACTION.getBoundKeyLocalizedText().getString();
-        ChatLib.showTitle("", "§b" + commandName + " §7(§ePress " + keybindName + "§7)", 0, 1, 0);
+        ChatLib.showTitle("", "§b" + command + " §7(§ePress " + keybindName + "§7)", 0, 1, 0);
 
         if (BINGO_GUIDE_ACTION.wasPressed()) {
-            ChatLib.command(commandName, false);
+            ChatLib.command(command, false);
         }
     }
 } 

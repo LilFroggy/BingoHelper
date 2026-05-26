@@ -11,7 +11,7 @@ import io.github.lilfroggy.bingohelper.util.render.GlowingEntities;
 
 @Mixin(Entity.class)
 public class EntityMixin {
-    
+
     @Inject(method = "isGlowing", at = @At("HEAD"), cancellable = true)
     private void onIsGlowing(CallbackInfoReturnable<Boolean> cir) {
         Entity entity = (Entity) (Object) this;

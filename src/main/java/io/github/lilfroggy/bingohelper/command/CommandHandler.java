@@ -22,6 +22,10 @@ public class CommandHandler {
 
         registerCommand(new BhSkillsCommand());
         registerCommand(new BhCollectionsCommand());
+        registerCommand(new BhMobTypesCommand());
+
+        registerCommand(new BhCopyNbt());
+        registerCommand(new BhCopyEnchants());
     }
 
     public static void registerCommand(ClientCommand command) {

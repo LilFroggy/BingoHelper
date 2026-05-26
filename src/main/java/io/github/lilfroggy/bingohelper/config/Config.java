@@ -8,6 +8,7 @@ import gg.essential.vigilance.data.Property;
 import gg.essential.vigilance.data.PropertyData;
 import gg.essential.vigilance.data.PropertyType;
 import gg.essential.vigilance.data.SortingBehavior;
+import io.github.lilfroggy.bingohelper.guide.ActiveSteps;
 import io.github.lilfroggy.bingohelper.guide.Guide;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Util;
@@ -113,6 +114,14 @@ public class Config extends Vigilant {
 
     @Property(
         type = PropertyType.TEXT,
+        name = "Saved Indices",
+        category = "Dev",
+        hidden = true
+    )
+    public static String activeIndices = "";
+
+    @Property(
+        type = PropertyType.TEXT,
         name = "Latest Release ETag",
         category = "Dev",
         hidden = true
@@ -199,8 +208,8 @@ public class Config extends Vigilant {
         initialize();
 
         registerListener("guide", (state) -> {
-            if ((boolean) state) Guide.currentStep.activate();
-            else Guide.currentStep.deactivate();
+            if ((boolean) state) ActiveSteps.activateAll();
+            else ActiveSteps.deactivateAll();
         });
     }
 

@@ -17,8 +17,7 @@ import com.google.gson.JsonParser;
 
 import io.github.lilfroggy.bingohelper.BingoHelper;
 import io.github.lilfroggy.bingohelper.config.Config;
-import io.github.lilfroggy.bingohelper.events.JoinHypixelEventBus;
-import io.github.lilfroggy.bingohelper.events.WorldChangeEventBus;
+import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.http.HttpUtils;
 import io.github.lilfroggy.bingohelper.messages.Messages;
 import io.github.lilfroggy.bingohelper.util.Bingo;
@@ -41,8 +40,8 @@ public class UpdateManager {
     private static UpdateState state = latestRelease != null ? latestRelease.STATE : UpdateState.NONE;
 
     public static void init() {
-        JoinHypixelEventBus.register(UpdateManager::onJoinHypixel);
-        WorldChangeEventBus.register(UpdateManager::onWorldChange);
+        Events.JOIN_HYPIXEL.register(UpdateManager::onJoinHypixel);
+        Events.CHANGE_WORLD.register(UpdateManager::onWorldChange);
     }
 
     public static void onJoinHypixel(boolean isAlpha) {

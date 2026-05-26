@@ -38,6 +38,6 @@ public class GuideSaver {
 
     public static void saveUserProgress() {
         Config.savedIndex = Guide.stepIndex;
-        Config.save();
+        ActiveSteps.save();
     }
 }

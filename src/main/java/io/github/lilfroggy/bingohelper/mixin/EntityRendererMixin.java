@@ -8,13 +8,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import io.github.lilfroggy.bingohelper.events.EntityStateUpdateEventBus;
+import io.github.lilfroggy.bingohelper.events.Events;
 
 @Mixin(EntityRenderer.class)
 public class EntityRendererMixin<T extends Entity, S extends EntityRenderState> {
     
     @Inject(method = "updateRenderState", at = @At("TAIL"))
     public void onUpdateRenderState(T entity, S state, float tickProgress, CallbackInfo ci) {
-        EntityStateUpdateEventBus.fire(entity, state);
+        Events.ENTITY_STATE_UPDATE.invoke(listener -> listener.onEntityStateUpdate(entity, state));
     }
 }

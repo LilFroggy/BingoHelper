@@ -25,7 +25,7 @@ public class GuideImporter {
         if (data == null) return;
         GuideInfo old = new GuideInfo(Guide.name, Guide.version);
         setGuideData(data);
-        GuideNavigator.goToStep(Config.savedIndex);
+        ActiveSteps.load();
         Logger.info(importMessage(old, data), true);
     }
 

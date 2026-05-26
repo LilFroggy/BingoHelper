@@ -55,10 +55,11 @@ dependencies {
 
 	// Fabric Language Kotlin
 
-	modImplementation("net.fabricmc:fabric-language-kotlin:1.13.7+kotlin.2.2.21")
+	modImplementation("net.fabricmc:fabric-language-kotlin:1.13.9+kotlin.2.3.10")
 	
 	// DevAuth
 	
+	modRuntimeOnly("org.apache.httpcomponents:httpclient:4.5.14")
 	modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 	
 	// HypixelModAPI
@@ -69,7 +70,7 @@ dependencies {
 	// Vigilance
 
 	shadowImpl("gg.essential:vigilance:312")
-	shadowModImpl("gg.essential:universalcraft-1.21.9-fabric:436") {
+	shadowModImpl("gg.essential:universalcraft-1.21.11-fabric:456+feature-em-1645-closing-uscreen-via-esc-on-119-puts-you-in-the-menu-rather") {
         exclude(group: "net.fabricmc")
 		exclude(group: "org.jetbrains.kotlin")
     }

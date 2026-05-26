@@ -1,22 +1,23 @@
 package io.github.lilfroggy.bingohelper.guide;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import io.github.lilfroggy.bingohelper.guide.steps.Step;
+import io.github.lilfroggy.bingohelper.guide.deserializing.StepDeserializer;
+import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.util.Logger;
 
 public class GuideParser {
-    /**
-     * Parses a JSON string into a {@link GuideData} object.
-     * @param guide The JSON string representing the guide.
-     * @return A {@link GuideData} object if the string represents a valid guide, or {@code null} if the JSON is invalid or does not meet the guide's format requirements.
-     */
+    
+    @Nullable
     public static GuideData toGuideData(String guide) {
         return toGuideData(toJsonObject(guide));
     }
 
+    @Nullable
     private static JsonObject toJsonObject(String guide) {
         try {
             if (!GuideValidator.isValidGuide(guide)) return null;
@@ -30,6 +31,7 @@ public class GuideParser {
         }
     }
 
+    @Nullable
     private static GuideData toGuideData(JsonObject guide) {
         if (guide == null) return null;
         String name = guide.get("name").getAsString();
@@ -39,7 +41,15 @@ public class GuideParser {
         return new GuideData(name, version, stepIndex, steps, guide.toString());
     }
 
-    private static Step[] stepsFromJsonArray(JsonArray steps) {
-        return steps.asList().stream().map(step -> StepParser.stepFromJson(step.toString())).toArray(Step[]::new);
+    private static Step[] stepsFromJsonArray(JsonArray jsonArray) {
+        Step[] steps = jsonArray.asList().stream()
+            .map(element -> StepDeserializer.stepFromJson(element.toString()))
+            .toArray(Step[]::new);
+
+        for (int i = 0; i < steps.length; i++) {
+            steps[i].setIndex(i);
+        }
+
+        return steps;
     }
 }

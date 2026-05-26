@@ -2,8 +2,7 @@ package io.github.lilfroggy.bingohelper.util;
 
 import java.util.ArrayList;
 
-import io.github.lilfroggy.bingohelper.events.ClientTickEventBus;
-import io.github.lilfroggy.bingohelper.events.ScoreboardUpdateEventBus;
+import io.github.lilfroggy.bingohelper.events.Events;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.scoreboard.ScoreboardDisplaySlot;
@@ -22,14 +21,14 @@ public class Scoreboard {
     public static ArrayList<String> STRING_LINES = new ArrayList<>();
 
     static {
-        ClientTickEventBus.register(Scoreboard::onClientTick);
+        Events.CLIENT_TICK_END.register(Scoreboard::onClientTickEnd);
     }
 
     public static void init() {
         // Load
     }
 
-    public static void onClientTick(int tick) {
+    public static void onClientTickEnd(int tick) {
         if(tick % 20 != 0) return;
         update();
     }
@@ -68,6 +67,6 @@ public class Scoreboard {
             Collections.reverse(TEXT_LINES);
         }
         
-        ScoreboardUpdateEventBus.fire(new ArrayList<>(STRING_LINES));
+        Events.SCOREBOARD_UPDATE.invoke(listener -> listener.onScoreboardUpdate(new ArrayList<>(STRING_LINES)));
     }
 }

@@ -2,32 +2,41 @@ package io.github.lilfroggy.bingohelper.guide;
 
 import java.util.concurrent.TimeUnit;
 
+import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.messages.Messages;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.Scheduler;
 import net.minecraft.client.MinecraftClient;
 
-public class GuideNavigator {
+public class GuideNavigator extends Guide {
     private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 
     public static void reset() {
+        ActiveSteps.clear();
         goToStep(0);
     }
 
-    public static void advance() {
-        Guide.currentStep.deactivate();
-        if (Guide.completed) return;
-        //if (Config.exitMenus && CLIENT.player != null) CLIENT.setScreen(null);
+    public static void advance(Step step) {
+        ActiveSteps.remove(step);
+
         long currentTime = System.currentTimeMillis();
-        long durationMillis = currentTime - Guide.stepStartTime;
+        long durationMillis = currentTime - stepStartTime;
         long seconds = durationMillis / 1000;
-        String message = Messages.GUIDE_ADVANCE.formatted(Guide.currentStep.formattedInstruction().replaceAll("\n", " ").replaceAll("&", "§"), ChatLib.formatDuration(seconds));
+
+        String message = Messages.GUIDE_ADVANCE.formatted(
+            step.instruction().replaceAll("\n", " ").replaceAll("&", "§"), 
+            ChatLib.formatDuration(seconds)
+        );
+
         Scheduler.SCHEDULER.schedule(() -> {
             CLIENT.execute(() -> {
                 ChatLib.chat(message);
             });
         }, 250, TimeUnit.MILLISECONDS);
-        skip();
+
+        if (ActiveSteps.anyBlocking()) return;
+
+        goToStep(stepIndex + 1);
     }
 
     public static String skip() {
@@ -35,13 +44,16 @@ public class GuideNavigator {
     }
 
     public static String skip(int amount) {
-        if (Guide.completed) return Messages.GUIDE_SKIP_NONE;
-        int max = Guide.steps.length - 1 - Guide.stepIndex;
-        if (!Guide.completed) max++;
-        int actual = Math.min(amount, max);
-        goToStep(Guide.stepIndex + actual);
-        if (actual == 1) return Messages.GUIDE_SKIP_ONE;
-        else return Messages.GUIDE_SKIP_MULTIPLE.formatted(actual);
+        if (isCompleted()) return Messages.GUIDE_SKIP_NONE;
+
+        int targetIndex = stepIndex + amount;
+
+        if (targetIndex >= steps.length) targetIndex = steps.length;
+
+        goToStep(targetIndex);
+
+        if (amount == 1) return Messages.GUIDE_SKIP_ONE;
+        return Messages.GUIDE_SKIP_MULTIPLE.formatted(amount);
     }
 
     public static String back() {
@@ -49,41 +61,44 @@ public class GuideNavigator {
     }
 
     public static String back(int amount) {
-        if (Guide.stepIndex == 0 && !Guide.completed) return Messages.GUIDE_BACK_NONE;
-        int currentIndex = Guide.completed ? Guide.stepIndex + 1 : Guide.stepIndex;
-        int max = Guide.stepIndex;
-        if (Guide.completed) max++;
-        int actual = Math.min(amount, max);
-        goToStep(currentIndex - actual);
-        if (actual == 1) return Messages.GUIDE_BACK_ONE;
-        else return Messages.GUIDE_BACK_MULTIPLE.formatted(actual);
+        // If we are at the very beginning, we can't go back
+        if (stepIndex == 0) return Messages.GUIDE_BACK_NONE;
+
+        int targetIndex = stepIndex - amount;
+
+        if (targetIndex < 0) targetIndex = 0;
+
+        goToStep(targetIndex);
+
+        if (amount == 1) return Messages.GUIDE_BACK_ONE;
+        return Messages.GUIDE_BACK_MULTIPLE.formatted(amount);
     }
     
     public static void goToStep(int index) {
-        Guide.completed = isIndexToolarge(index);
-        Guide.currentStep.deactivate();
-        if (Guide.completed) return;
-        setCurrentStep(index);
+
+        if (index > stepIndex) {
+            // Skipping forward: Clean up any background steps we are jumping past
+            ActiveSteps.removeAllEffectiveBefore(index);
+        } else {
+            // Going backward: Safely unregister everything we are retreating through
+            ActiveSteps.removeAllRegisteredAfter(index);
+        }
+
+        stepStartTime = System.currentTimeMillis();
+    
+        activateStep(index);
     }
 
-    private static void setCurrentStep(int index) {
-        Guide.stepIndex = isIndexToolarge(index) ? lastStepIndex() : isIndexTooSmall(index) ? 0 : index;
-        GuideSaver.saveUserProgress();
-        Guide.currentStep = Guide.steps[index];
-        Guide.currentStep.reset();
-        if (Guide.completed) return;
-        Guide.currentStep.activate();
-    }
+    private static void activateStep(int index) {
+        setIndex(index);
+        if (!isValidIndex(index())) return;
+        Step step = steps[index()];
+        step.reset();
 
-    private static boolean isIndexTooSmall(int index) {
-        return index < 0;
-    }
+        ActiveSteps.add(step);
 
-    private static boolean isIndexToolarge(int index) {
-        return index >= Guide.steps.length;
-    }
-
-    private static int lastStepIndex() {
-        return Guide.steps.length - 1;
+        if (!step.isBlocking()) {
+            activateStep(index() + 1);
+        }
     }
 }

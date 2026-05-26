@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import io.github.lilfroggy.bingohelper.events.ClientTickEventBus;
+import io.github.lilfroggy.bingohelper.events.Events;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
@@ -16,14 +16,14 @@ public class Tablist {
     private static List<String> lines = new ArrayList<>();
 
     static {
-        ClientTickEventBus.register(Tablist::onClientTick);
+        Events.CLIENT_TICK_END.register(Tablist::onClientTickEnd);
     }
 
     public static void init() {
         // Load
     }
 
-    private static void onClientTick(int tick) {
+    private static void onClientTickEnd(int tick) {
         if(tick % 20 != 0) return;
         update();
     }

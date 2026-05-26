@@ -1,15 +1,12 @@
 package io.github.lilfroggy.bingohelper.util;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import org.jetbrains.annotations.Nullable;
 
 import io.github.lilfroggy.bingohelper.config.Config;
-import io.github.lilfroggy.bingohelper.events.AreaChangeEventBus;
-import io.github.lilfroggy.bingohelper.events.ClientTickEventBus;
-import io.github.lilfroggy.bingohelper.events.JoinBingoEventBus;
-import io.github.lilfroggy.bingohelper.events.JoinHypixelEventBus;
-import io.github.lilfroggy.bingohelper.events.LeaveBingoEventBus;
-import io.github.lilfroggy.bingohelper.events.ScoreboardUpdateEventBus;
-import io.github.lilfroggy.bingohelper.events.SubAreaChangeEventBus;
+import io.github.lilfroggy.bingohelper.events.Events;
 import net.hypixel.data.region.Environment;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
@@ -40,14 +37,14 @@ public class Skyblock {
     private static String subArea = null;
 
     public static void init() {
-        ScoreboardUpdateEventBus.register(Skyblock::onScoreboardUpdate);
-        ClientTickEventBus.register(Skyblock::onClientTick);
+        Events.SCOREBOARD_UPDATE.register(Skyblock::onScoreboardUpdate);
+        Events.CLIENT_TICK_END.register(Skyblock::onClientTickEnd);
     }
 
     public static void onHelloPacket(ClientboundHelloPacket packet) {
         if (Config.debug) Logger.info("packet received: " + packet.toString());
         var isAlpha = packet.getEnvironment() != Environment.PRODUCTION;
-       JoinHypixelEventBus.fire(isAlpha);
+       Events.JOIN_HYPIXEL.invoke(listener -> listener.onJoinHypixel(isAlpha));
     }
 
     public static void onLocationPacket(ClientboundLocationPacket packet) {
@@ -60,7 +57,7 @@ public class Skyblock {
         if (Config.debug) Logger.info("New location: " + area);
 
         if ((oldArea == null && area != null) || (oldArea != null && !oldArea.equals(area))) {
-            AreaChangeEventBus.fire(area, oldArea);
+            Events.CHANGE_AREA.invoke(listener -> listener.onAreaChange(area, oldArea));
         }
     }
 
@@ -74,11 +71,11 @@ public class Skyblock {
         }
         subArea = newSubArea;
         if ((oldSubArea == null && newSubArea != null) || (oldSubArea != null && !oldSubArea.equals(newSubArea))) {
-            SubAreaChangeEventBus.fire(newSubArea, oldSubArea);
+            Events.CHANGE_SUB_AREA.invoke(listener -> listener.onSubAreaChange(subArea, oldSubArea));
         }
     }
 
-    public static void onClientTick(int tick) {
+    public static void onClientTickEnd(int tick) {
         if (tick % 20 != 0) return;
         if (CLIENT.player == null || CLIENT.world == null) return;
 
@@ -91,8 +88,8 @@ public class Skyblock {
 
         if (wasBingo == inBingo) return;
 
-        if (inBingo) JoinBingoEventBus.fire();
-        else LeaveBingoEventBus.fire();
+        if (inBingo) Events.JOIN_BINGO.invoke(listener -> listener.onJoinBingo());
+        else Events.LEAVE_BINGO.invoke(listener -> listener.onLeaveBingo());
         
         if (Config.debug) Logger.info("In Bingo: " + (inBingo ? "§a" : "§c") + inBingo);
     }
@@ -155,15 +152,46 @@ public class Skyblock {
      * @param item The ItemStack to extract ID from
      * @return The Skyblock item ID, or null if not found/invalid
      */
+    @Nullable
     public static String getID(ItemStack item) {
+        if (item == null || item.isEmpty()) return null;
+
+        NbtCompound nbt = getNbt(item);
+        if (nbt == null) return null;
+
+        return nbt.getString("id").orElse(null);
+    }
+
+    @Nullable
+    public static NbtCompound getNbt(ItemStack item) {
         if (item == null || item.isEmpty()) return null;
 
         NbtComponent nbtComponent = item.get(DataComponentTypes.CUSTOM_DATA);
         if (nbtComponent == null || nbtComponent.isEmpty()) return null;
 
         NbtCompound nbt = nbtComponent.copyNbt();
+        if (nbt == null || nbt.isEmpty()) return null;
+        return nbt;
+    }
 
-        return nbt.getString("id").orElse(null);
+    @Nullable
+    public static List<String> getEnchants(ItemStack item) {
+        NbtCompound nbt = getNbt(item);
+    
+        if (nbt == null) return null;
+
+        NbtCompound enchants = nbt.getCompound("enchantments").orElse(null);
+
+        if (enchants == null) return null;
+
+        List<String> enchantmentList = new ArrayList<>();
+
+        for (String key : enchants.getKeys()) {
+            int level = enchants.getInt(key, 0);
+            enchantmentList.add(key.toUpperCase() + "_" + level);
+        }
+        
+        return enchantmentList;
     }
 
     /**
@@ -172,13 +200,13 @@ public class Skyblock {
      * @param item The ItemStack to extract ID from
      * @return The Skyblock item ID, or null if not found/invalid
      */
+    @Nullable
     public static String getReforge(ItemStack item) {
         if (item == null || item.isEmpty()) return null;
 
-        NbtComponent nbtComponent = item.get(DataComponentTypes.CUSTOM_DATA);
-        if (nbtComponent == null || nbtComponent.isEmpty()) return null;
-
-        NbtCompound nbt = nbtComponent.copyNbt();
+        NbtCompound nbt = getNbt(item);
+    
+        if (nbt == null) return null;
 
         return ChatLib.toTitleCase(nbt.getString("modifier").orElse(null));
     }
@@ -224,6 +252,7 @@ public class Skyblock {
                 count += stack.getCount();
             }
         }
+
         return count;
     }
 }
