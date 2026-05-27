@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import io.github.lilfroggy.bingohelper.events.Events;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import net.minecraft.scoreboard.ScoreboardObjective;
@@ -34,9 +35,9 @@ public class Scoreboard {
     }
 
     public static void update() {
-        if (CLIENT.player == null || CLIENT.world == null) return;
+        if (!(CLIENT.world instanceof ClientWorld world)) return;
 
-        net.minecraft.scoreboard.Scoreboard scoreboard = CLIENT.world.getScoreboard();
+        net.minecraft.scoreboard.Scoreboard scoreboard = world.getScoreboard();
         ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
         TEXT_LINES.clear();
         STRING_LINES.clear();

@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "Guide Schema",
-    "description": "The schema that is actually used to validate guides. Differs from guide_creation_schema.json in that it does not have example bloat.",
+    "description": "The schema that is used to validate guides.",
     "type": "object",
     "properties": {
         "name": { "type": "string" },
@@ -15,9 +15,9 @@
                             "type": { "$ref": "#/definitions/StepTypes" },
                             "instruction": { "type": "string" },
                             "command": { "type": "string" },
-                            "clientCommand": { "type": "string" },
                             "waypoint": { "$ref": "#/definitions/WaypointProperty" },
-                            "outlineEntity": { "$ref": "#/definitions/OutlineEntityProperty" }
+                            "outlineEntity": { "$ref": "#/definitions/OutlineEntityProperty" },
+							"async": { "$ref": "#/definitions/AsyncProperty" }
                         },
                         "oneOf": [
                             { "$ref": "#/definitions/MessageStep" },
@@ -36,20 +36,23 @@
                             { "$ref": "#/definitions/StoreStep" },
                             { "$ref": "#/definitions/RetrieveStep" },
                             { "$ref": "#/definitions/ExperienceStep" },
-                            { "$ref": "#/definitions/UpgradeMinionStep" }
+                            { "$ref": "#/definitions/UpgradeMinionStep" },
+							{ "$ref": "#/definitions/MobTypesStep" }
                         ],
                         "required": [
                             "type",
                             "instruction"
                         ]
-                    }
+                    },
+					"additionalProperties": false
                 }
             },
             "required": [
                 "stepIndex",
                 "steps"
             ]
-        }
+        },
+		"additionalProperties": false
     },
     "required": [
         "name",
@@ -57,7 +60,7 @@
         "data"
     ],
     "definitions": {
-        "WaypointProperty": {
+        "WaypointProperty": { "type": "object",
             "properties": {
                 "type": { "const": "list" },
                 "beam": { "type": "boolean" },
@@ -72,6 +75,7 @@
                             },
                             "radius": { "type": "integer" }
                         },
+						"additionalProperties": false,
                         "required": [
                             "text",
                             "position",
@@ -81,6 +85,7 @@
                 },
                 "index": { "type": "integer" }
             },
+			"additionalProperties": false,
             "required": [
                 "type",
                 "beam",
@@ -88,20 +93,35 @@
                 "index"
             ]
         },
-        "OutlineEntityProperty": {
+        "OutlineEntityProperty": { "type": "object",
+            "$ref": "#/definitions/EntityPredicate"
+        },
+		"AsyncProperty": { "type": "object",
             "properties": {
-                "entityType": { "type": "string" },
+                "effectiveIndex": { "type": "integer" },
+				"requirements": { "type": "object",
+					"properties": {
+						"entity": { "$ref": "#/definitions/EntityPredicate" }
+					},
+					"additionalProperties": false,
+					"minProperties": 1
+				}
+            },
+			"additionalProperties": false
+        },
+		"EntityPredicate": { "type": "object",
+			"properties": {
+                "type": { "type": "string" },
                 "position": { "type": "array",
                     "items": { "type": "number" },
                     "minItems": 3,
                     "maxItems": 3
-                }
+                },
+				"skin": { "type": "string" }
             },
-            "required": [
-                "entityType",
-                "position"
-            ]
-        },
+			"additionalProperties": false,
+			"minProperties": 1
+		},
         "StepTypes": {
             "enum": [
                 "message",
@@ -120,10 +140,11 @@
                 "store",
                 "retrieve",
                 "experience",
-                "upgradeMinion"
+                "upgradeMinion",
+				"mobTypes"
             ]
         },
-        "MessageStep": {
+        "MessageStep": { "type": "object",
             "properties": {
                 "type": { "const": "message" },
                 "criteria": { "type": "string" }
@@ -132,7 +153,7 @@
                 "criteria"
             ]
         },
-        "CakeStep": {
+        "CakeStep": { "type": "object",
             "properties": {
                 "type": { "const": "cake" },
                 "eaten": {
@@ -144,7 +165,7 @@
                 "eaten"
             ]
         },
-        "SellStep": {
+        "SellStep": { "type": "object",
             "properties": {
                 "type": { "const": "sell" },
                 "items": {
@@ -156,7 +177,7 @@
                 "items"
             ]
         },
-        "BuyStep": {
+        "BuyStep": { "type": "object",
             "properties": {
                 "type": { "const": "buy" },
                 "items": { "type": "object",
@@ -182,7 +203,7 @@
                 "items"
             ]
         },
-        "HasStep": {
+        "HasStep": { "type": "object",
             "properties": {
                 "type": { "const": "has" },
                 "items": { "type": "object",
@@ -208,7 +229,7 @@
                 "items"
             ]
         },
-        "AreaStep": {
+        "AreaStep": { "type": "object",
             "properties": {
                 "type": { "const": "area" },
                 "area": { "$ref": "#/definitions/Area" }
@@ -217,7 +238,7 @@
                 "area"
             ]
         },
-        "SubAreaStep": {
+        "SubAreaStep": { "type": "object",
             "properties": {
                 "type": { "const": "subArea" },
                 "subArea": { "$ref": "#/definitions/SubArea" }
@@ -226,21 +247,21 @@
                 "subArea"
             ]
         },
-        "EnchantStep": {
+        "EnchantStep": { "type": "object",
             "properties": {
                 "type": { "const": "enchant" },
                 "items": { "type": "object",
                     "propertyNames": {
                         "$ref": "#/definitions/ItemIds"
                     },
-					"additionalProperties": {
-                        "type": "object",
+					"additionalProperties": { "type": "object",
                         "properties": {
                             "enchants": { "type": "array",
                                 "items": { "$ref": "#/definitions/Enchants" }
                             },
                             "done": { "type": "boolean" }
                         },
+						"additionalProperties": false,
                         "required": [
                             "enchants",
                             "done"
@@ -252,21 +273,21 @@
                 "items"
             ]
         },
-        "ReforgeStep": {
+        "ReforgeStep": { "type": "object",
             "properties": {
                 "type": { "const": "reforge" },
                 "items": { "type": "object",
                     "propertyNames": {
                         "$ref": "#/definitions/ItemIds"
                     },
-					"additionalProperties": {
-                        "type": "object",
+					"additionalProperties": { "type": "object",
                         "properties": {
                             "reforges": { "type": "array",
                                 "items": { "$ref": "#/definitions/Reforges" }
                             },
                             "done": { "type": "boolean" }
                         },
+						"additionalProperties": false,
                         "required": [
                             "reforges",
                             "done"
@@ -278,7 +299,7 @@
                 "items"
             ]
         },
-        "GuiItemStep": {
+        "GuiItemStep": { "type": "object",
             "properties": {
                 "type": { "const": "guiItem" },
                 "guiName": { "type": "string" },
@@ -290,7 +311,7 @@
                 "guiName"
             ]
         },
-        "GuiClickSlotStep": {
+        "GuiClickSlotStep": { "type": "object",
             "properties": {
                 "type": { "const": "guiClickSlot" },
                 "guiName": { "type": "string" },
@@ -301,7 +322,7 @@
                 "slotIndex"
             ]
         },
-        "SkillStep": {
+        "SkillStep": { "type": "object",
             "properties": {
                 "type": { "const": "skill" },
                 "skill": { "$ref": "#/definitions/Skills" },
@@ -312,7 +333,7 @@
                 "level"
             ]
         },
-        "CollectionStep": {
+        "CollectionStep": { "type": "object",
             "properties": {
                 "type": { "const": "collection" },
                 "collection": { "$ref": "#/definitions/Collections" },
@@ -323,7 +344,7 @@
                 "level"
             ]
         },
-        "StoreStep": {
+        "StoreStep": { "type": "object",
             "properties": {
                 "type": { "const": "store" },
                 "items": {
@@ -335,7 +356,7 @@
                 "items"
             ]
         },
-        "RetrieveStep": {
+        "RetrieveStep": { "type": "object",
             "properties": {
                 "type": { "const": "retrieve" },
                 "items": {
@@ -347,7 +368,7 @@
                 "items"
             ]
         },
-        "ExperienceStep": {
+        "ExperienceStep": { "type": "object",
             "properties": {
                 "type": { "const": "experience" },
                 "level": { "type": "integer" }
@@ -356,7 +377,7 @@
                 "level"
             ]
         },
-        "UpgradeMinionStep": {
+        "UpgradeMinionStep": { "type": "object",
             "properties": {
                 "type": { "const": "upgradeMinion" },
                 "minionId": { "$ref": "#/definitions/MinionIds" },
@@ -368,6 +389,45 @@
                 "fromLevel",
                 "toLevel"
             ]
+        },
+		"MobTypesStep": { "type": "object",
+            "properties": {
+                "type": { "const": "mobTypes" },
+                "mobTypes": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/MobTypes" }
+                }
+            },
+            "required": [
+                "mobTypes"
+            ]
+        },
+		"MobTypes": {
+            "enum": [
+				"airborne",
+				"animal",
+				"aquatic",
+				"arcane",
+				"arthropod",
+				"construct",
+				"cubic",
+				"elusive",
+				"ender",
+				"frozen",
+				"glacial",
+				"humanoid",
+				"infernal",
+				"magmatic",
+				"mythological",
+				"pest",
+				"shielded",
+				"skeletal",
+				"spooky",
+				"subterranean",
+				"undead",
+				"wither",
+				"woodland"
+			]
         },
         "MinionIds": {
             "type": "string"
@@ -393,5 +453,6 @@
         "SubArea": {
             "type": "string"
         }
-    }
+    },
+	"additionalProperties": false
 }

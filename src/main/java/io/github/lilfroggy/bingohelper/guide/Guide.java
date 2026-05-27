@@ -82,7 +82,7 @@ public class Guide {
             } else if (step.isBlocking()) {
                 blockingAsyncBody.append("\n&f" + step.instruction());
             } else {
-                asyncBody.append("\n&7- &f").append(step.instruction());
+                asyncBody.append("\n&f" + step.instruction());
             }
         }
     

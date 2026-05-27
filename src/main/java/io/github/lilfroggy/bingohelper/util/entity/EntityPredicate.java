@@ -1,6 +1,5 @@
 package io.github.lilfroggy.bingohelper.util.entity;
 
-import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.EntityUtils;
 import io.github.lilfroggy.bingohelper.util.render.GlowingEntities;
 import net.minecraft.client.MinecraftClient;

@@ -7,7 +7,7 @@ import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.UnlockMobTypeEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 
-public class MobTypeStep extends Step implements UnlockMobTypeEvent {
+public class MobTypesStep extends Step implements UnlockMobTypeEvent {
     public List<String> mobTypes;
 
     @Override

@@ -9,7 +9,6 @@ import gg.essential.vigilance.data.PropertyData;
 import gg.essential.vigilance.data.PropertyType;
 import gg.essential.vigilance.data.SortingBehavior;
 import io.github.lilfroggy.bingohelper.guide.ActiveSteps;
-import io.github.lilfroggy.bingohelper.guide.Guide;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Util;
 

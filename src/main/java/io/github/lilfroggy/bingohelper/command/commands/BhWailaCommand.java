@@ -13,6 +13,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.storage.NbtWriteView;
@@ -82,6 +83,8 @@ public class BhWailaCommand implements ClientCommand {
     }
 
     private int executeFormatted(CommandContext<FabricClientCommandSource> context, boolean includeWaypoint, boolean includeOutline) {
+        if (!(CLIENT.world instanceof ClientWorld world)) return 0;
+
         HitResult hitResult = CLIENT.crosshairTarget;
     
         if (hitResult == null || hitResult.getType() == HitResult.Type.MISS) {
@@ -109,7 +112,7 @@ public class BhWailaCommand implements ClientCommand {
         } else if (hitResult instanceof BlockHitResult blockHit && !includeOutline) {
             BlockPos pos = blockHit.getBlockPos();
             x = pos.getX(); y = pos.getY() + 1; z = pos.getZ();
-            targetLabel = CLIENT.world.getBlockState(pos).getBlock().getName().getString();
+            targetLabel = world.getBlockState(pos).getBlock().getName().getString();
         } else {
             ChatLib.chat("§cYou must be looking at an entity for outlines!");
             return 0;

@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.guide.step.impl.*;
-import io.github.lilfroggy.bingohelper.util.PolymorphicDeserializer;
+import io.github.lilfroggy.bingohelper.util.Deserializer;
 import net.minecraft.util.math.Vec3d;
 
 public class StepDeserializer {
@@ -13,7 +13,7 @@ public class StepDeserializer {
         .registerTypeAdapter(Vec3d.class, new Vec3dAdapter())
         .registerTypeAdapter(
             Step.class,
-            new PolymorphicDeserializer<Step>("type")
+            new Deserializer<Step>("type")
                 .register("message", MessageStep.class)
                 .register("cake", CakeStep.class)
                 .register("sell", SellStep.class)
@@ -31,12 +31,16 @@ public class StepDeserializer {
                 .register("skill", SkillStep.class)
                 .register("collection", CollectionStep.class)
                 .register("upgradeMinion", UpgradeMinionStep.class)
-                .register("mobType", MobTypeStep.class)
+                .register("mobTypes", MobTypesStep.class)
         )
         .create();
 
+    private static final Step MALFORMED_STEP = stepFromJson("{\"type\": \"message\",\"instruction\": \"&cThis step is malformed.\n&cRun &e/bhskip &cto skip it.\",\"criteria\": \"kdasndlqwdn\"}");
+
+    @SuppressWarnings({ "null", "unused" })
     public static Step stepFromJson(String step) {
         Step processed = GSON.fromJson(step, Step.class);
+        if (processed == null) return MALFORMED_STEP;
         processed.init();
         return processed;
     }

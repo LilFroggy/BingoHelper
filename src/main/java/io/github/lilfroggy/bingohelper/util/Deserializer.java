@@ -10,20 +10,21 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
-public class PolymorphicDeserializer<T> implements JsonDeserializer<T> {
+public class Deserializer<T> implements JsonDeserializer<T> {
     private final String typeFieldName;
     private final Map<String, Class<? extends T>> registry = new HashMap<>();
 
-    public PolymorphicDeserializer(String typeFieldName) {
+    public Deserializer(String typeFieldName) {
         this.typeFieldName = typeFieldName;
     }
 
-    public PolymorphicDeserializer<T> register(String label, Class<? extends T> subtype) {
+    public Deserializer<T> register(String label, Class<? extends T> subtype) {
         registry.put(label, subtype);
         return this;
     }
 
     @Override
+    @SuppressWarnings("null")
     public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject jsonObject = json.getAsJsonObject();
         
@@ -35,7 +36,8 @@ public class PolymorphicDeserializer<T> implements JsonDeserializer<T> {
         Class<? extends T> targetClass = registry.get(typeLabel);
         
         if (targetClass == null) {
-            throw new JsonParseException("Unknown type label: " + typeLabel);
+            Logger.warn("Unknown type label: " + typeLabel);
+            return null;
         }
         
         return context.deserialize(jsonObject, targetClass);

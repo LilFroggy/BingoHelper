@@ -2,6 +2,8 @@ package io.github.lilfroggy.bingohelper.util;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.collection.DefaultedList;
 
@@ -15,7 +17,8 @@ public class ScreenUtils {
     }
 
     public static DefaultedList<Slot> getSlots() {
-        if (CLIENT.player == null || CLIENT.player.currentScreenHandler == null) return DefaultedList.of();
-        return CLIENT.player.currentScreenHandler.slots;
+        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return DefaultedList.of();
+        if (!(player.currentScreenHandler instanceof ScreenHandler handler)) return DefaultedList.of();
+        return handler.slots;
     }
 }

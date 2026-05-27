@@ -7,6 +7,7 @@ import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
@@ -46,9 +47,10 @@ public class StoreStep extends Step implements ClientTickEndEvent, RenderSlotEve
 
     @Override
     public void onClientTickEnd(int tick) {
-        if (CLIENT.world == null || CLIENT.player == null || CLIENT.player.age < 20) return;
+        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return;
+        if (player.age < 20) return;
 
-        var stacks = CLIENT.player.getInventory().getMainStacks();
+        var stacks = player.getInventory().getMainStacks();
 
         boolean hasItems = false;
 

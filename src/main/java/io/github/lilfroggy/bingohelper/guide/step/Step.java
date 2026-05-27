@@ -5,7 +5,6 @@ import io.github.lilfroggy.bingohelper.guide.step.components.async.Async;
 import io.github.lilfroggy.bingohelper.guide.step.components.outline.Outline;
 import io.github.lilfroggy.bingohelper.guide.step.components.waypoint.Waypoint;
 import io.github.lilfroggy.bingohelper.config.Config;
-import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.GlowingEntities;

@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 import io.github.lilfroggy.bingohelper.events.Events;
-import io.github.lilfroggy.bingohelper.util.ChatLib;
 import net.minecraft.entity.Entity;
 
 public class EntityRegistry {

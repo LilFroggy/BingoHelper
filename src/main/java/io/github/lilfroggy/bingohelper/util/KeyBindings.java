@@ -44,7 +44,7 @@ public class KeyBindings {
         ChatLib.showTitle("", "§b" + command + " §7(§ePress " + keybindName + "§7)", 0, 1, 0);
 
         if (BINGO_GUIDE_ACTION.wasPressed()) {
-            ChatLib.command(command, false);
+            ChatLib.command(command);
         }
     }
 } 

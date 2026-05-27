@@ -11,6 +11,7 @@ import io.github.lilfroggy.bingohelper.util.Skyblock;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 
 public class BhCopyEnchants implements ClientCommand {
@@ -33,7 +34,8 @@ public class BhCopyEnchants implements ClientCommand {
     }
 
     private int execute(CommandContext<FabricClientCommandSource> context) {
-        ItemStack item = CLIENT.player.getMainHandStack();
+        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return 0;
+        ItemStack item = player.getMainHandStack();
         if (item == null) {
             ChatLib.chat("§cNo item in hand!");
             return 0;

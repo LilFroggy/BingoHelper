@@ -6,13 +6,11 @@ import org.jetbrains.annotations.Nullable;
 
 import io.github.lilfroggy.bingohelper.BingoHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
-import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
-import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
 
 public class ChatLib {
     private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
@@ -83,21 +81,14 @@ public class ChatLib {
     }
 
     /**
-     * Sends a command to the server or executes it client-side.
+     * Sends a command to the server.
      * @param command The command to send/execute
-     * @param clientSide Whether to execute as a client-side command (true) or send to server (false)
      */
-    public static void command(String command, boolean clientSide) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        ClientPlayerEntity player = client.player;
-        
-        if (player == null) return;
-        
-        if (clientSide) {
-            chat("yell at frog for not implementing client command support");
-        } else {
-            player.networkHandler.sendChatMessage(command);
-        }
+    public static void command(String command) {
+        if (command == null || command.isEmpty()) return;
+        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return;
+        String sanitized = command.startsWith("/") ? command.substring(1) : command;
+        player.networkHandler.sendChatCommand(sanitized);
     }
 
     /**
@@ -109,20 +100,16 @@ public class ChatLib {
      * @param fadeOut Fade out time in ticks
      */
     public static void showTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.getNetworkHandler() == null) return;
-        
-        // Set title timing
-        client.getNetworkHandler().onTitleFade(new TitleFadeS2CPacket(fadeIn, stay, fadeOut));
-        
-        // Show main title
-        if (title != null) {
-            client.getNetworkHandler().onTitle(new TitleS2CPacket(Text.literal(title)));
-        }
-        
-        // Show subtitle
+        if (!(CLIENT.inGameHud instanceof InGameHud hud)) return;
+
+        hud.setTitleTicks(fadeIn, stay, fadeOut);
+    
         if (subtitle != null) {
-            client.getNetworkHandler().onSubtitle(new SubtitleS2CPacket(Text.literal(subtitle)));
+            hud.setSubtitle(Text.literal(subtitle));
+        }
+    
+        if (title != null) {
+            hud.setTitle(Text.literal(title));
         }
     }
 
@@ -132,7 +119,7 @@ public class ChatLib {
      * @param subtitle The subtitle text (can be null)
      */
     public static void showTitle(String title, String subtitle) {
-        showTitle(title, subtitle, 10, 40, 10); // 0.5s fade in, 2s stay, 0.5s fade out
+        showTitle(title, subtitle, 10, 40, 10);
     }
 
     /**

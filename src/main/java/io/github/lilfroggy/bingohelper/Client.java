@@ -10,7 +10,6 @@ import io.github.lilfroggy.bingohelper.features.PuzzlerSolver;
 import io.github.lilfroggy.bingohelper.guide.Guide;
 import io.github.lilfroggy.bingohelper.update.UpdateManager;
 import io.github.lilfroggy.bingohelper.util.Bingo;
-import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.KeyBindings;
 import io.github.lilfroggy.bingohelper.util.Scoreboard;
 import io.github.lilfroggy.bingohelper.util.Skyblock;

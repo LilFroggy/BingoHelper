@@ -4,6 +4,7 @@ import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
+import net.minecraft.client.network.ClientPlayerEntity;
 
 import java.util.Map;
 
@@ -60,7 +61,8 @@ public class HasStep extends Step implements ClientTickEndEvent {
 
     @Override
     public void onClientTickEnd(int tick) {
-        if (CLIENT.world == null || CLIENT.player == null || CLIENT.player.age < 20) return;
+        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return;
+        if (player.age < 20) return;
 
         boolean allDone = true;
 

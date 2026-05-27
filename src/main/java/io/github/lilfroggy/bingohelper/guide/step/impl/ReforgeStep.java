@@ -6,7 +6,6 @@ import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.CloseScreenEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.RenderScreenEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
-import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.Display;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
@@ -15,6 +14,7 @@ import io.github.lilfroggy.bingohelper.mixin.HandledScreenAccessorMixin;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
@@ -72,11 +72,11 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
 
     @Override
     public void onClientTickEnd(int tick) {
-        if (CLIENT.player == null) return;
+        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return;
 
         boolean allDone = true;
 
-        for (ItemStack stack : CLIENT.player.getInventory()) {
+        for (ItemStack stack : player.getInventory()) {
             if (stack.isEmpty()) continue;
 
             String id = Skyblock.getID(stack);

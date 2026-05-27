@@ -11,8 +11,10 @@ import net.hypixel.data.region.Environment;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
@@ -99,7 +101,8 @@ public class Skyblock {
     }
 
     private static boolean bingoInName() {
-        return CLIENT.player.getDisplayName().getString().contains(symbols[Config.gamemodeIndex]);
+        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return false;
+        return player.getDisplayName().getString().contains(symbols[Config.gamemodeIndex]);
     }
 
     private static boolean bingoInTab() {
@@ -240,8 +243,10 @@ public class Skyblock {
         if (id == null) return 0;
         int count = 0;
 
-        if (CLIENT.player == null || CLIENT.player.currentScreenHandler == null) return 0;
-        var slots = CLIENT.player.currentScreenHandler.slots;
+        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return 0;
+        if (!(player.currentScreenHandler instanceof ScreenHandler handler)) return 0;
+
+        var slots = handler.slots;
 
         for (Slot slot : slots) {
             if (!(slot.inventory instanceof PlayerInventory)) continue;

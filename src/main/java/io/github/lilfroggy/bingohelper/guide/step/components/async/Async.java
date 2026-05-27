@@ -1,22 +1,21 @@
 package io.github.lilfroggy.bingohelper.guide.step.components.async;
 
 import io.github.lilfroggy.bingohelper.guide.Guide;
-import io.github.lilfroggy.bingohelper.util.entity.EntityPredicate;
 
 public class Async {
     public Integer effectiveIndex;
-    public EntityPredicate ifMob;
+    public AsyncRequirements requirements;
 
     public void init() {
         if (effectiveIndex == null) effectiveIndex = Integer.MAX_VALUE;
     }
 
     public void register() {
-        if (ifMob != null) ifMob.register();
+        if (requirements != null) requirements.register();
     }
 
     public void unregister() {
-        if (ifMob != null) ifMob.unregister();
+        if (requirements != null) requirements.unregister();
     }
 
     public boolean isBlocking() {
@@ -27,11 +26,11 @@ public class Async {
         return effectiveIndex;
     }
 
-    public boolean ifMob() {
-        return ifMob == null || ifMob.hasMatch();
+    public boolean meetsRequirements() {
+        return requirements == null || requirements.areMet();
     }
 
     public boolean isHidden() {
-        return !isBlocking() && !ifMob();
+        return !isBlocking() && !meetsRequirements();
     }
 }

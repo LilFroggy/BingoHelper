@@ -3,6 +3,7 @@ package io.github.lilfroggy.bingohelper.guide.step.impl;
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
+import net.minecraft.client.network.ClientPlayerEntity;
 
 public class ExperienceStep extends Step implements ClientTickEndEvent {
 
@@ -10,9 +11,9 @@ public class ExperienceStep extends Step implements ClientTickEndEvent {
 
     @Override
     public String formattedInstruction() {
-        if (CLIENT.player == null) return "(0/" + level + ")";
+        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return "(0/" + level + ")";
 
-        int playerLevel = CLIENT.player.experienceLevel;
+        int playerLevel = player.experienceLevel;
 
         return instruction
         .replaceAll("%level%", "(" + playerLevel + "/" + level + ")");
@@ -40,9 +41,9 @@ public class ExperienceStep extends Step implements ClientTickEndEvent {
 
     @Override
     public void onClientTickEnd(int tick) {
-        if (CLIENT.player == null) return;
+        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return;
 
-        int playerLevel = CLIENT.player.experienceLevel;
+        int playerLevel = player.experienceLevel;
     
         if (playerLevel >= level) complete();
     }
