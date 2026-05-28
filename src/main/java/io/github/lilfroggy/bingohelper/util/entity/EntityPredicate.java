@@ -21,22 +21,22 @@ public class EntityPredicate {
     public EntityPredicate delegate;
     
     public transient Set<Entity> cache;
-    private boolean glowing;
+    public boolean glowing;
     public int refCount;
 
     public EntityPredicate(String type, Vec3d position, String skin) {
         this.type = type;
         this.position = position;
         this.skin = skin;
-        this.register();
     }
 
     public void init() {
         cache = new HashSet<>();
     }
 
-    public void setGlowing(boolean state) {
-        this.glowing = state;
+    public EntityPredicate setGlowing(boolean state) {
+        getDelegateOrSelf().glowing = state;
+        return this;
     }
 
     public void register() {

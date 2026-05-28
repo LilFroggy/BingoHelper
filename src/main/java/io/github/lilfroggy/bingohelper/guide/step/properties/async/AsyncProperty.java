@@ -1,8 +1,8 @@
-package io.github.lilfroggy.bingohelper.guide.step.components.async;
+package io.github.lilfroggy.bingohelper.guide.step.properties.async;
 
 import io.github.lilfroggy.bingohelper.guide.Guide;
 
-public class Async {
+public class AsyncProperty {
     public Integer effectiveIndex;
     public AsyncRequirements requirements;
 

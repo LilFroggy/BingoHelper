@@ -153,16 +153,15 @@ public class Skyblock {
      * For enchanted books, returns "ENCHANTMENT_NAME_LEVEL" format.
      *
      * @param item The ItemStack to extract ID from
-     * @return The Skyblock item ID, or null if not found/invalid
+     * @return The Skyblock item ID, or an empty string if not found/invalid
      */
-    @Nullable
     public static String getID(ItemStack item) {
-        if (item == null || item.isEmpty()) return null;
+        if (item == null || item.isEmpty()) return "";
 
         NbtCompound nbt = getNbt(item);
-        if (nbt == null) return null;
+        if (nbt == null) return "";
 
-        return nbt.getString("id").orElse(null);
+        return nbt.getString("id").orElse("");
     }
 
     @Nullable
@@ -221,10 +220,10 @@ public class Skyblock {
      * @return The Skyblock item lore as a single string, or null if not found/invalid
      */
     public static String getLore(ItemStack item) {
-        if (item == null || item.isEmpty()) return null;
+        if (item == null || item.isEmpty()) return "";
 
         LoreComponent loreComponent = item.get(DataComponentTypes.LORE);
-        if (loreComponent == null) return null;
+        if (loreComponent == null) return "";
 
         // Convert lore lines to a single string with spaces
         return loreComponent.lines().stream()

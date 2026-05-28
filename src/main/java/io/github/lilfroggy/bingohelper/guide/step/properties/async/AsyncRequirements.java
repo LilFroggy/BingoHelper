@@ -1,4 +1,4 @@
-package io.github.lilfroggy.bingohelper.guide.step.components.async;
+package io.github.lilfroggy.bingohelper.guide.step.properties.async;
 
 import io.github.lilfroggy.bingohelper.util.entity.EntityPredicate;
 

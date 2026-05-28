@@ -75,7 +75,7 @@ public class Skills {
 
     private static void set(String skill, double level) {
         String id = ChatLib.toSnakeCase(skill);
-        double oldLevel = skills.getOrDefault(id, 0.0);
+        double oldLevel = getLevel(id);
         if (oldLevel == level) return;
         skills.put(id, level);
         if (Config.debug) Logger.info("Skill updated: " + id + ": " + oldLevel + " -> " + level);
@@ -93,7 +93,7 @@ public class Skills {
     }
     
     public static double getLevel(String skill) {
-        return skills.getOrDefault(ChatLib.toSnakeCase(skill), 0.0);
+        return skills.getOrDefault(ChatLib.toSnakeCase(skill), -1.0);
     }
 
     public static void reset() {

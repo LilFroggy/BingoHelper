@@ -64,7 +64,7 @@ public class RetrieveStep extends Step implements ClientTickEndEvent, RenderSlot
             if (stack.isEmpty()) continue;
 
             String itemId = Skyblock.getID(stack);
-            if (itemId == null || !items.contains(itemId)) continue;
+            if (itemId.isEmpty() || !items.contains(itemId)) continue;
 
             hasItems = true;
         }
@@ -78,7 +78,7 @@ public class RetrieveStep extends Step implements ClientTickEndEvent, RenderSlot
         ItemStack item = slot.getStack();
         if (item.isEmpty()) return;
         String itemId = Skyblock.getID(item);
-        if (itemId == null || !items.contains(itemId)) return;
+        if (itemId.isEmpty() || !items.contains(itemId)) return;
 
         RenderLib.highlightSlot(context, slot, RenderLib.MINECRAFT_AQUA);
     }

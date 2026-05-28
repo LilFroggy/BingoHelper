@@ -1,6 +1,8 @@
-package io.github.lilfroggy.bingohelper.guide.step.components.waypoint;
+package io.github.lilfroggy.bingohelper.guide.step.properties.waypoint;
 
-import io.github.lilfroggy.bingohelper.guide.step.components.outline.Outline;
+import java.util.List;
+
+import io.github.lilfroggy.bingohelper.guide.step.properties.outlineEntities.OutlineEntitiesProperty;
 import io.github.lilfroggy.bingohelper.util.render.RenderingEvent;
 import io.github.lilfroggy.bingohelper.util.render.RenderingEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
@@ -8,10 +10,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
 
-public class Waypoint implements RenderingEvent {
+public class WaypointProperty implements RenderingEvent {
     protected static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 
-    private Outline outlineEntity;
+    private List<OutlineEntitiesProperty> outlineEntities;
 
     public WaypointEntry[] list;
     public int index;
@@ -44,9 +46,9 @@ public class Waypoint implements RenderingEvent {
         this.index++;
     }
 
-    public void register(Outline outlineEntity) {
+    public void register(List<OutlineEntitiesProperty> outlineEntities) {
         init();
-        this.outlineEntity = outlineEntity;
+        this.outlineEntities = outlineEntities;
         RenderingEvents.LINE.register(this);
     }
 
@@ -58,7 +60,7 @@ public class Waypoint implements RenderingEvent {
     public void render(WorldRenderContext context, MatrixStack matrixStack, VertexConsumer consumer) {
         WaypointEntry entry = current();
 
-        if (outlineEntity != null && outlineEntity.hasMatch()) {
+        if (outlineEntities != null && outlineEntities.stream().anyMatch(OutlineEntitiesProperty::hasMatch)) {
             return;
         }
 

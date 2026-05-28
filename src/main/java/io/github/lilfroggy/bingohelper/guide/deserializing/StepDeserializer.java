@@ -5,12 +5,14 @@ import com.google.gson.GsonBuilder;
 
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.guide.step.impl.*;
+import io.github.lilfroggy.bingohelper.guide.step.properties.bingoRanks.BingoRanksProperty;
 import io.github.lilfroggy.bingohelper.util.Deserializer;
 import net.minecraft.util.math.Vec3d;
 
 public class StepDeserializer {
     private static final Gson GSON = new GsonBuilder()
         .registerTypeAdapter(Vec3d.class, new Vec3dAdapter())
+        .registerTypeAdapter(BingoRanksProperty.class, new RanksPropertyAdapter())
         .registerTypeAdapter(
             Step.class,
             new Deserializer<Step>("type")
@@ -24,7 +26,7 @@ public class StepDeserializer {
                 .register("enchant", EnchantStep.class)
                 .register("reforge", ReforgeStep.class)
                 .register("guiItem", GuiItemStep.class)
-                .register("guiClickSlot", GuiClickSlotStep.class)
+                .register("clickSlot", ClickSlotStep.class)
                 .register("store", StoreStep.class)
                 .register("retrieve", RetrieveStep.class)
                 .register("experience", ExperienceStep.class)

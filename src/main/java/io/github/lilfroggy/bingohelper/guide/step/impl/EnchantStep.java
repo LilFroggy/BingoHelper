@@ -72,7 +72,7 @@ public class EnchantStep extends Step implements RenderScreenEvent, ClientTickEn
             if (stack == null || stack.isEmpty()) continue;
 
             String itemId = Skyblock.getID(stack);
-            if (itemId == null) continue;
+            if (itemId.isEmpty()) continue;
             if (!items.containsKey(itemId)) continue;
 
             ItemInfo info = items.get(itemId);
@@ -95,7 +95,7 @@ public class EnchantStep extends Step implements RenderScreenEvent, ClientTickEn
             if (stack == null || stack.isEmpty()) continue;
 
             String itemId = Skyblock.getID(stack);
-            if (itemId == null) continue;
+            if (itemId.isEmpty()) continue;
             if (!items.containsKey(itemId)) continue;
 
             ItemInfo info = items.get(itemId);
@@ -156,7 +156,7 @@ public class EnchantStep extends Step implements RenderScreenEvent, ClientTickEn
             ItemStack item = slot.getStack();
             if (item.isEmpty()) continue;
             String itemId = Skyblock.getID(item);
-            if (itemId == null) continue;
+            if (itemId.isEmpty()) continue;
             if (!items.containsKey(itemId)) continue;
             if (items.get(itemId).done) continue;
 
@@ -166,6 +166,7 @@ public class EnchantStep extends Step implements RenderScreenEvent, ClientTickEn
 
     public void highlightMissingEnchants(DrawContext drawContext, ItemStack enchantItem, DefaultedList<Slot> slots) {
         String enchantItemId = Skyblock.getID(enchantItem);
+        if (enchantItemId.isEmpty()) return;
         if (!items.containsKey(enchantItemId)) return;
         List<String> requiredEnchants = items.get(enchantItemId).enchants;
 

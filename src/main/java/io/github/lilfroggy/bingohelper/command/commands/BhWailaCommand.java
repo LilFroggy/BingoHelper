@@ -152,7 +152,7 @@ public class BhWailaCommand implements ClientCommand {
         if (includeOutline) {
             if (!includeWaypoint) dataFormat = "outline";
             JsonObject outline = new JsonObject();
-            outline.addProperty("entityType", entityType);
+            outline.addProperty("type", entityType);
             
             JsonArray posArray = new JsonArray();
             posArray.add(x);

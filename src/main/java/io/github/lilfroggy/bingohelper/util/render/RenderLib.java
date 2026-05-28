@@ -5,7 +5,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.render.DrawStyle;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.slot.Slot;
@@ -144,17 +143,21 @@ public class RenderLib {
     }
 
     public static void highlightSlot(DrawContext context, Slot slot, int color) {
-        if (!(CLIENT.currentScreen instanceof GenericContainerScreen)) return;
-
         int x = slot.x;
         int y = slot.y;
 
-        // Calculate pulsing alpha (0.5 to 1.0)
         long time = System.currentTimeMillis();
-        float alpha = 0.45f + 0.10f * (float)Math.cos(time * 0.004); // oscillates between 0.5 and 1.0
+        float alpha = 0.45f + 0.10f * (float) Math.cos(time * 0.004); // oscillates between 0.5 and 1.0
         int baseRGB = color & 0x00FFFFFF;
-        int pulsingColor = ((int)(alpha * 255) << 24) | baseRGB;
+        int pulsingColor = ((int) (alpha * 255) << 24) | baseRGB;
         context.fill(x, y, x + 16, y + 16, pulsingColor);
+
+        int borderColor = 0xFF000000 | baseRGB; // 0xFF alpha (opaque) + base color
+    
+        context.fill(x - 1, y - 1, x + 17, y, borderColor);
+        context.fill(x - 1, y + 16, x + 17, y + 17, borderColor);
+        context.fill(x - 1, y, x, y + 16, borderColor);
+        context.fill(x + 16, y, x + 17, y + 16, borderColor);
     }
 
     public static int getFormattedStringWidth(String input) {

@@ -80,7 +80,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
             if (stack.isEmpty()) continue;
 
             String id = Skyblock.getID(stack);
-            if (id == null) continue;
+            if (id.isEmpty()) continue;
             if (!items.containsKey(id)) continue;
 
             String itemReforge = Skyblock.getReforge(stack);
@@ -120,7 +120,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
 
     public void renderReforgeDisplay(Screen screen, DrawContext context, ItemStack reforgeItem, String reforge) {
         String id = Skyblock.getID(reforgeItem);
-        if (id == null) return;
+        if (id.isEmpty()) return;
         
         // Check if we have a double chest open
         if (!(screen instanceof HandledScreen<?>)) return;
@@ -196,7 +196,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
             ItemStack item = slot.getStack();
             if (item.isEmpty()) continue;
             String id = Skyblock.getID(item);
-            if (id == null) continue;
+            if (id.isEmpty()) continue;
             if (!items.containsKey(id)) continue;
             if (items.get(id).done) continue;
 
@@ -210,7 +210,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
         ItemStack reforgeItem = slot.inventory.getStack(REFORGE_ITEM_SLOT_ID);
         if (reforgeItem.isEmpty()) return;
         String itemId = Skyblock.getID(reforgeItem);
-        if (itemId == null || !items.containsKey(itemId)) return;
+        if (itemId.isEmpty() || !items.containsKey(itemId)) return;
         ItemInfo info = items.get(itemId);
         String reforge = Skyblock.getReforge(reforgeItem);
         if (reforge == null) return;

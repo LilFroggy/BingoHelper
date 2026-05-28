@@ -7,8 +7,6 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jetbrains.annotations.Nullable;
-
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
@@ -17,15 +15,9 @@ import net.minecraft.util.Formatting;
 
 public class Bingo {
     private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
-
     private static final ClientTickEndEvent UPDATE_RANK = Bingo::updateRank;
-
     private static final Pattern RANK_COLOR_PATTERN = Pattern.compile("§(.)Ⓑ");
-
     private static final ZoneId EASTERN_TIME = ZoneId.of("America/New_York");
-
-    @Nullable
-    private static Integer rank;
 
     public static void init() {
         Events.CLIENT_TICK_END.register(UPDATE_RANK);
@@ -44,13 +36,13 @@ public class Bingo {
         
         if (formatting == null) return;
         
-        rank = getRankFromFormatting(formatting);
+        Config.bingoRank = getRankFromFormatting(formatting);
         Events.CLIENT_TICK_END.unregister(UPDATE_RANK);
-        Logger.info("Set bingo rank: " + rank, !Config.debug);
+        Logger.info("Set bingo rank: " + Config.bingoRank, !Config.debug);
     }
 
-    private static Integer getRankFromFormatting(Formatting f) {
-        return switch (f) {
+    private static int getRankFromFormatting(Formatting formatting) {
+        return switch (formatting) {
             case GRAY -> 0;
             case GREEN -> 1;
             case BLUE -> 2;
@@ -58,7 +50,7 @@ public class Bingo {
             case GOLD -> 4;
             case LIGHT_PURPLE -> 5;
             case AQUA -> 6;
-            default -> null;
+            default -> 0;
         };
     }
 
@@ -77,7 +69,7 @@ public class Bingo {
         return hoursUntil < x;
     }
 
-    public static Integer rank() {
-        return rank;
+    public static int rank() {
+        return Config.bingoRank;
     }
 }

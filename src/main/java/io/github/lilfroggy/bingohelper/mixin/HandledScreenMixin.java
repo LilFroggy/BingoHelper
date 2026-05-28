@@ -1,14 +1,12 @@
 package io.github.lilfroggy.bingohelper.mixin;
 
 import io.github.lilfroggy.bingohelper.events.Events;
-import net.minecraft.screen.ScreenHandler;
+import io.github.lilfroggy.bingohelper.util.ScreenUtils;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.network.ClientPlayerEntity;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -39,16 +37,7 @@ public class HandledScreenMixin {
     @Inject(method = "drawSlots", at = @At("TAIL"))
     private void onDrawSlots(DrawContext context, int mouseX, int mouseY, CallbackInfo ci) {
         if (Events.RENDER_SCREEN.getListeners().isEmpty()) return;
-        
-        Screen screen = CLIENT.currentScreen;
-        if (screen == null || screen.getTitle() == null) return;
-        String title = screen.getTitle().getString();
 
-        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return;
-        if (!(player.currentScreenHandler instanceof ScreenHandler handler)) return;
-
-        var slots = handler.slots;
-
-        Events.RENDER_SCREEN.invoke(listener -> listener.onRenderScreen(context, screen, title, slots));
+        Events.RENDER_SCREEN.invoke(listener -> listener.onRenderScreen(context, CLIENT.currentScreen, ScreenUtils.getTitle(), ScreenUtils.getSlots()));
     }
 }

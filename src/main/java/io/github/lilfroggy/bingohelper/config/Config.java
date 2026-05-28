@@ -163,6 +163,23 @@ public class Config extends Vigilant {
     public static int gamemodeIndex = 0;
 
     @Property(
+        type = PropertyType.NUMBER,
+        name = "Bingo Rank",
+        category = "Dev",
+        min = -1,
+        max = Integer.MAX_VALUE
+    )
+    public static int bingoRank = -1;
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Validate Guides",
+        description = "§cMay cause crashes if disabled!",
+        category = "Dev"
+    )
+    public static boolean validateGuides = true;
+
+    @Property(
         type = PropertyType.SWITCH,
         name = "Debug",
         category = "Dev"
@@ -175,13 +192,6 @@ public class Config extends Vigilant {
         category = "Dev"
     )
     public static String jsonIndent = "\\t";
-
-    @Property(
-        type = PropertyType.SWITCH,
-        name = "Validate Guides",
-        category = "Dev"
-    )
-    public static boolean validateGuides = true;
 
     public static final Config INSTANCE = new Config(); // Needs to be at the bottom or the default values take priority
 

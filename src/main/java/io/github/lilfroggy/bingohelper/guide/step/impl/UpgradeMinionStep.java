@@ -92,7 +92,7 @@ public class UpgradeMinionStep extends Step implements ClientTickEndEvent, Click
 
     private void handleNavigationClick(ItemStack stack) {
         String id = Skyblock.getID(stack);
-        if (id == null || !id.equals(desiredId)) return;
+        if (id.isEmpty() || !id.equals(desiredId)) return;
 
         desiredName = stack.getName().getString();
         navigating = false;

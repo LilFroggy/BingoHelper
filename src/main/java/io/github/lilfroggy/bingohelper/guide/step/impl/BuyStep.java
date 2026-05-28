@@ -114,7 +114,7 @@ public class BuyStep extends Step implements MessageEvent, RenderScreenEvent {
             ItemStack item = slot.getStack();
             if (item.isEmpty()) continue;
             String id = Skyblock.getID(item);
-            if (id == null) continue;
+            if (id.isEmpty()) continue;
             if (!items.containsKey(id)) continue;
             ItemInfo itemInfo = items.get(id);
 

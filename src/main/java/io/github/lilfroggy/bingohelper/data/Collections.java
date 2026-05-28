@@ -47,7 +47,7 @@ public class Collections {
     private static void set(String collection, Object level) {
         String id = ChatLib.toSnakeCase(collection);
         Integer newLevel = ChatLib.decodeNumeral(level.toString());
-        Integer oldLevel = collections.get(id);
+        Integer oldLevel = getLevel(id);
         collections.put(id, newLevel);
 
         if (Config.debug) Logger.info("Collection updated: " + id + " " + oldLevel + " -> " + newLevel);
@@ -60,7 +60,7 @@ public class Collections {
     }
     
     public static Integer getLevel(String collection) {
-        return collections.getOrDefault(ChatLib.toSnakeCase(collection), null);
+        return collections.getOrDefault(ChatLib.toSnakeCase(collection), -1);
     }
     
     public static int getUnlocked(int tier) {

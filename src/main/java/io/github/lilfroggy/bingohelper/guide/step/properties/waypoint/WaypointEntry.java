@@ -1,4 +1,4 @@
-package io.github.lilfroggy.bingohelper.guide.step.components.waypoint;
+package io.github.lilfroggy.bingohelper.guide.step.properties.waypoint;
 
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;

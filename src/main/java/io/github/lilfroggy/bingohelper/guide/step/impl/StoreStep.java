@@ -58,7 +58,7 @@ public class StoreStep extends Step implements ClientTickEndEvent, RenderSlotEve
             if (stack.isEmpty()) continue;
 
             String id = Skyblock.getID(stack);
-            if(id == null || !items.contains(id)) continue;
+            if(id.isEmpty() || !items.contains(id)) continue;
 
             hasItems = true;
         }
@@ -72,7 +72,7 @@ public class StoreStep extends Step implements ClientTickEndEvent, RenderSlotEve
         ItemStack item = slot.getStack();
         if (item.isEmpty()) return;
         String itemId = Skyblock.getID(item);
-        if (itemId == null || !items.contains(itemId)) return;
+        if (itemId.isEmpty() || !items.contains(itemId)) return;
 
         RenderLib.highlightSlot(context, slot, RenderLib.MINECRAFT_AQUA);
     }

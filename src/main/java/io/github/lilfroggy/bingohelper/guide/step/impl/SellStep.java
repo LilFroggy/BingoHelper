@@ -58,7 +58,7 @@ public class SellStep extends Step implements ClientTickEndEvent, RenderSlotEven
             if (stack.isEmpty()) continue;
 
             String id = Skyblock.getID(stack);
-            if(id == null || !items.contains(id)) continue;
+            if(id.isEmpty() || !items.contains(id)) continue;
 
             hasItems = true;
         }
@@ -72,7 +72,7 @@ public class SellStep extends Step implements ClientTickEndEvent, RenderSlotEven
         ItemStack item = slot.getStack();
         if (item.isEmpty()) return;
         String itemId = Skyblock.getID(item);
-        if (itemId == null || !items.contains(itemId)) return;
+        if (itemId.isEmpty() || !items.contains(itemId)) return;
         
         RenderLib.highlightSlot(context, slot, RenderLib.MINECRAFT_RED);
     }

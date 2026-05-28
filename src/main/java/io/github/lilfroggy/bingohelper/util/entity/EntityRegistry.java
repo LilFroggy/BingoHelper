@@ -2,10 +2,8 @@ package io.github.lilfroggy.bingohelper.util.entity;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import io.github.lilfroggy.bingohelper.events.Events;
-import net.minecraft.entity.Entity;
 
 public class EntityRegistry {
     private static final Map<EntityPredicate, EntityPredicate> REGISTRY = new HashMap<>();
@@ -26,11 +24,6 @@ public class EntityRegistry {
         if (canonical.getRefCount() <= 0) {
             REGISTRY.remove(canonical);
         }
-    }
-
-    public static Set<Entity> getEntities(EntityPredicate predicate) {
-        EntityPredicate canonical = REGISTRY.get(predicate);
-        return (canonical != null) ? canonical.getMatches() : Set.of();
     }
 
     public static void onClientTickEnd(int tick) {

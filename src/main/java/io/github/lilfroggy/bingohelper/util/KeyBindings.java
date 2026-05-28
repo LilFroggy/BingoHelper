@@ -41,7 +41,7 @@ public class KeyBindings {
         
         if (command.isEmpty() || !command.startsWith("/")) return;
         String keybindName = BINGO_GUIDE_ACTION.getBoundKeyLocalizedText().getString();
-        ChatLib.showTitle("", "§b" + command + " §7(§ePress " + keybindName + "§7)", 0, 1, 0);
+        ChatLib.showTitle("", "§b" + command + " §7(§ePress " + keybindName + "§7)", 0, 2, 0);
 
         if (BINGO_GUIDE_ACTION.wasPressed()) {
             ChatLib.command(command);

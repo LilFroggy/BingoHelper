@@ -1,18 +1,22 @@
 package io.github.lilfroggy.bingohelper.guide.step.impl;
 
+import java.util.List;
+
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
-import io.github.lilfroggy.bingohelper.util.ScreenUtils;
-import io.github.lilfroggy.bingohelper.util.Skyblock;
-import net.minecraft.item.ItemStack;
+import io.github.lilfroggy.bingohelper.util.slot.SlotPredicate;
 
 public class GuiItemStep extends Step implements ClientTickEndEvent {
 
     public String guiName;
-    public int itemIndex;
-    public String has;
-    public String doesntHave;
+    public Integer slotIndex;
+    public String skyblockId;
+    public List<String> has;
+    public List<String> doesntHave;
+    public Boolean playerInv;
+
+    public SlotPredicate predicate;
 
     @Override
     public String formattedInstruction() {
@@ -21,7 +25,7 @@ public class GuiItemStep extends Step implements ClientTickEndEvent {
 
     @Override
     public void onInit() {
-        // Nothing to reset
+        predicate = new SlotPredicate(guiName, slotIndex, skyblockId, has, doesntHave, playerInv, null);
     }
 
     @Override
@@ -31,52 +35,18 @@ public class GuiItemStep extends Step implements ClientTickEndEvent {
 
     @Override
     protected void onActivate() {
+        predicate.register();
         Events.CLIENT_TICK_END.register(this);
     }
 
     @Override
     protected void onDeactivate() {
+        predicate.unregister();
         Events.CLIENT_TICK_END.unregister(this);
     }
 
     @Override
     public void onClientTickEnd(int tick) {
-        if (!ScreenUtils.getTitle().equals(guiName)) return;
-
-        if (has == null && doesntHave == null) {
-            complete();
-            return;
-        }
-        
-        var slots = ScreenUtils.getSlots();
-
-        if (itemIndex >= slots.size()) return;
-        
-        ItemStack item = slots.get(itemIndex).getStack();
-
-        if (item.isEmpty()) return;
-        
-        String lore = Skyblock.getLore(item);
-
-        boolean done = true;
-        
-        if (has != null) {
-            boolean hasInLore = lore.contains(has);
-            boolean hasInName = item.getName().getString().contains(has);
-            if (!hasInLore && !hasInName) {
-                done = false;
-            }
-        }
-        
-        if (doesntHave != null) {
-            boolean hasInLore = lore.contains(doesntHave);
-            boolean hasInName = item.getName().getString().contains(doesntHave);
-            if (hasInLore || hasInName) {
-                done = false;
-            }
-        }
-        
-        if (done) complete();
+        if (predicate.hasMatch()) complete();
     }
-
 }

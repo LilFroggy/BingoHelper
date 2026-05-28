@@ -1,9 +1,14 @@
 package io.github.lilfroggy.bingohelper.guide.step;
 
 import io.github.lilfroggy.bingohelper.guide.Guide;
-import io.github.lilfroggy.bingohelper.guide.step.components.async.Async;
-import io.github.lilfroggy.bingohelper.guide.step.components.outline.Outline;
-import io.github.lilfroggy.bingohelper.guide.step.components.waypoint.Waypoint;
+import io.github.lilfroggy.bingohelper.guide.step.properties.async.AsyncProperty;
+import io.github.lilfroggy.bingohelper.guide.step.properties.bingoRanks.BingoRanksProperty;
+import io.github.lilfroggy.bingohelper.guide.step.properties.highlightSlots.HighlightSlotsProperty;
+import io.github.lilfroggy.bingohelper.guide.step.properties.outlineEntities.OutlineEntitiesProperty;
+import io.github.lilfroggy.bingohelper.guide.step.properties.waypoint.WaypointProperty;
+
+import java.util.List;
+
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
@@ -24,13 +29,14 @@ public abstract class Step {
     public String type;
     public String instruction;
     public String command;
-    public String clientCommand;
-    public Waypoint waypoint;
-    public Outline outlineEntity;
-    public Async async;
+    public WaypointProperty waypoint;
+    public List<OutlineEntitiesProperty> outlineEntities;
+    public List<HighlightSlotsProperty> highlightSlots;
+    public AsyncProperty async;
+    public BingoRanksProperty bingoRanks;
 
     public void init() {
-
+        onInit();
     }
 
     public void setIndex(int index) {
@@ -86,8 +92,10 @@ public abstract class Step {
         if (isActive()) return;
         isActive = true;
 
-        if (outlineEntity != null) outlineEntity.register();
-        if (waypoint != null) waypoint.register(outlineEntity);
+        if (outlineEntities != null) outlineEntities.forEach(OutlineEntitiesProperty::register);
+        if (highlightSlots != null) highlightSlots.forEach(HighlightSlotsProperty::register);
+        if (waypoint != null) waypoint.register(outlineEntities);
+        if (bingoRanks != null) bingoRanks.register(this);
         if (async != null) async.register();
 
         Guide.stepStartTime = System.currentTimeMillis();
@@ -100,8 +108,10 @@ public abstract class Step {
         if (!isActive()) return;
         isActive = false;
 
-        if (outlineEntity != null) outlineEntity.unregister();
+        if (outlineEntities != null) outlineEntities.forEach(OutlineEntitiesProperty::unregister);
+        if (highlightSlots != null) highlightSlots.forEach(HighlightSlotsProperty::unregister);
         if (waypoint != null) waypoint.unregister();
+        if (bingoRanks != null) bingoRanks.unregister();
         if (async != null) async.unregister();
         GlowingEntities.clear();
 
