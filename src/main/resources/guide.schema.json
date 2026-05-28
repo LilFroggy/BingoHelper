@@ -16,7 +16,12 @@
                             "instruction": { "type": "string" },
                             "command": { "type": "string" },
                             "waypoint": { "$ref": "#/definitions/WaypointProperty" },
-                            "outlineEntity": { "$ref": "#/definitions/OutlineEntityProperty" },
+                            "outlineEntities": { "$ref": "#/definitions/OutlineEntitiesProperty" },
+                            "highlightSlots": { "$ref": "#/definitions/HighlightSlotsProperty" },
+                            "bingoRanks": { "type": "array",
+                                "items": { "type": "integer" },
+                                "minItems": 1
+                            },
 							"async": { "$ref": "#/definitions/AsyncProperty" }
                         },
                         "oneOf": [
@@ -30,7 +35,7 @@
                             { "$ref": "#/definitions/EnchantStep" },
                             { "$ref": "#/definitions/ReforgeStep" },
                             { "$ref": "#/definitions/GuiItemStep" },
-                            { "$ref": "#/definitions/GuiClickSlotStep" },
+                            { "$ref": "#/definitions/ClickSlotStep" },
                             { "$ref": "#/definitions/SkillStep" },
                             { "$ref": "#/definitions/CollectionStep" },
                             { "$ref": "#/definitions/StoreStep" },
@@ -93,8 +98,17 @@
                 "index"
             ]
         },
-        "OutlineEntityProperty": { "type": "object",
-            "$ref": "#/definitions/EntityPredicate"
+        "OutlineEntitiesProperty": { "type": "array",
+            "items": {
+                "$ref": "#/definitions/EntityPredicate"
+            },
+            "minItems": 1
+        },
+        "HighlightSlotsProperty": { "type": "array",
+            "items": {
+                "$ref": "#/definitions/SlotPredicate"
+            },
+            "minItems": 1
         },
 		"AsyncProperty": { "type": "object",
             "properties": {
@@ -122,6 +136,28 @@
 			"additionalProperties": false,
 			"minProperties": 1
 		},
+        "SlotPredicate": { "type": "object",
+			"properties": {
+                "guiName": { "type": "string" },
+                "slotIndex": { "type": "integer" },
+                "skyblockId": { "$ref": "#/definitions/ItemIds" },
+                "has": { "type": "array",
+                    "items": { "type": "string" },
+                    "minItems": 1
+                },
+                "doesntHave": { "type": "array",
+                    "items": { "type": "string" },
+                    "minItems": 1
+                },
+                "playerInv": { "type": "boolean" },
+                "highlightColor": { "type": "string",
+                    "format": "color",
+                    "pattern": "^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$"
+                }
+            },
+			"additionalProperties": false,
+			"minProperties": 1
+		},
         "StepTypes": {
             "enum": [
                 "message",
@@ -134,7 +170,7 @@
                 "enchant",
                 "reforge",
                 "guiItem",
-                "guiClickSlot",
+                "clickSlot",
                 "skill",
                 "collection",
                 "store",
@@ -299,28 +335,39 @@
                 "items"
             ]
         },
-        "GuiItemStep": { "type": "object",
+        "GuiItemStep": {
             "properties": {
                 "type": { "const": "guiItem" },
                 "guiName": { "type": "string" },
-                "itemIndex": { "type": "integer" },
-                "has": { "type": "string" },
-                "doesntHave": { "type": "string" }
-            },
-            "required": [
-                "guiName"
-            ]
+                "slotIndex": { "type": "integer" },
+                "skyblockId": { "$ref": "#/definitions/ItemIds" },
+                "has": { "type": "array",
+                    "items": { "type": "string" },
+                    "minItems": 1
+                },
+                "doesntHave": { "type": "array",
+                    "items": { "type": "string" },
+                    "minItems": 1
+                },
+                "playerInv": { "type": "boolean" }
+            }
         },
-        "GuiClickSlotStep": { "type": "object",
+        "ClickSlotStep": { "type": "object",
             "properties": {
-                "type": { "const": "guiClickSlot" },
+                "type": { "const": "clickSlot" },
                 "guiName": { "type": "string" },
-                "slotIndex": { "type": "integer" }
-            },
-            "required": [
-                "guiName",
-                "slotIndex"
-            ]
+                "slotIndex": { "type": "integer" },
+                "skyblockId": { "$ref": "#/definitions/ItemIds" },
+                "has": { "type": "array",
+                    "items": { "type": "string" },
+                    "minItems": 1
+                },
+                "doesntHave": { "type": "array",
+                    "items": { "type": "string" },
+                    "minItems": 1
+                },
+                "playerInv": { "type": "boolean" }
+            }
         },
         "SkillStep": { "type": "object",
             "properties": {
@@ -403,31 +450,7 @@
             ]
         },
 		"MobTypes": {
-            "enum": [
-				"airborne",
-				"animal",
-				"aquatic",
-				"arcane",
-				"arthropod",
-				"construct",
-				"cubic",
-				"elusive",
-				"ender",
-				"frozen",
-				"glacial",
-				"humanoid",
-				"infernal",
-				"magmatic",
-				"mythological",
-				"pest",
-				"shielded",
-				"skeletal",
-				"spooky",
-				"subterranean",
-				"undead",
-				"wither",
-				"woodland"
-			]
+            "type": "string"
         },
         "MinionIds": {
             "type": "string"

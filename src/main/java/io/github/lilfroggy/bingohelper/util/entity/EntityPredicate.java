@@ -1,15 +1,18 @@
 package io.github.lilfroggy.bingohelper.util.entity;
 
 import io.github.lilfroggy.bingohelper.util.EntityUtils;
-import io.github.lilfroggy.bingohelper.util.render.GlowingEntities;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+
+import org.jetbrains.annotations.Nullable;
 
 public class EntityPredicate {
     private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
@@ -19,9 +22,9 @@ public class EntityPredicate {
     private String skin;
 
     public EntityPredicate delegate;
+    public transient Entity closest;
     
     public transient Set<Entity> cache;
-    public boolean glowing;
     public int refCount;
 
     public EntityPredicate(String type, Vec3d position, String skin) {
@@ -32,11 +35,6 @@ public class EntityPredicate {
 
     public void init() {
         cache = new HashSet<>();
-    }
-
-    public EntityPredicate setGlowing(boolean state) {
-        getDelegateOrSelf().glowing = state;
-        return this;
     }
 
     public void register() {
@@ -61,18 +59,32 @@ public class EntityPredicate {
         return getDelegateOrSelf().cache;
     }
 
+    @Nullable
+    public Entity getClosest() {
+        return getDelegateOrSelf().closest;
+    }
+
     public boolean hasMatch() {
         return !getDelegateOrSelf().cache.isEmpty();
     }
 
     public void scanWorld() {
         cache.clear();
-        if (CLIENT.world == null) return;
-        for (Entity entity : CLIENT.world.getEntities()) {
+        if (!(CLIENT.world instanceof ClientWorld world)) return;
+        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return;
+
+        closest = null;
+        double nearestSq = Double.MAX_VALUE;
+
+        for (Entity entity : world.getEntities()) {
             if (matches(entity)) {
                 cache.add(entity);
-                if (glowing) {
-                    GlowingEntities.add(entity, 0, 255, 255, 255);
+                
+                double distanceSq = player.squaredDistanceTo(entity);
+                
+                if (distanceSq < nearestSq) {
+                    nearestSq = distanceSq;
+                    closest = entity;
                 }
             }
         }
