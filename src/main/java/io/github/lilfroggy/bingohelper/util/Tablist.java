@@ -3,7 +3,10 @@ package io.github.lilfroggy.bingohelper.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.Events;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -13,6 +16,10 @@ import net.minecraft.text.Text;
 // Shoutout Skyblocker
 
 public class Tablist {
+    private static final Pattern ISLAND_REGEX = Pattern.compile("(?:Area|Dungeon): (.*)");
+
+    private static String island;
+
     private static List<String> lines = new ArrayList<>();
 
     static {
@@ -26,6 +33,7 @@ public class Tablist {
     private static void onClientTickEnd(int tick) {
         if(tick % 20 != 0) return;
         update();
+        updateIsland();
     }
 
     private static void update() {
@@ -40,6 +48,21 @@ public class Tablist {
             .map(Text::getString)
             .map(String::strip)
             .toList();
+    }
+
+    private static void updateIsland() {
+        for (String line : getLines()) {
+            Matcher matcher = ISLAND_REGEX.matcher(line);
+
+            if (!matcher.matches()) continue;
+
+            String oldIsland = island;
+            island = matcher.group(1);
+            if (island.equals(oldIsland)) break;
+            Events.CHANGE_ISLAND.invoke(listener -> listener.onIslandChange(oldIsland, oldIsland));
+            Logger.info("" + oldIsland + " -> " + island, !Config.debug);
+            break;
+        }
     }
 
     public static List<String> getLines() {

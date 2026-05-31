@@ -73,7 +73,7 @@ public class Skills {
         }
     }
 
-    private static void set(String skill, double level) {
+    public static void set(String skill, double level) {
         String id = ChatLib.toSnakeCase(skill);
         double oldLevel = getLevel(id);
         if (oldLevel == level) return;
@@ -82,7 +82,7 @@ public class Skills {
         Events.LEVEL_SKILL.invoke(listener -> listener.onLevelSkill(id, oldLevel, level));
     }
 
-    private static void set(String skill, String level) {
+    public static void set(String skill, String level) {
         Integer decoded = ChatLib.decodeNumeral(level.toString());
         if (decoded == null) return;
         set(skill, (double) decoded);
@@ -93,7 +93,7 @@ public class Skills {
     }
     
     public static double getLevel(String skill) {
-        return skills.getOrDefault(ChatLib.toSnakeCase(skill), -1.0);
+        return skills.getOrDefault(ChatLib.toSnakeCase(skill), 0.0);
     }
 
     public static void reset() {

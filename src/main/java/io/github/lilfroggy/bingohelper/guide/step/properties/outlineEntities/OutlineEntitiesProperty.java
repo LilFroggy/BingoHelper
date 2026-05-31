@@ -17,8 +17,8 @@ import net.minecraft.util.math.Vec3d;
 public class OutlineEntitiesProperty extends EntityPredicate implements ClientTickEndEvent, RenderingEvent {
     private static final int DEFAULT_LINE_COLOR = RenderLib.MINECRAFT_AQUA;
 
-    public OutlineEntitiesProperty(String type, Vec3d position, String skin) {
-        super(type, position, skin);
+    public OutlineEntitiesProperty(Line line, String type, Vec3d position, String skin) {
+        super(line, type, position, skin);
     }
 
     public void register() {
@@ -42,9 +42,21 @@ public class OutlineEntitiesProperty extends EntityPredicate implements ClientTi
 
     @Override
     public void render(WorldRenderContext context, MatrixStack matrixStack, VertexConsumer consumer) {
-        Entity closest = super.getClosest();
-        if (closest == null) return;
-        Vec3d mid = EntityUtils.getEntityMid(closest);
-        RenderLib.renderLineFromCursor(context, mid, DEFAULT_LINE_COLOR);
+        switch (super.line()) {
+            case NONE:
+                return;
+            case NEAREST:
+                Entity closest = super.getClosest();
+                if (closest == null) return;
+                renderLine(context, closest);
+                break;
+            case ALL:
+                super.getMatches().forEach(entity -> renderLine(context, entity));
+                break;
+        }
+    }
+
+    private void renderLine(WorldRenderContext context, Entity entity) {
+        RenderLib.renderLineFromCursor(context, EntityUtils.getEntityMid(entity), DEFAULT_LINE_COLOR);
     }
 }

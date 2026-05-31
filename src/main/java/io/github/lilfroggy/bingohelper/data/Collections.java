@@ -44,7 +44,7 @@ public class Collections {
         else if (collectionTierOne.matches()) set(collectionTierOne.group(1), collectionTierOne.group(2));
     }
     
-    private static void set(String collection, Object level) {
+    public static void set(String collection, Object level) {
         String id = ChatLib.toSnakeCase(collection);
         Integer newLevel = ChatLib.decodeNumeral(level.toString());
         Integer oldLevel = getLevel(id);

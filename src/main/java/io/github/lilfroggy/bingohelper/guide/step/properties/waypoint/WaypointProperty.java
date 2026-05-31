@@ -59,6 +59,7 @@ public class WaypointProperty implements RenderingEvent {
     @Override
     public void render(WorldRenderContext context, MatrixStack matrixStack, VertexConsumer consumer) {
         WaypointEntry entry = current();
+        if (entry.isWithinRadius()) return;
 
         if (outlineEntities != null && outlineEntities.stream().anyMatch(OutlineEntitiesProperty::hasMatch)) {
             return;

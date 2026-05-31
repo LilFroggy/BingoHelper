@@ -1,6 +1,8 @@
 package io.github.lilfroggy.bingohelper.command.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import io.github.lilfroggy.bingohelper.command.ClientCommand;
 import io.github.lilfroggy.bingohelper.data.Collections;
@@ -15,10 +17,14 @@ public class BhCollectionsCommand implements ClientCommand {
     @Override
     public void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
         dispatcher.register(ClientCommandManager.literal("bhcollections")
-                .then(ClientCommandManager.literal("list")
-                        .executes(this::listCollections))
-                .then(ClientCommandManager.literal("reset")
-                        .executes(this::resetCollections)));
+            .then(ClientCommandManager.literal("list")
+                .executes(this::listCollections))
+            .then(ClientCommandManager.literal("reset")
+                .executes(this::resetCollections))
+            .then(ClientCommandManager.literal("set")
+                .then(ClientCommandManager.argument("name", StringArgumentType.string())
+                .then(ClientCommandManager.argument("level", IntegerArgumentType.integer())
+                .executes(this::setCollection)))));
     }
 
     @Override
@@ -51,6 +57,17 @@ public class BhCollectionsCommand implements ClientCommand {
     private int resetCollections(CommandContext<FabricClientCommandSource> context) {
         Collections.reset();
         ChatLib.chat("§aAll collection data has been reset.");
+        return 1;
+    }
+
+    private int setCollection(CommandContext<FabricClientCommandSource> context) {
+        String name = StringArgumentType.getString(context, "name");
+        Integer level = IntegerArgumentType.getInteger(context, "level");
+    
+        Collections.set(name, level);
+
+        ChatLib.chat("§aSet collection §b" + name + " §ato level §b" + level);
+    
         return 1;
     }
 }

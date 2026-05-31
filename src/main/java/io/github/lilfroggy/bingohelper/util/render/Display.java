@@ -33,7 +33,7 @@ public class Display {
             this.text = MultilineText.create(
                 CLIENT.textRenderer,
                 Text.literal(ChatLib.replaceAmpersands(string)),
-                200
+                Integer.MAX_VALUE
             );
             lineCount = this.text.getLineCount();
             maxWidth = this.text.getMaxWidth();

@@ -1,6 +1,8 @@
 package io.github.lilfroggy.bingohelper.command.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import io.github.lilfroggy.bingohelper.command.ClientCommand;
 import io.github.lilfroggy.bingohelper.data.Skills;
@@ -15,10 +17,14 @@ public class BhSkillsCommand implements ClientCommand {
     @Override
     public void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
         dispatcher.register(ClientCommandManager.literal("bhskills")
-                .then(ClientCommandManager.literal("list")
-                        .executes(this::listSkills))
-                .then(ClientCommandManager.literal("reset")
-                        .executes(this::resetSkills)));
+            .then(ClientCommandManager.literal("list")
+                .executes(this::listSkills))
+            .then(ClientCommandManager.literal("reset")
+                .executes(this::resetSkills))
+            .then(ClientCommandManager.literal("set")
+                .then(ClientCommandManager.argument("name", StringArgumentType.string())
+                .then(ClientCommandManager.argument("level", DoubleArgumentType.doubleArg())
+                .executes(this::setSkill)))));
     }
 
     @Override
@@ -51,6 +57,17 @@ public class BhSkillsCommand implements ClientCommand {
     private int resetSkills(CommandContext<FabricClientCommandSource> context) {
         Skills.reset();
         ChatLib.chat("§aAll skill data has been reset.");
+        return 1;
+    }
+
+    private int setSkill(CommandContext<FabricClientCommandSource> context) {
+        String name = StringArgumentType.getString(context, "name");
+        double level = DoubleArgumentType.getDouble(context, "level");
+    
+        Skills.set(name, level);
+
+        ChatLib.chat("§aSet skill §b" + name + " §ato level §b" + level);
+    
         return 1;
     }
 }

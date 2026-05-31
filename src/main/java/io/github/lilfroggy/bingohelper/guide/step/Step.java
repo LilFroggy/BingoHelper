@@ -4,6 +4,7 @@ import io.github.lilfroggy.bingohelper.guide.Guide;
 import io.github.lilfroggy.bingohelper.guide.step.properties.async.AsyncProperty;
 import io.github.lilfroggy.bingohelper.guide.step.properties.bingoRanks.BingoRanksProperty;
 import io.github.lilfroggy.bingohelper.guide.step.properties.highlightSlots.HighlightSlotsProperty;
+import io.github.lilfroggy.bingohelper.guide.step.properties.navTo.NavToProperty;
 import io.github.lilfroggy.bingohelper.guide.step.properties.outlineEntities.OutlineEntitiesProperty;
 import io.github.lilfroggy.bingohelper.guide.step.properties.waypoint.WaypointProperty;
 
@@ -29,11 +30,12 @@ public abstract class Step {
     public String type;
     public String instruction;
     public String command;
+    public NavToProperty navTo;
     public WaypointProperty waypoint;
     public List<OutlineEntitiesProperty> outlineEntities;
     public List<HighlightSlotsProperty> highlightSlots;
-    public AsyncProperty async;
     public BingoRanksProperty bingoRanks;
+    public AsyncProperty async;
 
     public void init() {
         onInit();
@@ -92,8 +94,9 @@ public abstract class Step {
         if (isActive()) return;
         isActive = true;
 
-        if (outlineEntities != null) outlineEntities.forEach(OutlineEntitiesProperty::register);
-        if (highlightSlots != null) highlightSlots.forEach(HighlightSlotsProperty::register);
+        if (navTo != null) navTo.register();
+        if (outlineEntities != null) outlineEntities.forEach(p -> p.register());
+        if (highlightSlots != null) highlightSlots.forEach(p -> p.register());
         if (waypoint != null) waypoint.register(outlineEntities);
         if (bingoRanks != null) bingoRanks.register(this);
         if (async != null) async.register();
@@ -108,6 +111,7 @@ public abstract class Step {
         if (!isActive()) return;
         isActive = false;
 
+        if (navTo != null) navTo.unregister();
         if (outlineEntities != null) outlineEntities.forEach(OutlineEntitiesProperty::unregister);
         if (highlightSlots != null) highlightSlots.forEach(HighlightSlotsProperty::unregister);
         if (waypoint != null) waypoint.unregister();

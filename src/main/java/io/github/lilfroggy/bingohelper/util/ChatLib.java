@@ -71,6 +71,7 @@ public class ChatLib {
 
     public static void chat(Text message, boolean withPrefix) {
         if (CLIENT.inGameHud == null) return;
+
         final Text FINAL = withPrefix ? Text.literal(BingoHelper.PREFIX).append(message) : message;
 
         try {

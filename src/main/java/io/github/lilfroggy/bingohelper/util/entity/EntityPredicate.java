@@ -17,6 +17,13 @@ import org.jetbrains.annotations.Nullable;
 public class EntityPredicate {
     private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 
+    public static enum Line {
+        ALL,
+        NEAREST,
+        NONE;
+    }
+
+    private Line line;
     private String type;
     private Vec3d position;
     private String skin;
@@ -27,7 +34,8 @@ public class EntityPredicate {
     public transient Set<Entity> cache;
     public int refCount;
 
-    public EntityPredicate(String type, Vec3d position, String skin) {
+    public EntityPredicate(Line line, String type, Vec3d position, String skin) {
+        this.line = line;
         this.type = type;
         this.position = position;
         this.skin = skin;
@@ -88,6 +96,10 @@ public class EntityPredicate {
                 }
             }
         }
+    }
+
+    public Line line() {
+        return line == null ? Line.NEAREST : line;
     }
 
     public boolean matches(Entity entity) {

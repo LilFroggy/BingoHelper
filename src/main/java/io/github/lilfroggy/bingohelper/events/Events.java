@@ -3,10 +3,12 @@ package io.github.lilfroggy.bingohelper.events;
 import io.github.lilfroggy.bingohelper.events.interfaces.ActionBarMessageEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.AreaChangeEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.ClickSlotEvent;
+import io.github.lilfroggy.bingohelper.events.interfaces.ClientMessageEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickStartEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.CreateBingoProfileEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.EntityStateUpdateEvent;
+import io.github.lilfroggy.bingohelper.events.interfaces.IslandChangeEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.RenderHudEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.RenderWorldEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.JoinBingoEvent;
@@ -31,6 +33,7 @@ public class Events {
     public static final EventHandler<ClientTickEndEvent> CLIENT_TICK_END = new EventHandler<>();
     public static final EventHandler<WorldChangeEvent> CHANGE_WORLD = new EventHandler<>();
 
+    public static final EventHandler<ClientMessageEvent> CLIENT_MESSAGE = new EventHandler<>();
     public static final EventHandler<MessageEvent> MESSAGE = new EventHandler<>();
     public static final EventHandler<ActionBarMessageEvent> ACTION_BAR_MESSAGE = new EventHandler<>();
 
@@ -62,6 +65,9 @@ public class Events {
     public static final EventHandler<UnlockMobTypeEvent> UNLOCK_MOB_TYPE = new EventHandler<>();
     public static final EventHandler<LevelCollectionEvent> LEVEL_COLLECTION = new EventHandler<>();
     public static final EventHandler<LevelSkillEvent> LEVEL_SKILL = new EventHandler<>();
+
+    // this is based off tablist (not hypixelmodapi packets)
+    public static final EventHandler<IslandChangeEvent> CHANGE_ISLAND = new EventHandler<>();
 
     public static final EventHandler<AreaChangeEvent> CHANGE_AREA = new EventHandler<>();
     public static final EventHandler<SubAreaChangeEvent> CHANGE_SUB_AREA = new EventHandler<>();

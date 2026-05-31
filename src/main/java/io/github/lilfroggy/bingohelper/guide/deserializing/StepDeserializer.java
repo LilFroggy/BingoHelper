@@ -6,13 +6,16 @@ import com.google.gson.GsonBuilder;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.guide.step.impl.*;
 import io.github.lilfroggy.bingohelper.guide.step.properties.bingoRanks.BingoRanksProperty;
+import io.github.lilfroggy.bingohelper.guide.step.properties.navTo.NavToProperty;
 import io.github.lilfroggy.bingohelper.util.Deserializer;
+import io.github.lilfroggy.bingohelper.util.Logger;
 import net.minecraft.util.math.Vec3d;
 
 public class StepDeserializer {
     private static final Gson GSON = new GsonBuilder()
         .registerTypeAdapter(Vec3d.class, new Vec3dAdapter())
         .registerTypeAdapter(BingoRanksProperty.class, new RanksPropertyAdapter())
+        .registerTypeAdapter(NavToProperty.class, new NavToPropertyAdapter())
         .registerTypeAdapter(
             Step.class,
             new Deserializer<Step>("type")
@@ -41,9 +44,14 @@ public class StepDeserializer {
 
     @SuppressWarnings({ "null", "unused" })
     public static Step stepFromJson(String step) {
-        Step processed = GSON.fromJson(step, Step.class);
-        if (processed == null) return MALFORMED_STEP;
-        processed.init();
-        return processed;
+        try {
+            Step processed = GSON.fromJson(step, Step.class);
+            if (processed == null) return MALFORMED_STEP;
+            processed.init();
+            return processed;
+        } catch (Exception e) {
+            Logger.error("error parsing step", e);
+            return MALFORMED_STEP;
+        }
     }
 }

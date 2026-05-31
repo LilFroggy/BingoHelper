@@ -76,6 +76,8 @@ public class Guide {
         StringBuilder asyncBody = new StringBuilder();
     
         for (Step step : ActiveSteps.getInternalSet()) {
+            String instruction = step.instruction();
+            if (instruction == null || instruction.isBlank()) continue;
             if (step.isHidden()) continue;
             if (step.isBlocking() && !step.isAsync()) {
                 blockingBody.append("\n&f" + step.instruction());

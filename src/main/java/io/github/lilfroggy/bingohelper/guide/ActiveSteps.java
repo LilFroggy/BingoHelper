@@ -126,6 +126,13 @@ public class ActiveSteps {
         return null;
     }
 
+    public static boolean anyOutlineEntityExists() {
+        return active.stream().anyMatch(step -> {
+            if (step.outlineEntities == null) return false;
+            return step.outlineEntities.stream().anyMatch(outlinEntity -> outlinEntity.hasMatch());
+        });
+    }
+
     public static void clear() {
         deactivateAll();
         active.clear();

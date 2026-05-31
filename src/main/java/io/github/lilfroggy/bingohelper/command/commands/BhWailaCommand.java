@@ -121,7 +121,7 @@ public class BhWailaCommand implements ClientCommand {
         if (hit instanceof EntityHitResult entityHit) {
             Entity entity = entityHit.getEntity();
             x = entity.getX() - 0.5;
-            y = entity.getY();
+            y = entity.getY() + (entity.getHeight() / 2) - 0.5;
             z = entity.getZ() - 0.5;
         } else if (hit instanceof BlockHitResult blockHit) {
             BlockPos pos = blockHit.getBlockPos();
