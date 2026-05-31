@@ -6,6 +6,7 @@ import io.github.lilfroggy.bingohelper.events.interfaces.MessageEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.RenderScreenEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.util.Logger;
+import io.github.lilfroggy.bingohelper.util.ScreenUtils;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import net.minecraft.client.gui.DrawContext;
@@ -148,6 +149,7 @@ public class BuyStep extends Step implements MessageEvent, RenderScreenEvent {
             boughtCount = null;
         }
 
+        if (!ScreenUtils.getCursorStack().isEmpty()) return;
         if (best == null) best = bestFallback;
         if (best != null) RenderLib.highlightSlot(context, best, RenderLib.MINECRAFT_GREEN);
         if (items.values().stream().allMatch(info -> info.done)) complete();
