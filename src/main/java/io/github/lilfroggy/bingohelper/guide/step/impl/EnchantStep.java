@@ -4,16 +4,15 @@ import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.RenderScreenEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
+import io.github.lilfroggy.bingohelper.util.ScreenUtils;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.Display;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
@@ -62,58 +61,46 @@ public class EnchantStep extends Step implements RenderScreenEvent, ClientTickEn
 
     @Override
     public void onClientTickEnd(int tick) {
-        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return;
+        var containerSlots = ScreenUtils.getSlots();
 
-        // Track if all items are done
-        boolean allDone = true;
+        if (containerSlots.isEmpty()) checkPlayerSlots();
+        else checkContainerSlots(containerSlots);
 
-        // Check player inventory
-        for (ItemStack stack : player.getInventory()) {
-            if (stack == null || stack.isEmpty()) continue;
-
-            String itemId = Skyblock.getID(stack);
-            if (itemId.isEmpty()) continue;
-            if (!items.containsKey(itemId)) continue;
-
-            ItemInfo info = items.get(itemId);
-
-            String lore = Skyblock.getLore(stack);
-            boolean hasAllEnchants = info.enchants.stream().allMatch(enchant -> 
-                lore.matches(".*\\b" + enchant.replace(" ", "\\s+") + "\\b.*"));
-            if (hasAllEnchants) info.done = true;
-            else info.done = false;
-        }
-
-        // Check container items (double chest)
-        if (!(player.currentScreenHandler instanceof PlayerScreenHandler handler)) return;
-        
-        DefaultedList<ItemStack> containerItems = handler.getStacks();
-        // Only check container slots (exclude player inventory slots which are the last 36 slots)
-        int containerSlots = containerItems.size() - 36;
-        for (int i = 0; i < containerSlots; i++) {
-            ItemStack stack = containerItems.get(i);
-            if (stack == null || stack.isEmpty()) continue;
-
-            String itemId = Skyblock.getID(stack);
-            if (itemId.isEmpty()) continue;
-            if (!items.containsKey(itemId)) continue;
-
-            ItemInfo info = items.get(itemId);
-
-            String lore = Skyblock.getLore(stack);
-            boolean hasAllEnchants = info.enchants.stream().allMatch(enchant -> 
-                lore.matches(".*\\b" + enchant.replace(" ", "\\s+") + "\\b.*"));
-            if (hasAllEnchants) info.done = true;
-            else info.done = false;
-        }
-
-        // After checking all, see if all are done
-        for (ItemInfo info : items.values()) {
-            if (info.done) continue;
-            allDone = false;
-            break;
-        }
+        boolean allDone = items.values().stream().allMatch(info -> info.done);
         if (allDone) complete();
+    }
+
+    private void checkPlayerSlots() {
+        if (CLIENT.player == null) return;
+
+        for (ItemStack item : CLIENT.player.getInventory()) {
+            checkItem(item);
+        }
+    }
+
+    private void checkContainerSlots(DefaultedList<Slot> slots) {
+        boolean inEnchantTable = ScreenUtils.getTitle().contains("Enchant Item");
+
+        for (Slot slot : slots) {
+            boolean isPlayerSlot = slot.inventory instanceof PlayerInventory;
+            if (!inEnchantTable && !isPlayerSlot) continue;
+            checkItem(slot.getStack());
+        }
+    }
+
+    private void checkItem(ItemStack item) {
+        if (item == null || item.isEmpty()) return;
+        String id = Skyblock.getID(item);
+        if (id.isEmpty()) return;
+        if (!items.containsKey(id)) return;
+
+        ItemInfo info = items.get(id);
+
+        String lore = Skyblock.getLore(item);
+        boolean hasAllEnchants = info.enchants.stream().allMatch(enchant -> 
+            lore.matches(".*\\b" + enchant.replace(" ", "\\s+") + "\\b.*"));
+        if (hasAllEnchants) info.done = true;
+        else info.done = false;
     }
 
     @Override
