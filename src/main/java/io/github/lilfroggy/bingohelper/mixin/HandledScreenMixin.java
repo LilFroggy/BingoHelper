@@ -16,11 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class HandledScreenMixin {
     private static final Minecraft CLIENT = Minecraft.getInstance();
 
-    @Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V",
-            at = @At("HEAD"),
-            cancellable = true)
-    private void onMouseClick(Slot slot, int slotId, int button, ClickType actionType, CallbackInfo ci) {
-        Events.CLICK_SLOT.invoke(listener -> listener.onClickSlot(slot, slotId, button, actionType, ci));
+    @Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V", at = @At("HEAD"), cancellable = true)
+    private void onMouseClick(Slot slot, int slotId, int button, ClickType clickType, CallbackInfo ci) {
+        Events.CLICK_SLOT.invoke(listener -> listener.onClickSlot(slot, slotId, button, clickType, ci));
     }
 
     /*@Inject(method = "drawSlot", at = @At("HEAD"))
