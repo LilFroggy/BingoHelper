@@ -1,10 +1,9 @@
 package io.github.lilfroggy.bingohelper.events.interfaces;
 
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-
 public interface ClickSlotEvent {
-    void onClickSlot(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci);
+    void onClickSlot(Slot slot, int slotId, int button, ClickType actionType, CallbackInfo ci);
 }

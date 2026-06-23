@@ -10,12 +10,12 @@ import io.github.lilfroggy.bingohelper.util.ClipboardUtils;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.item.ItemStack;
 
 public class BhCopyEnchants implements ClientCommand {
-    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final Minecraft CLIENT = Minecraft.getInstance();
 
     @Override
     public void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
@@ -34,8 +34,8 @@ public class BhCopyEnchants implements ClientCommand {
     }
 
     private int execute(CommandContext<FabricClientCommandSource> context) {
-        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return 0;
-        ItemStack item = player.getMainHandStack();
+        if (!(CLIENT.player instanceof LocalPlayer player)) return 0;
+        ItemStack item = player.getMainHandItem();
         if (item == null) {
             ChatLib.chat("§cNo item in hand!");
             return 0;

@@ -1,9 +1,9 @@
 package io.github.lilfroggy.bingohelper.util.render;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
 
 public interface RenderingEvent {
-    void render(WorldRenderContext context, MatrixStack matrixStack, VertexConsumer consumer);
+    void render(WorldRenderContext context, PoseStack matrixStack, VertexConsumer consumer);
 }

@@ -7,8 +7,8 @@ import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.Display;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.GuiGraphics;
 
 public class Guide {
     private static final Step EXAMPLE_STEP = StepDeserializer.stepFromJson("{\"type\": \"message\",\"instruction\": \"&cRun &e/"+ GuideUpdater.UPDATE_COMMAND + " &cto import guide\",\"criteria\": \"kdasndlqwdn\"}");
@@ -35,9 +35,9 @@ public class Guide {
 
     private static final Display display = new Display("");
 
-    private static void onHudRender(DrawContext context, RenderTickCounter tickDelta) {
+    private static void onHudRender(GuiGraphics graphics, DeltaTracker tickDelta) {
         if (!Config.guide || !Skyblock.inBingo()) return;
-        display.setString(getDisplayText()).draw(context, 10, 10);
+        display.setString(getDisplayText()).draw(graphics, 10, 10);
     }
 
     private static void onCreateBingoProfile() {

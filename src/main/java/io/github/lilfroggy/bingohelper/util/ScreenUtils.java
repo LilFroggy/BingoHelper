@@ -1,28 +1,28 @@
 package io.github.lilfroggy.bingohelper.util;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class ScreenUtils {
-    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final Minecraft CLIENT = Minecraft.getInstance();
 
     public static String getTitle() {
-        return CLIENT.currentScreen != null ? CLIENT.currentScreen.getTitle().getString() : ""; 
+        return CLIENT.screen != null ? CLIENT.screen.getTitle().getString() : ""; 
     }
 
-    public static DefaultedList<Slot> getSlots() {
-        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return DefaultedList.of();
-        if (!(player.currentScreenHandler instanceof ScreenHandler handler)) return DefaultedList.of();
+    public static NonNullList<Slot> getSlots() {
+        if (!(CLIENT.player instanceof LocalPlayer player)) return NonNullList.create();
+        if (!(player.containerMenu instanceof AbstractContainerMenu handler)) return NonNullList.create();
         return handler.slots;
     }
 
     public static ItemStack getCursorStack() {
-        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return ItemStack.EMPTY;
-        if (!(player.currentScreenHandler instanceof ScreenHandler handler)) return ItemStack.EMPTY;
-        return handler.getCursorStack();
+        if (!(CLIENT.player instanceof LocalPlayer player)) return ItemStack.EMPTY;
+        if (!(player.containerMenu instanceof AbstractContainerMenu handler)) return ItemStack.EMPTY;
+        return handler.getCarried();
     }
 }

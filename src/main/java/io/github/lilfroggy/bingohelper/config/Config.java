@@ -9,7 +9,7 @@ import gg.essential.vigilance.data.PropertyData;
 import gg.essential.vigilance.data.PropertyType;
 import gg.essential.vigilance.data.SortingBehavior;
 import io.github.lilfroggy.bingohelper.guide.ActiveSteps;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.Util;
 
 import java.io.File;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Config extends Vigilant {
-    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final Minecraft CLIENT = Minecraft.getInstance();
 
     // CREDITS
 
@@ -228,11 +228,11 @@ public class Config extends Vigilant {
     }
 
     public static void open() {
-        CLIENT.send(() -> UScreen.displayScreen(Config.INSTANCE.gui()));
+        CLIENT.schedule(() -> UScreen.displayScreen(Config.INSTANCE.gui()));
     }
 
     public static void openLink(String url) {
-        Util.getOperatingSystem().open(url);
+        Util.getPlatform().openUri(url);
     }
 
     public static void init() {}

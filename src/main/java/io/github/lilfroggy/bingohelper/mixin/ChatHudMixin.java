@@ -7,13 +7,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
-import net.minecraft.client.gui.hud.ChatHud;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.network.chat.Component;
 
-@Mixin(ChatHud.class)
+@Mixin(ChatComponent.class)
 public class ChatHudMixin {
-    @Inject(method = "addMessage(Lnet/minecraft/text/Text;)V", at = @At("HEAD"))
-    private void onAddMessage(Text message, CallbackInfo ci) {
+    @Inject(method = "addMessage(Lnet/minecraft/network/chat/Component;)V", at = @At("HEAD"))
+    private void onAddMessage(Component message, CallbackInfo ci) {
         String formatted = message.getString();
         String unformatted = ChatLib.removeFormatting(formatted);
 

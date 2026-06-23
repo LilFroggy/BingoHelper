@@ -5,13 +5,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.network.chat.Component;
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.Events;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.text.Text;
 
 // Shoutout Skyblocker
 
@@ -37,15 +36,15 @@ public class Tablist {
     }
 
     private static void update() {
-        ClientPlayNetworkHandler networkHandler = MinecraftClient.getInstance().getNetworkHandler();
+        ClientPacketListener networkHandler = Minecraft.getInstance().getConnection();
         
 		if (networkHandler == null) return;
 
-        lines = networkHandler.getPlayerList()
+        lines = networkHandler.getOnlinePlayers()
             .stream()
-            .map(PlayerListEntry::getDisplayName)
+            .map(PlayerInfo::getTabListDisplayName)
             .filter(Objects::nonNull)
-            .map(Text::getString)
+            .map(Component::getString)
             .map(String::strip)
             .toList();
     }

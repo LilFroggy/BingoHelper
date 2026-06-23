@@ -25,11 +25,11 @@ import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.Version;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 
 public class UpdateManager {
-    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final Minecraft CLIENT = Minecraft.getInstance();
     private static final int HOURS_BEFORE_BINGO_TO_PERFORM_CHECK = 4;
     private static final String DOWNLOAD_COMMAND = "bh";
     public static final String LATEST_RELEASE_URL = "https://api.github.com/repos/LilFroggy/BingoHelper/releases/latest";
@@ -48,7 +48,7 @@ public class UpdateManager {
         check(true);
     }
 
-    public static void onWorldChange(MinecraftClient client, ClientWorld world) {
+    public static void onWorldChange(Minecraft client, ClientLevel world) {
         attemptLastMinuteCheck();
     }
 
@@ -173,14 +173,14 @@ public class UpdateManager {
 
     public static void onStateChange(Consumer<UpdateState> callback) {
         stateChangeListener = callback;
-        CLIENT.send(() -> stateChangeListener.accept(state));
+        CLIENT.schedule(() -> stateChangeListener.accept(state));
     }
 
     public static void setState(UpdateState newState) {
         if (state == newState) return;
         state = newState;
         if (stateChangeListener == null) return;
-        CLIENT.send(() -> stateChangeListener.accept(state));
+        CLIENT.schedule(() -> stateChangeListener.accept(state));
     }
 
     public static UpdateState getState() {

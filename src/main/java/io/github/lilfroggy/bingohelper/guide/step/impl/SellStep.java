@@ -6,13 +6,12 @@ import io.github.lilfroggy.bingohelper.events.interfaces.RenderSlotEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
-
 import java.util.List;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class SellStep extends Step implements ClientTickEndEvent, RenderSlotEvent {
 
@@ -47,10 +46,10 @@ public class SellStep extends Step implements ClientTickEndEvent, RenderSlotEven
 
     @Override
     public void onClientTickEnd(int tick) {
-        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return;
-        if (player.age < 20) return;
+        if (!(CLIENT.player instanceof LocalPlayer player)) return;
+        if (player.tickCount < 20) return;
 
-        var stacks = player.getInventory().getMainStacks();
+        var stacks = player.getInventory().getNonEquipmentItems();
 
         boolean hasItems = false;
 
@@ -67,13 +66,13 @@ public class SellStep extends Step implements ClientTickEndEvent, RenderSlotEven
     }
 
     @Override
-    public void onRenderSlot(DrawContext context, Slot slot) {
-        if (!(slot.inventory instanceof PlayerInventory)) return;
-        ItemStack item = slot.getStack();
+    public void onRenderSlot(GuiGraphics graphics, Slot slot) {
+        if (!(slot.container instanceof Inventory)) return;
+        ItemStack item = slot.getItem();
         if (item.isEmpty()) return;
         String itemId = Skyblock.getID(item);
         if (itemId.isEmpty() || !items.contains(itemId)) return;
         
-        RenderLib.highlightSlot(context, slot, RenderLib.MINECRAFT_RED);
+        RenderLib.highlightSlot(graphics, slot, RenderLib.MINECRAFT_RED);
     }
 }

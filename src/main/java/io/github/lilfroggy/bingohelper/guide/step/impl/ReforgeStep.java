@@ -10,21 +10,20 @@ import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.Display;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import io.github.lilfroggy.bingohelper.mixin.HandledScreenAccessorMixin;
-
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 import java.util.Map;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEndEvent, ClickSlotEvent, CloseScreenEvent {
 
@@ -72,7 +71,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
 
     @Override
     public void onClientTickEnd(int tick) {
-        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return;
+        if (!(CLIENT.player instanceof LocalPlayer player)) return;
 
         boolean allDone = true;
 
@@ -103,27 +102,27 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
     }
 
     @Override
-    public void onRenderScreen(DrawContext context, Screen screen, String title, DefaultedList<Slot> slots) {
+    public void onRenderScreen(GuiGraphics graphics, Screen screen, String title, NonNullList<Slot> slots) {
         if (!title.contains(REFORGE_SCREEN_TITLE)) return;
 
-        renderMissingReforgeList(context);
+        renderMissingReforgeList(graphics);
         
-        ItemStack reforgeItem = slots.get(REFORGE_ITEM_SLOT_ID).getStack();
+        ItemStack reforgeItem = slots.get(REFORGE_ITEM_SLOT_ID).getItem();
 
         String itemReforge = Skyblock.getReforge(reforgeItem);
 
-        if (itemReforge == null || reforgeItem.isEmpty()) highlightUnfinishedItems(context, slots);
-        else renderReforgeDisplay(screen, context, reforgeItem, itemReforge);
+        if (itemReforge == null || reforgeItem.isEmpty()) highlightUnfinishedItems(graphics, slots);
+        else renderReforgeDisplay(screen, graphics, reforgeItem, itemReforge);
     }
 
     private static final Display reforgeDisplay = new Display("");
 
-    public void renderReforgeDisplay(Screen screen, DrawContext context, ItemStack reforgeItem, String reforge) {
+    public void renderReforgeDisplay(Screen screen, GuiGraphics graphics, ItemStack reforgeItem, String reforge) {
         String id = Skyblock.getID(reforgeItem);
         if (id.isEmpty()) return;
         
         // Check if we have a double chest open
-        if (!(screen instanceof HandledScreen<?>)) return;
+        if (!(screen instanceof AbstractContainerScreen<?>)) return;
         HandledScreenAccessorMixin accessor = (HandledScreenAccessorMixin) screen;
         
         // Get double chest position and dimensions
@@ -149,7 +148,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
         
         // Calculate text dimensions
         int textWidth = RenderLib.getFormattedStringWidth(displayText);
-        int textHeight = CLIENT.textRenderer.fontHeight; // Use actual font height
+        int textHeight = CLIENT.font.lineHeight; // Use actual font height
         
         // Position text inside the chest menu
         // Horizontal: center around 1/6 from left edge of chest container
@@ -162,15 +161,15 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
         
         // Draw dark semi-transparent background
         int backgroundColor = 0xBF000000; // Dark semi-transparent (75% opacity)
-        context.fill(textX - 5, textY - 3, textX + textWidth + 5, textY + textHeight + 2, backgroundColor);
+        graphics.fill(textX - 5, textY - 3, textX + textWidth + 5, textY + textHeight + 2, backgroundColor);
 
         // Draw the text
-        reforgeDisplay.setString(displayText).draw(context, textX, textY);
+        reforgeDisplay.setString(displayText).draw(graphics, textX, textY);
     }
 
     private static final Display itemsMissingReforge = new Display("");
 
-    public void renderMissingReforgeList(DrawContext context) {
+    public void renderMissingReforgeList(GuiGraphics graphics) {
         StringBuilder statusText = new StringBuilder("&cRemaining:\n");
         for (var entry : items.entrySet()) {
             String itemName = entry.getKey();
@@ -187,27 +186,27 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
         int x = -textWidth - 10; // 10 pixels gap between text and chest
         int y = 20; // Align with top of chest with small offset
         
-        itemsMissingReforge.setString(statusText.toString()).draw(context, x, y);
+        itemsMissingReforge.setString(statusText.toString()).draw(graphics, x, y);
     }
 
-    public void highlightUnfinishedItems(DrawContext context, DefaultedList<Slot> slots) {
+    public void highlightUnfinishedItems(GuiGraphics graphics, NonNullList<Slot> slots) {
         for (Slot slot : slots) {
-            if (!(slot.inventory instanceof PlayerInventory)) continue;
-            ItemStack item = slot.getStack();
+            if (!(slot.container instanceof Inventory)) continue;
+            ItemStack item = slot.getItem();
             if (item.isEmpty()) continue;
             String id = Skyblock.getID(item);
             if (id.isEmpty()) continue;
             if (!items.containsKey(id)) continue;
             if (items.get(id).done) continue;
 
-            RenderLib.highlightSlot(context, slot, RenderLib.MINECRAFT_GOLD);
+            RenderLib.highlightSlot(graphics, slot, RenderLib.MINECRAFT_GOLD);
         }
     }
 
     @Override
-    public void onClickSlot(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
+    public void onClickSlot(Slot slot, int slotId, int button, ClickType actionType, CallbackInfo ci) {
         if (slotId != REFORGE_BUTTON_SLOT_ID) return;
-        ItemStack reforgeItem = slot.inventory.getStack(REFORGE_ITEM_SLOT_ID);
+        ItemStack reforgeItem = slot.container.getItem(REFORGE_ITEM_SLOT_ID);
         if (reforgeItem.isEmpty()) return;
         String itemId = Skyblock.getID(reforgeItem);
         if (itemId.isEmpty() || !items.containsKey(itemId)) return;
@@ -222,7 +221,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
 
     @Override
     public void onScreenClose(Screen screen) {
-        if (!(screen instanceof GenericContainerScreen)) return;
+        if (!(screen instanceof ContainerScreen)) return;
         if (isActive()) return;
         
         Events.RENDER_SCREEN.unregister(this);

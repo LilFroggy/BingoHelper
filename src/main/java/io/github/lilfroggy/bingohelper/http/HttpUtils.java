@@ -6,13 +6,12 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.function.Consumer;
-
+import net.minecraft.client.Minecraft;
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.util.Logger;
-import net.minecraft.client.MinecraftClient;
 
 public class HttpUtils {
-    private static final MinecraftClient MINECRAFT_CLIENT = MinecraftClient.getInstance();
+    private static final Minecraft MINECRAFT_CLIENT = Minecraft.getInstance();
 
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
@@ -53,7 +52,7 @@ public class HttpUtils {
     public static void sendAsync(HttpRequest request, Consumer<HttpResponse<String>> onSuccess, Consumer<Throwable> onError) {
         HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString())
             .thenAccept(response -> {
-                MINECRAFT_CLIENT.send(() -> {
+                MINECRAFT_CLIENT.schedule(() -> {
                     try {
                         onSuccess.accept(response);
                     } catch (Exception e) {
@@ -65,7 +64,7 @@ public class HttpUtils {
             .exceptionally(t -> {
                 Exception e = new Exception(t);
                 Logger.error("Network error for " + request.uri(), e);
-                MINECRAFT_CLIENT.send(() -> onError.accept(t));
+                MINECRAFT_CLIENT.schedule(() -> onError.accept(t));
                 return null;
             });
     }

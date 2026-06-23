@@ -9,11 +9,11 @@ import io.github.lilfroggy.bingohelper.guide.step.properties.bingoRanks.BingoRan
 import io.github.lilfroggy.bingohelper.guide.step.properties.navTo.NavToProperty;
 import io.github.lilfroggy.bingohelper.util.Deserializer;
 import io.github.lilfroggy.bingohelper.util.Logger;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
 
 public class StepDeserializer {
     private static final Gson GSON = new GsonBuilder()
-        .registerTypeAdapter(Vec3d.class, new Vec3dAdapter())
+        .registerTypeAdapter(Vec3.class, new Vec3dAdapter())
         .registerTypeAdapter(BingoRanksProperty.class, new RanksPropertyAdapter())
         .registerTypeAdapter(NavToProperty.class, new NavToPropertyAdapter())
         .registerTypeAdapter(

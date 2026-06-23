@@ -7,7 +7,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public class BingoHelper implements ModInitializer {
 	public static final String MOD_ID = "bingohelper";
@@ -28,6 +28,6 @@ public class BingoHelper implements ModInitializer {
 	}
 	
 	public static Identifier id(String path) {
-		return Identifier.of(MOD_ID, path);
+		return Identifier.fromNamespaceAndPath(MOD_ID, path);
 	}
-}	
+}

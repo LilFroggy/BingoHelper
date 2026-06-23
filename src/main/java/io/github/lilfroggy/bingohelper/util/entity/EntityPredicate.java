@@ -1,21 +1,19 @@
 package io.github.lilfroggy.bingohelper.util.entity;
 
 import io.github.lilfroggy.bingohelper.util.EntityUtils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class EntityPredicate {
-    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final Minecraft CLIENT = Minecraft.getInstance();
 
     public static enum Line {
         ALL,
@@ -25,7 +23,7 @@ public class EntityPredicate {
 
     private Line line;
     private String type;
-    private Vec3d position;
+    private Vec3 position;
     private String skin;
 
     public EntityPredicate delegate;
@@ -34,7 +32,7 @@ public class EntityPredicate {
     public transient Set<Entity> cache;
     public int refCount;
 
-    public EntityPredicate(Line line, String type, Vec3d position, String skin) {
+    public EntityPredicate(Line line, String type, Vec3 position, String skin) {
         this.line = line;
         this.type = type;
         this.position = position;
@@ -78,17 +76,17 @@ public class EntityPredicate {
 
     public void scanWorld() {
         cache.clear();
-        if (!(CLIENT.world instanceof ClientWorld world)) return;
-        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return;
+        if (!(CLIENT.level instanceof ClientLevel world)) return;
+        if (!(CLIENT.player instanceof LocalPlayer player)) return;
 
         closest = null;
         double nearestSq = Double.MAX_VALUE;
 
-        for (Entity entity : world.getEntities()) {
+        for (Entity entity : world.entitiesForRendering()) {
             if (matches(entity)) {
                 cache.add(entity);
                 
-                double distanceSq = player.squaredDistanceTo(entity);
+                double distanceSq = player.distanceToSqr(entity);
                 
                 if (distanceSq < nearestSq) {
                     nearestSq = distanceSq;
@@ -107,19 +105,19 @@ public class EntityPredicate {
     }
 
     private boolean isType(Entity entity) {
-        return type == null || entity.getType().getName().getString().toUpperCase().equals(type.toUpperCase());
+        return type == null || entity.getType().getDescription().getString().toUpperCase().equals(type.toUpperCase());
     }
 
     private boolean isAt(Entity entity) {
-        return position == null || entity.getEntityPos().equals(position);
+        return position == null || entity.position().equals(position);
     }
 
     private boolean hasSkin(Entity entity) {
         if (skin == null) return true;
-        return entity instanceof AbstractClientPlayerEntity player && skin.equals(EntityUtils.getPlayerSkin(player));
+        return entity instanceof AbstractClientPlayer player && skin.equals(EntityUtils.getPlayerSkin(player));
     }
     private boolean canSee(Entity entity) {
-        return CLIENT.player != null && CLIENT.player.canSee(entity) && !entity.isInvisible();
+        return CLIENT.player != null && CLIENT.player.hasLineOfSight(entity) && !entity.isInvisible();
     }
 
     public void incrementRef() {

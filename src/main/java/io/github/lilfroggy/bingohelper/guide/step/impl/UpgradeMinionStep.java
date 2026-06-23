@@ -1,7 +1,5 @@
 package io.github.lilfroggy.bingohelper.guide.step.impl;
 
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.entity.player.PlayerInventory;
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.ClickSlotEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
@@ -9,13 +7,14 @@ import io.github.lilfroggy.bingohelper.events.interfaces.RenderScreenEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.util.collection.DefaultedList;
-
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -79,11 +78,11 @@ public class UpgradeMinionStep extends Step implements ClientTickEndEvent, Click
     }
 
     @Override
-    public void onClickSlot(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
-        Screen screen = CLIENT.currentScreen;
-        if (!(screen instanceof GenericContainerScreen)) return;
+    public void onClickSlot(Slot slot, int slotId, int button, ClickType actionType, CallbackInfo ci) {
+        Screen screen = CLIENT.screen;
+        if (!(screen instanceof ContainerScreen)) return;
 
-        ItemStack item = slot.getStack();
+        ItemStack item = slot.getItem();
         if (item.isEmpty()) return;
 
         if (isNavigationScreen(screen)) handleNavigationClick(item);
@@ -94,12 +93,12 @@ public class UpgradeMinionStep extends Step implements ClientTickEndEvent, Click
         String id = Skyblock.getID(stack);
         if (id.isEmpty() || !id.equals(desiredId)) return;
 
-        desiredName = stack.getName().getString();
+        desiredName = stack.getHoverName().getString();
         navigating = false;
     }
 
     private void handleUpgradeClick(ItemStack stack) {
-        if (!stack.getName().getString().equals("Supercraft")) return;
+        if (!stack.getHoverName().getString().equals("Supercraft")) return;
 
         String lore = Skyblock.getLore(stack);
         if (lore == null || lore.contains("Missing ingredients!") || lore.contains("No inventory space!")) return;
@@ -109,22 +108,22 @@ public class UpgradeMinionStep extends Step implements ClientTickEndEvent, Click
     }
 
     @Override
-    public void onRenderScreen(DrawContext context, Screen screen, String title, DefaultedList<Slot> slots) {
+    public void onRenderScreen(GuiGraphics graphics, Screen screen, String title, NonNullList<Slot> slots) {
         if (desiredLevel > toLevel) return;
 
-        if (isNavigationScreen(screen)) highlightNavigationSlot(context, slots);
-        else if (isUpgradeScreen(screen)) highlightUpgradeSlot(context, slots);
+        if (isNavigationScreen(screen)) highlightNavigationSlot(graphics, slots);
+        else if (isUpgradeScreen(screen)) highlightUpgradeSlot(graphics, slots);
     }
 
-    private void highlightNavigationSlot(DrawContext drawContext, DefaultedList<Slot> slots) {
+    private void highlightNavigationSlot(GuiGraphics graphics, NonNullList<Slot> slots) {
         Slot slot = findSlotByItemId(slots, desiredId);
-        if (slot != null) RenderLib.highlightSlot(drawContext, slot, RenderLib.MINECRAFT_GREEN);
+        if (slot != null) RenderLib.highlightSlot(graphics, slot, RenderLib.MINECRAFT_GREEN);
     }
 
-    private void highlightUpgradeSlot(DrawContext drawContext, DefaultedList<Slot> slots) {
-        if (navigating) RenderLib.highlightSlot(drawContext, slots.get(SLOT_BACK_BUTTON), RenderLib.MINECRAFT_GREEN);
-        else if (isMissingIngredients(slots) && isNextPage(slots)) RenderLib.highlightSlot(drawContext, slots.get(SLOT_NEXT_PAGE), RenderLib.MINECRAFT_GREEN);
-        else if (isInventorySpace(slots)) RenderLib.highlightSlot(drawContext, slots.get(SLOT_SUPERCRAFT), RenderLib.MINECRAFT_GREEN);
+    private void highlightUpgradeSlot(GuiGraphics graphics, NonNullList<Slot> slots) {
+        if (navigating) RenderLib.highlightSlot(graphics, slots.get(SLOT_BACK_BUTTON), RenderLib.MINECRAFT_GREEN);
+        else if (isMissingIngredients(slots) && isNextPage(slots)) RenderLib.highlightSlot(graphics, slots.get(SLOT_NEXT_PAGE), RenderLib.MINECRAFT_GREEN);
+        else if (isInventorySpace(slots)) RenderLib.highlightSlot(graphics, slots.get(SLOT_SUPERCRAFT), RenderLib.MINECRAFT_GREEN);
     }
 
     private boolean isNavigationScreen(Screen screen) {
@@ -136,29 +135,29 @@ public class UpgradeMinionStep extends Step implements ClientTickEndEvent, Click
         return screen.getTitle().getString().equals(desiredName + " Recipe");
     }
 
-    private boolean isMissingIngredients(DefaultedList<Slot> slots) {
+    private boolean isMissingIngredients(NonNullList<Slot> slots) {
         if (slots.size() <= SLOT_SUPERCRAFT) return false;
-        String lore = Skyblock.getLore(slots.get(SLOT_SUPERCRAFT).getStack());
+        String lore = Skyblock.getLore(slots.get(SLOT_SUPERCRAFT).getItem());
         return lore != null && lore.contains("Missing ingredients!");
     }
 
-    private boolean isNextPage(DefaultedList<Slot> slots) {
+    private boolean isNextPage(NonNullList<Slot> slots) {
         if (slots.size() <= SLOT_NEXT_PAGE) return false;
-        return slots.get(SLOT_NEXT_PAGE).getStack().getName().getString().equals("Next Recipe");
+        return slots.get(SLOT_NEXT_PAGE).getItem().getHoverName().getString().equals("Next Recipe");
     }
 
-    private boolean isInventorySpace(DefaultedList<Slot> slots) {
+    private boolean isInventorySpace(NonNullList<Slot> slots) {
         if (slots.size() <= SLOT_SUPERCRAFT) return false;
-        String lore = Skyblock.getLore(slots.get(SLOT_SUPERCRAFT).getStack());
+        String lore = Skyblock.getLore(slots.get(SLOT_SUPERCRAFT).getItem());
         return lore != null && !lore.contains("No inventory space!");
     }
 
     @Nullable
-    private Slot findSlotByItemId(DefaultedList<Slot> slots, String id) {
+    private Slot findSlotByItemId(NonNullList<Slot> slots, String id) {
         for (int i = 0; i < slots.size(); i++) {
             Slot slot = slots.get(i);
-            if (slot.inventory instanceof PlayerInventory) continue;
-            if (id.equals(Skyblock.getID(slot.getStack()))) {
+            if (slot.container instanceof Inventory) continue;
+            if (id.equals(Skyblock.getID(slot.getItem()))) {
                 return slot;
             }
         }

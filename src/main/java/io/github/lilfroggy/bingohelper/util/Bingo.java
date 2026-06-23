@@ -6,15 +6,14 @@ import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.Formatting;
 
 public class Bingo {
-    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final Minecraft CLIENT = Minecraft.getInstance();
     private static final ClientTickEndEvent UPDATE_RANK = Bingo::updateRank;
     private static final Pattern RANK_COLOR_PATTERN = Pattern.compile("§(.)Ⓑ");
     private static final ZoneId EASTERN_TIME = ZoneId.of("America/New_York");
@@ -32,7 +31,7 @@ public class Bingo {
         if (!matcher.find()) return;
         
         char colorCode = matcher.group(1).charAt(0);
-        Formatting formatting = Formatting.byCode(colorCode);        
+        ChatFormatting formatting = ChatFormatting.getByCode(colorCode);        
         
         if (formatting == null) return;
         
@@ -41,7 +40,7 @@ public class Bingo {
         Logger.info("Set bingo rank: " + Config.bingoRank, !Config.debug);
     }
 
-    private static int getRankFromFormatting(Formatting formatting) {
+    private static int getRankFromFormatting(ChatFormatting formatting) {
         return switch (formatting) {
             case GRAY -> 0;
             case GREEN -> 1;

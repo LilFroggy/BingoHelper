@@ -9,15 +9,14 @@ import io.github.lilfroggy.bingohelper.guide.step.properties.outlineEntities.Out
 import io.github.lilfroggy.bingohelper.guide.step.properties.waypoint.WaypointProperty;
 
 import java.util.List;
-
+import net.minecraft.client.Minecraft;
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.GlowingEntities;
-import net.minecraft.client.MinecraftClient;
 
 public abstract class Step {
-    protected static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    protected static final Minecraft CLIENT = Minecraft.getInstance();
 
     protected abstract String formattedInstruction();
     protected abstract void onInit();

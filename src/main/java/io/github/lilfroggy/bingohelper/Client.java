@@ -23,8 +23,8 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 
 public class Client implements ClientModInitializer {
 
@@ -44,7 +44,7 @@ public class Client implements ClientModInitializer {
             Events.CLIENT_TICK_END.invoke(listener -> listener.onClientTickEnd(currentTick));
         });
 
-        ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((MinecraftClient client, ClientWorld world) -> {
+        ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((Minecraft client, ClientLevel world) -> {
             Events.CHANGE_WORLD.invoke(listener -> listener.onWorldChange(client, world));
         });
 

@@ -2,21 +2,21 @@ package io.github.lilfroggy.bingohelper.mixin;
 
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ClientPlayNetworkHandler.class)
+@Mixin(ClientPacketListener.class)
 public class ChatInterceptorMixin {
     private static final String CREATE_PROFILE_MESSAGE = "Welcome to SkyBlock Bingo!";
 
-    @Inject(method = "onGameMessage", at = @At("HEAD"))
-    private void onGameMessage(GameMessageS2CPacket packet, CallbackInfo ci) {
-        if (!MinecraftClient.getInstance().isOnThread()) {
+    @Inject(method = "handleSystemChat", at = @At("HEAD"))
+    private void onGameMessage(ClientboundSystemChatPacket packet, CallbackInfo ci) {
+        if (!Minecraft.getInstance().isSameThread()) {
             return;
         }
         

@@ -1,19 +1,18 @@
 package io.github.lilfroggy.bingohelper.util;
 
 import java.net.URI;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import org.jetbrains.annotations.Nullable;
 
 import io.github.lilfroggy.bingohelper.BingoHelper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.Text;
-import net.minecraft.client.network.ClientPlayerEntity;
 
 public class ChatLib {
-    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final Minecraft CLIENT = Minecraft.getInstance();
 
     // Command Overloads
     public static void chatClickableCommand(String message, String command) {
@@ -51,31 +50,31 @@ public class ChatLib {
 
     // Clickable Helper
     private static void chatClickable(String message, ClickEvent clickEvent, String hoverText, boolean withPrefix) {
-        Text msg = Text.literal(message)
-            .styled(style -> style
+        Component msg = Component.literal(message)
+            .withStyle(style -> style
                 .withClickEvent(clickEvent)
-                .withHoverEvent(new HoverEvent.ShowText(Text.literal(hoverText)))
+                .withHoverEvent(new HoverEvent.ShowText(Component.literal(hoverText)))
             );
         chat(msg, withPrefix);
     }
 
     // Main Chat Methods
     public static void chatNoPrefix(String message) { chat(message, false); }
-    public static void chatNoPrefix(Text message) { chat(message, false); }
+    public static void chatNoPrefix(Component message) { chat(message, false); }
     public static void chat(String message) { chat(message, true); }
-    public static void chat(Text message) { chat(message, true); }
+    public static void chat(Component message) { chat(message, true); }
 
     public static void chat(String message, boolean withPrefix) {
-        chat(Text.literal(message), withPrefix);
+        chat(Component.literal(message), withPrefix);
     }
 
-    public static void chat(Text message, boolean withPrefix) {
-        if (CLIENT.inGameHud == null) return;
+    public static void chat(Component message, boolean withPrefix) {
+        if (CLIENT.gui == null) return;
 
-        final Text FINAL = withPrefix ? Text.literal(BingoHelper.PREFIX).append(message) : message;
+        final Component FINAL = withPrefix ? Component.literal(BingoHelper.PREFIX).append(message) : message;
 
         try {
-            CLIENT.send(() -> CLIENT.inGameHud.getChatHud().addMessage(FINAL));
+            CLIENT.schedule(() -> CLIENT.gui.getChat().addMessage(FINAL));
         } catch (Exception e) {
             Logger.error("Error sending chat message", e, true);
         }
@@ -87,9 +86,9 @@ public class ChatLib {
      */
     public static void command(String command) {
         if (command == null || command.isEmpty()) return;
-        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return;
+        if (!(CLIENT.player instanceof LocalPlayer player)) return;
         String sanitized = command.startsWith("/") ? command.substring(1) : command;
-        player.networkHandler.sendChatCommand(sanitized);
+        player.connection.sendCommand(sanitized);
     }
 
     /**
@@ -101,16 +100,16 @@ public class ChatLib {
      * @param fadeOut Fade out time in ticks
      */
     public static void showTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
-        if (!(CLIENT.inGameHud instanceof InGameHud hud)) return;
+        if (!(CLIENT.gui instanceof Gui hud)) return;
 
-        hud.setTitleTicks(fadeIn, stay, fadeOut);
+        hud.setTimes(fadeIn, stay, fadeOut);
     
         if (subtitle != null) {
-            hud.setSubtitle(Text.literal(subtitle));
+            hud.setSubtitle(Component.literal(subtitle));
         }
     
         if (title != null) {
-            hud.setTitle(Text.literal(title));
+            hud.setTitle(Component.literal(title));
         }
     }
 

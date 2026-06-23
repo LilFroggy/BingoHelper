@@ -1,8 +1,8 @@
 package io.github.lilfroggy.bingohelper.events.interfaces;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.world.inventory.Slot;
 
 public interface RenderSlotEvent {
-    void onRenderSlot(DrawContext context, Slot slot);
+    void onRenderSlot(GuiGraphics graphics, Slot slot);
 }

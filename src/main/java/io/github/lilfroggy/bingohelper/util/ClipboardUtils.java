@@ -1,16 +1,16 @@
 package io.github.lilfroggy.bingohelper.util;
 
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 public class ClipboardUtils {
-    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final Minecraft CLIENT = Minecraft.getInstance();
 
     public static String getClipboard() {
-        return CLIENT.keyboard.getClipboard();
+        return CLIENT.keyboardHandler.getClipboard();
     }
 
     public static void setClipboard(String string) {
         if (string == null) return;
-        CLIENT.keyboard.setClipboard(string);
+        CLIENT.keyboardHandler.setClipboard(string);
     }
 }

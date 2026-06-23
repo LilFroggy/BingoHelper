@@ -1,15 +1,14 @@
 package io.github.lilfroggy.bingohelper.guide;
 
 import java.util.concurrent.TimeUnit;
-
+import net.minecraft.client.Minecraft;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.messages.Messages;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.Scheduler;
-import net.minecraft.client.MinecraftClient;
 
 public class GuideNavigator extends Guide {
-    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final Minecraft CLIENT = Minecraft.getInstance();
 
     public static void reset() {
         ActiveSteps.clear();

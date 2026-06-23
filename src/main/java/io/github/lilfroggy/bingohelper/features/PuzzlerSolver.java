@@ -4,7 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
@@ -12,12 +13,10 @@ import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import io.github.lilfroggy.bingohelper.util.render.RenderingEvent;
 import io.github.lilfroggy.bingohelper.util.render.RenderingEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class PuzzlerSolver {
     private static final RenderingEvent RENDER = PuzzlerSolver::render;
@@ -28,8 +27,8 @@ public class PuzzlerSolver {
     private static final float[] SOLUTION_FILL_COLOR = {0.0f, 1.0f, 0.0f, 0.5f};
     private static final float[] SOLUTION_OUTLINE_COLOR = {0.0f, 1.0f, 0.0f, 1.0f};
 
-    private static Vec3d solution = null;
-    private static Vec3d tracePos = null;
+    private static Vec3 solution = null;
+    private static Vec3 tracePos = null;
 
     public static void init() {
         Events.MESSAGE.register(PuzzlerSolver::onGameMessage);
@@ -60,8 +59,8 @@ public class PuzzlerSolver {
             else if (c == '◀') x++;
             else if (c == '▶') x--;
         }
-        solution = new Vec3d(x, 195, z);
-        tracePos = new Vec3d(x + 0.5, 196.01, z + 0.5);
+        solution = new Vec3(x, 195, z);
+        tracePos = new Vec3(x + 0.5, 196.01, z + 0.5);
         RenderingEvents.LINE.register(RENDER);
     }
 
@@ -71,13 +70,13 @@ public class PuzzlerSolver {
         tracePos = null;
     }
 
-    public static void render(WorldRenderContext context, MatrixStack matrixStack, VertexConsumer consumer) {
+    public static void render(WorldRenderContext context, PoseStack matrixStack, VertexConsumer consumer) {
         if (solution == null || tracePos == null) return;
-        RenderLib.renderFilledAndOutline(Box.from(solution), SOLUTION_OUTLINE_COLOR, SOLUTION_FILL_COLOR);
+        RenderLib.renderFilledAndOutline(AABB.unitCubeFromLowerCorner(solution), SOLUTION_OUTLINE_COLOR, SOLUTION_FILL_COLOR);
         RenderLib.renderLineFromCursor(context, tracePos, RenderLib.MINECRAFT_GREEN);
     }
 
-    public static void onWorldChange(MinecraftClient client, ClientWorld world) {
+    public static void onWorldChange(Minecraft client, ClientLevel world) {
         clearSolution();
     }
 }

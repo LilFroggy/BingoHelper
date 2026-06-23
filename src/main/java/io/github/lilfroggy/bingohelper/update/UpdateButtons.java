@@ -1,14 +1,13 @@
 package io.github.lilfroggy.bingohelper.update;
 
 import java.awt.Color;
-
+import net.minecraft.client.Minecraft;
 import gg.essential.elementa.components.UIImage;
 import gg.essential.elementa.constraints.PixelConstraint;
 import io.github.lilfroggy.bingohelper.config.Config;
-import net.minecraft.client.MinecraftClient;
 
 public class UpdateButtons {
-    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final Minecraft CLIENT = Minecraft.getInstance();
     private static final float BUTTON_SIZE = 16f;
     private static final Color BUTTON_HOVER_COLOR = new Color(0xC8C8C8);
     private static final Color BUTTON_CLICK_COLOR = new Color(0x6E6E6E);
@@ -20,7 +19,7 @@ public class UpdateButtons {
 
     // Possibly change to RESTART if I can figure out how to relaunch the instance
     public static final UIImage SHUTDOWN = button("/assets/bingohelper/textures/config/shutdown.png", () -> {
-        CLIENT.scheduleStop();
+        CLIENT.stop();
     });
 
     public static final UIImage MANUAL_UPDATE_INFO = button("/assets/bingohelper/textures/config/info-gold.png", () -> {

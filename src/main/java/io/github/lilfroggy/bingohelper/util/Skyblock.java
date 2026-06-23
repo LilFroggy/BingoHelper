@@ -10,19 +10,19 @@ import io.github.lilfroggy.bingohelper.events.Events;
 import net.hypixel.data.region.Environment;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.LoreComponent;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.ItemLore;
 
 public class Skyblock {
-    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final Minecraft CLIENT = Minecraft.getInstance();
 
     private static final String BINGO_SYMBOL = "Ⓑ";
     private static final String IRONMAN_SYMBOL = "♲";
@@ -79,7 +79,7 @@ public class Skyblock {
 
     public static void onClientTickEnd(int tick) {
         if (tick % 20 != 0) return;
-        if (CLIENT.player == null || CLIENT.world == null) return;
+        if (CLIENT.player == null || CLIENT.level == null) return;
 
         boolean wasBingo = inBingo;
 
@@ -101,7 +101,7 @@ public class Skyblock {
     }
 
     private static boolean bingoInName() {
-        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return false;
+        if (!(CLIENT.player instanceof LocalPlayer player)) return false;
         return player.getDisplayName().getString().contains(symbols[Config.gamemodeIndex]);
     }
 
@@ -158,38 +158,38 @@ public class Skyblock {
     public static String getID(ItemStack item) {
         if (item == null || item.isEmpty()) return "";
 
-        NbtCompound nbt = getNbt(item);
+        CompoundTag nbt = getNbt(item);
         if (nbt == null) return "";
 
         return nbt.getString("id").orElse("");
     }
 
     @Nullable
-    public static NbtCompound getNbt(ItemStack item) {
+    public static CompoundTag getNbt(ItemStack item) {
         if (item == null || item.isEmpty()) return null;
 
-        NbtComponent nbtComponent = item.get(DataComponentTypes.CUSTOM_DATA);
+        CustomData nbtComponent = item.get(DataComponents.CUSTOM_DATA);
         if (nbtComponent == null || nbtComponent.isEmpty()) return null;
 
-        NbtCompound nbt = nbtComponent.copyNbt();
+        CompoundTag nbt = nbtComponent.copyTag();
         if (nbt == null || nbt.isEmpty()) return null;
         return nbt;
     }
 
     @Nullable
     public static List<String> getEnchants(ItemStack item) {
-        NbtCompound nbt = getNbt(item);
+        CompoundTag nbt = getNbt(item);
     
         if (nbt == null) return null;
 
-        NbtCompound enchants = nbt.getCompound("enchantments").orElse(null);
+        CompoundTag enchants = nbt.getCompound("enchantments").orElse(null);
 
         if (enchants == null) return null;
 
         List<String> enchantmentList = new ArrayList<>();
 
-        for (String key : enchants.getKeys()) {
-            int level = enchants.getInt(key, 0);
+        for (String key : enchants.keySet()) {
+            int level = enchants.getIntOr(key, 0);
             enchantmentList.add(key.toUpperCase() + "_" + level);
         }
         
@@ -206,7 +206,7 @@ public class Skyblock {
     public static String getReforge(ItemStack item) {
         if (item == null || item.isEmpty()) return null;
 
-        NbtCompound nbt = getNbt(item);
+        CompoundTag nbt = getNbt(item);
     
         if (nbt == null) return null;
 
@@ -222,7 +222,7 @@ public class Skyblock {
     public static String getLore(ItemStack item) {
         if (item == null || item.isEmpty()) return "";
 
-        LoreComponent loreComponent = item.get(DataComponentTypes.LORE);
+        ItemLore loreComponent = item.get(DataComponents.LORE);
         if (loreComponent == null) return "";
 
         // Convert lore lines to a single string with spaces
@@ -242,14 +242,14 @@ public class Skyblock {
         if (id == null) return 0;
         int count = 0;
 
-        if (!(CLIENT.player instanceof ClientPlayerEntity player)) return 0;
-        if (!(player.currentScreenHandler instanceof ScreenHandler handler)) return 0;
+        if (!(CLIENT.player instanceof LocalPlayer player)) return 0;
+        if (!(player.containerMenu instanceof AbstractContainerMenu handler)) return 0;
 
         var slots = handler.slots;
 
         for (Slot slot : slots) {
-            if (!(slot.inventory instanceof PlayerInventory)) continue;
-            ItemStack stack = slot.getStack();
+            if (!(slot.container instanceof Inventory)) continue;
+            ItemStack stack = slot.getItem();
             if (stack == null || stack.isEmpty()) continue;
             String itemId = getID(stack);
             if (id.equals(itemId)) {

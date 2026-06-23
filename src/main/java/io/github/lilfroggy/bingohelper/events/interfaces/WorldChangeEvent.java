@@ -1,8 +1,8 @@
 package io.github.lilfroggy.bingohelper.events.interfaces;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 
 public interface WorldChangeEvent {
-    void onWorldChange(MinecraftClient client, ClientWorld world);
+    void onWorldChange(Minecraft client, ClientLevel world);
 }

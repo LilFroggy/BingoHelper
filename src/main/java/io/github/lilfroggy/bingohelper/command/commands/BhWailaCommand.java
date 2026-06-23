@@ -12,21 +12,21 @@ import io.github.lilfroggy.bingohelper.util.EntityUtils;
 import io.github.lilfroggy.bingohelper.util.JsonUtils;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class BhWailaCommand implements ClientCommand {
-    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final Minecraft CLIENT = Minecraft.getInstance();
 
     @Override
     public void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
@@ -44,16 +44,16 @@ public class BhWailaCommand implements ClientCommand {
         Entity target = getTargetEntity();
         if (target == null) return 0;
 
-        NbtWriteView view = NbtWriteView.create(ErrorReporter.EMPTY);
-        target.writeData(view);
-        Text nbt = NbtHelper.toPrettyPrintedText(view.getNbt());
+        TagValueOutput view = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING);
+        target.saveWithoutId(view);
+        Component nbt = NbtUtils.toPrettyComponent(view.buildResult());
         
         copyAndNotify(nbt.getString(), "NBT data");
         return 1;
     }
 
     private int executeWaypoint(CommandContext<FabricClientCommandSource> ctx) {
-        HitResult hit = CLIENT.crosshairTarget;
+        HitResult hit = CLIENT.hitResult;
         if (hit == null || hit.getType() == HitResult.Type.MISS) return sendError("Not looking at anything!");
 
         JsonObject waypoint = createWaypointJson(hit);
@@ -64,7 +64,7 @@ public class BhWailaCommand implements ClientCommand {
     }
 
     private int executeWaypointFull(CommandContext<FabricClientCommandSource> ctx) {
-        HitResult hit = CLIENT.crosshairTarget;
+        HitResult hit = CLIENT.hitResult;
         if (hit == null || hit.getType() == HitResult.Type.MISS) return sendError("Not looking at anything!");
 
         JsonObject waypointFull = createWaypointFullJson(hit);
@@ -101,7 +101,7 @@ public class BhWailaCommand implements ClientCommand {
         if (target == null) return sendError("You must be looking at an entity for outlines!");
 
         JsonObject root = new JsonObject();
-        root.add("waypoint", createWaypointFullJson(CLIENT.crosshairTarget).get("waypoint"));
+        root.add("waypoint", createWaypointFullJson(CLIENT.hitResult).get("waypoint"));
         root.add("outlineEntities", createOutlineFullJson(target).get("outlineEntities"));
         String json = removeRootBrackets(JsonUtils.toPretty(root));
 
@@ -110,7 +110,7 @@ public class BhWailaCommand implements ClientCommand {
     }
 
     private Entity getTargetEntity() {
-        if (CLIENT.crosshairTarget instanceof EntityHitResult res) return res.getEntity();
+        if (CLIENT.hitResult instanceof EntityHitResult res) return res.getEntity();
         sendError("Not looking at an entity!");
         return null;
     }
@@ -121,7 +121,7 @@ public class BhWailaCommand implements ClientCommand {
         if (hit instanceof EntityHitResult entityHit) {
             Entity entity = entityHit.getEntity();
             x = entity.getX() - 0.5;
-            y = entity.getY() + (entity.getHeight() / 2) - 0.5;
+            y = entity.getY() + (entity.getBbHeight() / 2) - 0.5;
             z = entity.getZ() - 0.5;
         } else if (hit instanceof BlockHitResult blockHit) {
             BlockPos pos = blockHit.getBlockPos();
@@ -129,7 +129,7 @@ public class BhWailaCommand implements ClientCommand {
             y = pos.getY() + 1;
             z = pos.getZ();
         } else {
-            Vec3d pos = hit.getPos();
+            Vec3 pos = hit.getLocation();
             x = pos.x; y = pos.y; z = pos.z;
         }
 
@@ -157,11 +157,11 @@ public class BhWailaCommand implements ClientCommand {
 
     private JsonObject createOutlineJson(Entity entity) {
         JsonObject obj = new JsonObject();
-        obj.addProperty("type", entity.getType().getName().getString());
+        obj.addProperty("type", entity.getType().getDescription().getString());
         JsonArray pos = new JsonArray();
         pos.add(entity.getX()); pos.add(entity.getY()); pos.add(entity.getZ());
         obj.add("position", pos);
-        if (entity instanceof AbstractClientPlayerEntity player) {
+        if (entity instanceof AbstractClientPlayer player) {
             String skin = EntityUtils.getPlayerSkin(player);
             obj.add("skin", new JsonPrimitive(skin));
         }

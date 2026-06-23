@@ -4,14 +4,13 @@ import io.github.lilfroggy.bingohelper.util.ColorUtils;
 import io.github.lilfroggy.bingohelper.util.ScreenUtils;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class SlotPredicate {
 
@@ -92,30 +91,30 @@ public class SlotPredicate {
     }
 
     private boolean matchesIndex(Slot slot) {
-        return slotIndex == null || slot.getIndex() == slotIndex;
+        return slotIndex == null || slot.getContainerSlot() == slotIndex;
     }
 
     private boolean matchesSkyblockId(Slot slot) {
-        return skyblockId == null || skyblockId.equals(Skyblock.getID(slot.getStack()));
+        return skyblockId == null || skyblockId.equals(Skyblock.getID(slot.getItem()));
     }
 
     private boolean has(Slot slot) {
         if (has == null) return true;
-        ItemStack item = slot.getStack();
-        String name = item.getName().getString();
+        ItemStack item = slot.getItem();
+        String name = item.getHoverName().getString();
         String lore = Skyblock.getLore(item);
         return has.stream().allMatch(line -> lore.contains(line) || name.contains(line));
     }
 
     private boolean doesntHave(Slot slot) {
         if (doesntHave == null) return true;
-        String lore = Skyblock.getLore(slot.getStack());
+        String lore = Skyblock.getLore(slot.getItem());
         return doesntHave.stream().allMatch(line -> !lore.contains(line));
     }
 
     private boolean isCorrectInventory(Slot slot) {
-        if (playerInv == null) return !(slot.inventory instanceof PlayerInventory);
-        return playerInv == slot.inventory instanceof PlayerInventory;
+        if (playerInv == null) return !(slot.container instanceof Inventory);
+        return playerInv == slot.container instanceof Inventory;
     }
 
     public void incrementRef() {

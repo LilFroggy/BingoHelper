@@ -1,17 +1,15 @@
 package io.github.lilfroggy.bingohelper.util.render;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.ColorHelper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.util.ARGB;
+import net.minecraft.world.entity.Entity;
 import io.github.lilfroggy.bingohelper.events.Events;
 
 public class GlowingEntities {
-    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final Minecraft CLIENT = Minecraft.getInstance();
 
     private static final Map<Entity, Integer> GLOWING_ENTITIES = new ConcurrentHashMap<>();
 
@@ -32,8 +30,8 @@ public class GlowingEntities {
 
     public static void add(Entity entity, int red, int green, int blue, int alpha) {
         if (CLIENT.player == null) return;
-        if (!CLIENT.player.canSee(entity) || !entity.isAlive()) return;
-        GLOWING_ENTITIES.put(entity, ColorHelper.getArgb(alpha, red, green, blue));
+        if (!CLIENT.player.hasLineOfSight(entity) || !entity.isAlive()) return;
+        GLOWING_ENTITIES.put(entity, ARGB.color(alpha, red, green, blue));
     }
 
     public static void remove(Entity entity) {
