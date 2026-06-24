@@ -55,28 +55,28 @@ dependencies {
 
 	// Fabric Language Kotlin
 
-	modImplementation("net.fabricmc:fabric-language-kotlin:1.13.9+kotlin.2.3.10")
+	modImplementation("net.fabricmc:fabric-language-kotlin:${project.fabric_language_kotlin_version}")
 	
 	// DevAuth
 	
-	modRuntimeOnly("org.apache.httpcomponents:httpclient:4.5.14")
-	modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+	modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:${project.devauth_version}")
 	
 	// HypixelModAPI
 
-	modImplementation("net.hypixel:mod-api:1.0.1")
+	modImplementation("net.hypixel:mod-api:${project.hypixel_mod_api_version}")
 	include("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")
 
 	// Vigilance
 
-	shadowImpl("gg.essential:vigilance:312")
-	shadowModImpl("gg.essential:universalcraft-1.21.11-fabric:456+feature-em-1645-closing-uscreen-via-esc-on-119-puts-you-in-the-menu-rather") {
+	shadowImpl("gg.essential:vigilance:${project.vigilance_version}")
+	shadowModImpl("gg.essential:universalcraft-1.21.11-fabric:${project.universalcraft_version}") {
         exclude(group: "net.fabricmc")
 		exclude(group: "org.jetbrains.kotlin")
     }
 
 	// Json Schema Validator
-	shadowImpl("com.networknt:json-schema-validator:1.5.8")
+	
+	shadowImpl("com.networknt:json-schema-validator:${project.json_schema_validator_version}")
 }
 
 tasks.named('remapJar') {
