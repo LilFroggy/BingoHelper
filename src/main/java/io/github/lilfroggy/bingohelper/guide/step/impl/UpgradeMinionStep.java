@@ -7,12 +7,12 @@ import io.github.lilfroggy.bingohelper.events.interfaces.RenderScreenEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -78,7 +78,7 @@ public class UpgradeMinionStep extends Step implements ClientTickEndEvent, Click
     }
 
     @Override
-    public void onClickSlot(Slot slot, int slotId, int button, ClickType actionType, CallbackInfo ci) {
+    public void onClickSlot(Slot slot, int slotId, int button, ContainerInput actionType, CallbackInfo ci) {
         Screen screen = CLIENT.screen;
         if (!(screen instanceof ContainerScreen)) return;
 
@@ -108,19 +108,19 @@ public class UpgradeMinionStep extends Step implements ClientTickEndEvent, Click
     }
 
     @Override
-    public void onRenderScreen(GuiGraphics graphics, Screen screen, String title, NonNullList<Slot> slots) {
+    public void onRenderScreen(GuiGraphicsExtractor graphics, Screen screen, String title, NonNullList<Slot> slots) {
         if (desiredLevel > toLevel) return;
 
         if (isNavigationScreen(screen)) highlightNavigationSlot(graphics, slots);
         else if (isUpgradeScreen(screen)) highlightUpgradeSlot(graphics, slots);
     }
 
-    private void highlightNavigationSlot(GuiGraphics graphics, NonNullList<Slot> slots) {
+    private void highlightNavigationSlot(GuiGraphicsExtractor graphics, NonNullList<Slot> slots) {
         Slot slot = findSlotByItemId(slots, desiredId);
         if (slot != null) RenderLib.highlightSlot(graphics, slot, RenderLib.MINECRAFT_GREEN);
     }
 
-    private void highlightUpgradeSlot(GuiGraphics graphics, NonNullList<Slot> slots) {
+    private void highlightUpgradeSlot(GuiGraphicsExtractor graphics, NonNullList<Slot> slots) {
         if (navigating) RenderLib.highlightSlot(graphics, slots.get(SLOT_BACK_BUTTON), RenderLib.MINECRAFT_GREEN);
         else if (isMissingIngredients(slots) && isNextPage(slots)) RenderLib.highlightSlot(graphics, slots.get(SLOT_NEXT_PAGE), RenderLib.MINECRAFT_GREEN);
         else if (isInventorySpace(slots)) RenderLib.highlightSlot(graphics, slots.get(SLOT_SUPERCRAFT), RenderLib.MINECRAFT_GREEN);

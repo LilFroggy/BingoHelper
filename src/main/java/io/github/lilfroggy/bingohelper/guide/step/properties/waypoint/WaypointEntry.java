@@ -1,7 +1,7 @@
 package io.github.lilfroggy.bingohelper.guide.step.properties.waypoint;
 
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -42,24 +42,24 @@ public class WaypointEntry {
         RenderLib.renderFilledAndOutline(box, strokeRGBA, fillRGBA);
     }
 
-    public void renderText(WorldRenderContext context) {
+    public void renderText(LevelRenderContext context) {
         renderText(context, DEFAULT_TEXT_SCALE);
     }
 
-    public void renderText(WorldRenderContext context, float scale) {
+    public void renderText(LevelRenderContext context, float scale) {
         if (text == null) return;
         RenderLib.renderText(context, text, center, scale);
     }
 
-    public void renderLine(WorldRenderContext context) {
+    public void renderLine(LevelRenderContext context) {
         renderLine(context, DEFAULT_LINE_COLOR);
     }
 
-    public void renderLine(WorldRenderContext context, int color) {
+    public void renderLine(LevelRenderContext context, int color) {
         RenderLib.renderLineFromCursor(context, center, color);
     }
 
-    public void render(WorldRenderContext context) {
+    public void render(LevelRenderContext context) {
         renderBox();
         renderLine(context);
         renderText(context);

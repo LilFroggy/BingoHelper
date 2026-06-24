@@ -6,16 +6,16 @@ import com.mojang.brigadier.context.CommandContext;
 import io.github.lilfroggy.bingohelper.command.ClientCommand;
 import io.github.lilfroggy.bingohelper.guide.Guide;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 
 public class BhBackCommand implements ClientCommand {
 
     @Override
     public void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
-        dispatcher.register(ClientCommandManager.literal("bhback")
+        dispatcher.register(ClientCommands.literal("bhback")
                 .executes(this::backOne)
-                .then(ClientCommandManager.argument("amount", IntegerArgumentType.integer(1))
+                .then(ClientCommands.argument("amount", IntegerArgumentType.integer(1))
                         .executes(this::backAmount)));
     }
 

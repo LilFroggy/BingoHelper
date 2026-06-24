@@ -1,6 +1,6 @@
 package io.github.lilfroggy.bingohelper.util;
 
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import org.lwjgl.glfw.GLFW;
 
@@ -21,7 +21,7 @@ public class KeyBindings {
     public static KeyMapping BINGO_GUIDE_ACTION;
     
     public static void init() {
-        BINGO_GUIDE_ACTION = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        BINGO_GUIDE_ACTION = KeyMappingHelper.registerKeyMapping(new KeyMapping(
             "key.bingohelper.bingo_guide_action",
             GLFW.GLFW_KEY_F,
             BINGO_HELPER_CATEGORY

@@ -74,7 +74,7 @@ public class ChatLib {
         final Component FINAL = withPrefix ? Component.literal(BingoHelper.PREFIX).append(message) : message;
 
         try {
-            CLIENT.schedule(() -> CLIENT.gui.getChat().addMessage(FINAL));
+            CLIENT.schedule(() -> CLIENT.gui.getChat().addClientSystemMessage(FINAL));
         } catch (Exception e) {
             Logger.error("Error sending chat message", e, true);
         }

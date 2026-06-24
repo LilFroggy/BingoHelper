@@ -10,7 +10,7 @@ import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.ClipboardUtils;
 import io.github.lilfroggy.bingohelper.util.EntityUtils;
 import io.github.lilfroggy.bingohelper.util.JsonUtils;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -30,13 +30,13 @@ public class BhWailaCommand implements ClientCommand {
 
     @Override
     public void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
-        dispatcher.register(ClientCommandManager.literal("bhwaila")
+        dispatcher.register(ClientCommands.literal("bhwaila")
             .executes(this::executeNbt)
-            .then(ClientCommandManager.literal("waypoint").executes(this::executeWaypoint))
-            .then(ClientCommandManager.literal("waypointFull").executes(this::executeWaypointFull))
-            .then(ClientCommandManager.literal("outline").executes(this::executeOutline))
-            .then(ClientCommandManager.literal("outlineFull").executes(this::executeOutlineFull))
-            .then(ClientCommandManager.literal("outlinewaypoint").executes(this::executeOutlineWaypoint))
+            .then(ClientCommands.literal("waypoint").executes(this::executeWaypoint))
+            .then(ClientCommands.literal("waypointFull").executes(this::executeWaypointFull))
+            .then(ClientCommands.literal("outline").executes(this::executeOutline))
+            .then(ClientCommands.literal("outlineFull").executes(this::executeOutlineFull))
+            .then(ClientCommands.literal("outlinewaypoint").executes(this::executeOutlineWaypoint))
         );
     }
 

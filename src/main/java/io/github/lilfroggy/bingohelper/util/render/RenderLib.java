@@ -2,10 +2,10 @@ package io.github.lilfroggy.bingohelper.util.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.gizmos.GizmoStyle;
 import net.minecraft.gizmos.Gizmos;
 import net.minecraft.network.chat.Component;
@@ -40,27 +40,27 @@ public class RenderLib {
 
     // Shoutout Blade-Addons
 
-    public static void renderText(WorldRenderContext context, String text, Vec3 pos, float scale) {
+    public static void renderText(LevelRenderContext context, String text, Vec3 pos, float scale) {
         renderText(context, Component.literal(ChatLib.replaceAmpersands(text)), pos.x, pos.y, pos.z, scale);
     }
     
-    public static void renderText(WorldRenderContext context, Component text, Vec3 pos, float scale) {
+    public static void renderText(LevelRenderContext context, Component text, Vec3 pos, float scale) {
         renderText(context, text, pos.x, pos.y, pos.z, scale);
     }
 
-    public static void renderText(WorldRenderContext context, String text, double x, double y, double z, float scale) {
+    public static void renderText(LevelRenderContext context, String text, double x, double y, double z, float scale) {
         renderText(context, Component.literal(ChatLib.replaceAmpersands(text)), x, y, z, scale);
     }
 
-    public static void renderText(WorldRenderContext context, Component text, double x, double y, double z, float scale) {
+    public static void renderText(LevelRenderContext context, Component text, double x, double y, double z, float scale) {
         Minecraft client = Minecraft.getInstance();
         Font textRenderer = client.font;
         if (client.player == null) return;
 
-        PoseStack matrices = context.matrices();
+        PoseStack matrices = context.poseStack();
     
         // 1. Get camera position from the modern context
-        Vec3 cameraPos = context.worldState().cameraRenderState.pos;
+        Vec3 cameraPos = context.levelState().cameraRenderState.pos;
     
         double distance = Math.sqrt(cameraPos.distanceToSqr(x, y, z));
     
@@ -74,7 +74,7 @@ public class RenderLib {
         matrices.translate(x, y, z);
         
         // 5. Face the camera
-        matrices.mulPose(context.worldState().cameraRenderState.orientation);
+        matrices.mulPose(context.levelState().cameraRenderState.orientation);
         
         // 6. Apply distance scale (flipping Y like your old matrix did)
         matrices.scale(consistentScale, -consistentScale, consistentScale);
@@ -87,7 +87,7 @@ public class RenderLib {
         float halfWidth = textRenderer.width(text) / 2f;
     
         // 9. Submit text to the command queue (using modern max light coordinates)
-        context.commandQueue().submitText(
+        context.submitNodeCollector().submitText(
             matrices, 
             -halfWidth,                       // Centered horizontally
             0,                                // 0 is now cleanly anchored at the bottom
@@ -103,17 +103,17 @@ public class RenderLib {
         matrices.popPose();
     }
 
-    public static void renderLineFromCursor(WorldRenderContext context, Vec3 pos, int color) {
+    public static void renderLineFromCursor(LevelRenderContext context, Vec3 pos, int color) {
         renderLineFromCursor(context, pos.x, pos.y, pos.z, color, LINE_THICKNESS);
     }
 
-    public static void renderLineFromCursor(WorldRenderContext context, Vec3 pos, int color, float width) {
+    public static void renderLineFromCursor(LevelRenderContext context, Vec3 pos, int color, float width) {
         renderLineFromCursor(context, pos.x, pos.y, pos.z, color, width);
     }
 
-    public static void renderLineFromCursor(WorldRenderContext context, double x, double y, double z, int color, float width) {
-        Vec3 cameraPos = context.worldState().cameraRenderState.pos;
-        Vector3f lookAt = new Vector3f(0, 0, -1f).rotate(context.worldState().cameraRenderState.orientation);
+    public static void renderLineFromCursor(LevelRenderContext context, double x, double y, double z, int color, float width) {
+        Vec3 cameraPos = context.levelState().cameraRenderState.pos;
+        Vector3f lookAt = new Vector3f(0, 0, -1f).rotate(context.levelState().cameraRenderState.orientation);
         Vec3 startPos = cameraPos.add(lookAt.x * 0.1, lookAt.y * 0.1, lookAt.z * 0.1);
         Gizmos.line(startPos, new Vec3(x, y, z), color, width);
     }
@@ -141,7 +141,7 @@ public class RenderLib {
         Gizmos.cuboid(box, GizmoStyle.strokeAndFill(stroke, outlineWidth, fill));
     }
 
-    public static void highlightSlot(GuiGraphics graphics, Slot slot, int color) {
+    public static void highlightSlot(GuiGraphicsExtractor graphics, Slot slot, int color) {
         int x = slot.x;
         int y = slot.y;
 

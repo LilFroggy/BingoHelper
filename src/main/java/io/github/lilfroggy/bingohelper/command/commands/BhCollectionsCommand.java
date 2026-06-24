@@ -7,7 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import io.github.lilfroggy.bingohelper.command.ClientCommand;
 import io.github.lilfroggy.bingohelper.data.Collections;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 
 import java.util.Map;
@@ -16,14 +16,14 @@ public class BhCollectionsCommand implements ClientCommand {
 
     @Override
     public void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
-        dispatcher.register(ClientCommandManager.literal("bhcollections")
-            .then(ClientCommandManager.literal("list")
+        dispatcher.register(ClientCommands.literal("bhcollections")
+            .then(ClientCommands.literal("list")
                 .executes(this::listCollections))
-            .then(ClientCommandManager.literal("reset")
+            .then(ClientCommands.literal("reset")
                 .executes(this::resetCollections))
-            .then(ClientCommandManager.literal("set")
-                .then(ClientCommandManager.argument("name", StringArgumentType.string())
-                .then(ClientCommandManager.argument("level", IntegerArgumentType.integer())
+            .then(ClientCommands.literal("set")
+                .then(ClientCommands.argument("name", StringArgumentType.string())
+                .then(ClientCommands.argument("level", IntegerArgumentType.integer())
                 .executes(this::setCollection)))));
     }
 

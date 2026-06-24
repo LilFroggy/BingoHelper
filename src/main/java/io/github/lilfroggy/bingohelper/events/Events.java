@@ -1,29 +1,6 @@
 package io.github.lilfroggy.bingohelper.events;
 
-import io.github.lilfroggy.bingohelper.events.interfaces.ActionBarMessageEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.AreaChangeEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.ClickSlotEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.ClientMessageEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickStartEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.CreateBingoProfileEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.EntityStateUpdateEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.IslandChangeEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.RenderHudEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.RenderWorldEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.JoinBingoEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.JoinHypixelEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.LeaveBingoEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.LevelCollectionEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.MessageEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.ScoreboardUpdateEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.CloseScreenEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.RenderScreenEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.LevelSkillEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.RenderSlotEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.SubAreaChangeEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.UnlockMobTypeEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.WorldChangeEvent;
+import io.github.lilfroggy.bingohelper.events.interfaces.*;
 
 public class Events {
 
@@ -33,7 +10,6 @@ public class Events {
     public static final EventHandler<ClientTickEndEvent> CLIENT_TICK_END = new EventHandler<>();
     public static final EventHandler<WorldChangeEvent> CHANGE_WORLD = new EventHandler<>();
 
-    public static final EventHandler<ClientMessageEvent> CLIENT_MESSAGE = new EventHandler<>();
     public static final EventHandler<MessageEvent> MESSAGE = new EventHandler<>();
     public static final EventHandler<ActionBarMessageEvent> ACTION_BAR_MESSAGE = new EventHandler<>();
 

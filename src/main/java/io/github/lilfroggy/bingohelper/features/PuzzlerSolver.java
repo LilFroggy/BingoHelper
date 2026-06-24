@@ -12,7 +12,7 @@ import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import io.github.lilfroggy.bingohelper.util.render.RenderingEvent;
 import io.github.lilfroggy.bingohelper.util.render.RenderingEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.phys.AABB;
@@ -70,7 +70,7 @@ public class PuzzlerSolver {
         tracePos = null;
     }
 
-    public static void render(WorldRenderContext context, PoseStack matrixStack, VertexConsumer consumer) {
+    public static void render(LevelRenderContext context, PoseStack matrixStack, VertexConsumer consumer) {
         if (solution == null || tracePos == null) return;
         RenderLib.renderFilledAndOutline(AABB.unitCubeFromLowerCorner(solution), SOLUTION_OUTLINE_COLOR, SOLUTION_FILL_COLOR);
         RenderLib.renderLineFromCursor(context, tracePos, RenderLib.MINECRAFT_GREEN);

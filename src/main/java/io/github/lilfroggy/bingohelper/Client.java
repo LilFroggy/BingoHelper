@@ -19,9 +19,9 @@ import io.github.lilfroggy.bingohelper.util.render.RenderingEvents;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -44,12 +44,12 @@ public class Client implements ClientModInitializer {
             Events.CLIENT_TICK_END.invoke(listener -> listener.onClientTickEnd(currentTick));
         });
 
-        ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((Minecraft client, ClientLevel world) -> {
+        ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register((Minecraft client, ClientLevel world) -> {
             Events.CHANGE_WORLD.invoke(listener -> listener.onWorldChange(client, world));
         });
 
-        WorldRenderEvents.END_MAIN.register(context -> {
-            Events.RENDER_WORLD.invoke(listener -> listener.onRenderWorld(context.matrices(), context.consumers(), context));
+        LevelRenderEvents.END_MAIN.register(context -> {
+            Events.RENDER_WORLD.invoke(listener -> listener.onRenderWorld(context.poseStack(), context.bufferSource(), context));
         });
 
         HudElementRegistry.addLast(BingoHelper.id("hud"), (context, tickCounter) -> {

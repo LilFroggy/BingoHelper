@@ -7,7 +7,7 @@ import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -66,7 +66,7 @@ public class SellStep extends Step implements ClientTickEndEvent, RenderSlotEven
     }
 
     @Override
-    public void onRenderSlot(GuiGraphics graphics, Slot slot) {
+    public void onRenderSlot(GuiGraphicsExtractor graphics, Slot slot) {
         if (!(slot.container instanceof Inventory)) return;
         ItemStack item = slot.getItem();
         if (item.isEmpty()) return;

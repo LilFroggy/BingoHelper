@@ -14,14 +14,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 import java.util.Map;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
@@ -102,7 +102,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
     }
 
     @Override
-    public void onRenderScreen(GuiGraphics graphics, Screen screen, String title, NonNullList<Slot> slots) {
+    public void onRenderScreen(GuiGraphicsExtractor graphics, Screen screen, String title, NonNullList<Slot> slots) {
         if (!title.contains(REFORGE_SCREEN_TITLE)) return;
 
         renderMissingReforgeList(graphics);
@@ -117,7 +117,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
 
     private static final Display reforgeDisplay = new Display("");
 
-    public void renderReforgeDisplay(Screen screen, GuiGraphics graphics, ItemStack reforgeItem, String reforge) {
+    public void renderReforgeDisplay(Screen screen, GuiGraphicsExtractor graphics, ItemStack reforgeItem, String reforge) {
         String id = Skyblock.getID(reforgeItem);
         if (id.isEmpty()) return;
         
@@ -169,7 +169,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
 
     private static final Display itemsMissingReforge = new Display("");
 
-    public void renderMissingReforgeList(GuiGraphics graphics) {
+    public void renderMissingReforgeList(GuiGraphicsExtractor graphics) {
         StringBuilder statusText = new StringBuilder("&cRemaining:\n");
         for (var entry : items.entrySet()) {
             String itemName = entry.getKey();
@@ -189,7 +189,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
         itemsMissingReforge.setString(statusText.toString()).draw(graphics, x, y);
     }
 
-    public void highlightUnfinishedItems(GuiGraphics graphics, NonNullList<Slot> slots) {
+    public void highlightUnfinishedItems(GuiGraphicsExtractor graphics, NonNullList<Slot> slots) {
         for (Slot slot : slots) {
             if (!(slot.container instanceof Inventory)) continue;
             ItemStack item = slot.getItem();
@@ -204,7 +204,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
     }
 
     @Override
-    public void onClickSlot(Slot slot, int slotId, int button, ClickType actionType, CallbackInfo ci) {
+    public void onClickSlot(Slot slot, int slotId, int button, ContainerInput actionType, CallbackInfo ci) {
         if (slotId != REFORGE_BUTTON_SLOT_ID) return;
         ItemStack reforgeItem = slot.container.getItem(REFORGE_ITEM_SLOT_ID);
         if (reforgeItem.isEmpty()) return;

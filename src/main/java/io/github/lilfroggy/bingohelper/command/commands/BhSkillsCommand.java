@@ -7,7 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import io.github.lilfroggy.bingohelper.command.ClientCommand;
 import io.github.lilfroggy.bingohelper.data.Skills;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 
 import java.util.Map;
@@ -16,14 +16,14 @@ public class BhSkillsCommand implements ClientCommand {
 
     @Override
     public void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
-        dispatcher.register(ClientCommandManager.literal("bhskills")
-            .then(ClientCommandManager.literal("list")
+        dispatcher.register(ClientCommands.literal("bhskills")
+            .then(ClientCommands.literal("list")
                 .executes(this::listSkills))
-            .then(ClientCommandManager.literal("reset")
+            .then(ClientCommands.literal("reset")
                 .executes(this::resetSkills))
-            .then(ClientCommandManager.literal("set")
-                .then(ClientCommandManager.argument("name", StringArgumentType.string())
-                .then(ClientCommandManager.argument("level", DoubleArgumentType.doubleArg())
+            .then(ClientCommands.literal("set")
+                .then(ClientCommands.argument("name", StringArgumentType.string())
+                .then(ClientCommands.argument("level", DoubleArgumentType.doubleArg())
                 .executes(this::setSkill)))));
     }
 

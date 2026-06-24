@@ -2,7 +2,7 @@ package io.github.lilfroggy.bingohelper.util.render;
 
 import io.github.lilfroggy.bingohelper.util.ChatLib;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.network.chat.Component;
@@ -66,7 +66,7 @@ public class Display {
         return this;
     }
 
-    public void draw(GuiGraphics graphics, int x, int y) {
+    public void draw(GuiGraphicsExtractor graphics, int x, int y) {
         ensureTextInitialized();
 
         if (text == null) return;

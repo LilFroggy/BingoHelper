@@ -6,7 +6,7 @@ import io.github.lilfroggy.bingohelper.command.ClientCommand;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.ClipboardUtils;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -18,7 +18,7 @@ public class BhCopyNbt implements ClientCommand {
 
     @Override
     public void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
-        dispatcher.register(ClientCommandManager.literal("bhcopynbt")
+        dispatcher.register(ClientCommands.literal("bhcopynbt")
                 .executes(this::execute));
     }
 

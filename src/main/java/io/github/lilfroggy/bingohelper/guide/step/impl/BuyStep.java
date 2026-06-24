@@ -12,7 +12,7 @@ import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Inventory;
@@ -102,7 +102,7 @@ public class BuyStep extends Step implements MessageEvent, RenderScreenEvent {
     }
 
     @Override
-    public void onRenderScreen(GuiGraphics context, Screen screen, String title, NonNullList<Slot> slots) {
+    public void onRenderScreen(GuiGraphicsExtractor context, Screen screen, String title, NonNullList<Slot> slots) {
         int lowest = Integer.MAX_VALUE;
         int highest = 0;
         Slot best = null;

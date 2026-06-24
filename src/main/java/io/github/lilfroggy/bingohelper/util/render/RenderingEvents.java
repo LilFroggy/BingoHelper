@@ -2,10 +2,10 @@ package io.github.lilfroggy.bingohelper.util.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.state.LevelRenderState;
+import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.world.phys.Vec3;
 
 public class RenderingEvents {
@@ -18,24 +18,24 @@ public class RenderingEvents {
     public static final RenderHandler<RenderingEvent> LINE = new RenderHandler<>();
 
     public static void init() {
-        WorldRenderEvents.BEFORE_DEBUG_RENDER.register(RenderingEvents::filled);
-        WorldRenderEvents.BEFORE_DEBUG_RENDER.register(RenderingEvents::filledNoDepth);
-        WorldRenderEvents.AFTER_ENTITIES.register(RenderingEvents::entityFilled);
-        WorldRenderEvents.AFTER_ENTITIES.register(RenderingEvents::entityOutline);
-        WorldRenderEvents.AFTER_ENTITIES.register(RenderingEvents::entityOutlineNoDepth);
-        WorldRenderEvents.BEFORE_DEBUG_RENDER.register(RenderingEvents::debugLine);
+        LevelRenderEvents.AFTER_SOLID_FEATURES.register(RenderingEvents::filled);
+        LevelRenderEvents.AFTER_SOLID_FEATURES.register(RenderingEvents::filledNoDepth);
+        LevelRenderEvents.AFTER_SOLID_FEATURES.register(RenderingEvents::debugLine);
+        LevelRenderEvents.AFTER_SOLID_FEATURES.register(RenderingEvents::entityFilled);
+        LevelRenderEvents.AFTER_SOLID_FEATURES.register(RenderingEvents::entityOutline);
+        LevelRenderEvents.AFTER_SOLID_FEATURES.register(RenderingEvents::entityOutlineNoDepth);
     }
 
-    private static void filled(WorldRenderContext context) {
-        LevelRenderState worldState = context.worldState();
+    private static void filled(LevelRenderContext context) {
+        LevelRenderState worldState = context.levelState();
         if (worldState == null) return;
         Vec3 camera = worldState.cameraRenderState.pos;
-        PoseStack matrices = context.matrices();
+        PoseStack matrices = context.poseStack();
         if (matrices == null) return;
         matrices.pushPose();
         matrices.translate(-camera.x, -camera.y, -camera.z);
 
-        MultiBufferSource consumers = context.consumers();
+        MultiBufferSource consumers = context.bufferSource();
         if (consumers == null) return;
         VertexConsumer consumer = consumers.getBuffer(RenderLayers.FILLED_LAYER);
 
@@ -43,16 +43,16 @@ public class RenderingEvents {
         matrices.popPose();
     }
 
-    private static void filledNoDepth(WorldRenderContext context) {
-        LevelRenderState worldState = context.worldState();
+    private static void filledNoDepth(LevelRenderContext context) {
+        LevelRenderState worldState = context.levelState();
         if (worldState == null) return;
         Vec3 camera = worldState.cameraRenderState.pos;
-        PoseStack matrices = context.matrices();
+        PoseStack matrices = context.poseStack();
         if (matrices == null) return;
         matrices.pushPose();
         matrices.translate(-camera.x, -camera.y, -camera.z);
 
-        MultiBufferSource consumers = context.consumers();
+        MultiBufferSource consumers = context.bufferSource();
         if (consumers == null) return;
         VertexConsumer consumer = consumers.getBuffer(RenderLayers.FILLED_LAYER_NO_DEPTH);
 
@@ -60,16 +60,16 @@ public class RenderingEvents {
         matrices.popPose();
     }
 
-    private static void entityFilled(WorldRenderContext context) {
-        LevelRenderState worldState = context.worldState();
+    private static void entityFilled(LevelRenderContext context) {
+        LevelRenderState worldState = context.levelState();
         if (worldState == null) return;
         Vec3 camera = worldState.cameraRenderState.pos;
-        PoseStack matrices = context.matrices();
+        PoseStack matrices = context.poseStack();
         if (matrices == null) return;
         matrices.pushPose();
         matrices.translate(-camera.x, -camera.y, -camera.z);
 
-        MultiBufferSource consumers = context.consumers();
+        MultiBufferSource consumers = context.bufferSource();
         if (consumers == null) return;
         VertexConsumer consumer = consumers.getBuffer(RenderLayers.FILLED_ENTITY_LAYER);
 
@@ -78,16 +78,16 @@ public class RenderingEvents {
     }
 
 
-    private static void entityOutline(WorldRenderContext context) {
-        LevelRenderState worldState = context.worldState();
+    private static void entityOutline(LevelRenderContext context) {
+        LevelRenderState worldState = context.levelState();
         if (worldState == null) return;
         Vec3 camera = worldState.cameraRenderState.pos;
-        PoseStack matrices = context.matrices();
+        PoseStack matrices = context.poseStack();
         if (matrices == null) return;
         matrices.pushPose();
         matrices.translate(-camera.x, -camera.y, -camera.z);
 
-        MultiBufferSource consumers = context.consumers();
+        MultiBufferSource consumers = context.bufferSource();
         if (consumers == null) return;
         VertexConsumer consumer = consumers.getBuffer(RenderLayers.getOutline(4, true));
 
@@ -95,16 +95,16 @@ public class RenderingEvents {
         matrices.popPose();
     }
 
-    private static void entityOutlineNoDepth(WorldRenderContext context) {
-        LevelRenderState worldState = context.worldState();
+    private static void entityOutlineNoDepth(LevelRenderContext context) {
+        LevelRenderState worldState = context.levelState();
         if (worldState == null) return;
         Vec3 camera = worldState.cameraRenderState.pos;
-        PoseStack matrices = context.matrices();
+        PoseStack matrices = context.poseStack();
         if (matrices == null) return;
         matrices.pushPose();
         matrices.translate(-camera.x, -camera.y, -camera.z);
 
-        MultiBufferSource consumers = context.consumers();
+        MultiBufferSource consumers = context.bufferSource();
         if (consumers == null) return;
         VertexConsumer consumer = consumers.getBuffer(RenderLayers.getOutline(4, false));
 
@@ -112,16 +112,16 @@ public class RenderingEvents {
         matrices.popPose();
     }
 
-    private static void debugLine(WorldRenderContext context) {
-        LevelRenderState worldState = context.worldState();
+    private static void debugLine(LevelRenderContext context) {
+        LevelRenderState worldState = context.levelState();
         if (worldState == null) return;
-        Vec3 camera = context.worldState().cameraRenderState.pos;
-        PoseStack matrices = context.matrices();
+        Vec3 camera = context.levelState().cameraRenderState.pos;
+        PoseStack matrices = context.poseStack();
         if (matrices == null) return;
         matrices.pushPose();
         matrices.translate(-camera.x, -camera.y, -camera.z);
 
-        MultiBufferSource consumers = context.consumers();
+        MultiBufferSource consumers = context.bufferSource();
         if (consumers == null) return;
         VertexConsumer consumer = consumers.getBuffer(RenderLayers.getOutline(4, true));
 

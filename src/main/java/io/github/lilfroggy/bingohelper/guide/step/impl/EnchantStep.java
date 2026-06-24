@@ -11,7 +11,7 @@ import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
@@ -102,7 +102,7 @@ public class EnchantStep extends Step implements RenderScreenEvent, ClientTickEn
     }
 
     @Override
-    public void onRenderScreen(GuiGraphics graphics, Screen screen, String title, NonNullList<Slot> slots) {
+    public void onRenderScreen(GuiGraphicsExtractor graphics, Screen screen, String title, NonNullList<Slot> slots) {
         if (!title.contains("Enchant Item")) return;
 
         renderMissingEnchantList(screen, graphics);
@@ -115,7 +115,7 @@ public class EnchantStep extends Step implements RenderScreenEvent, ClientTickEn
 
     private static final Display itemsMissingEnchants = new Display("");
 
-    public void renderMissingEnchantList(Screen screen, GuiGraphics graphics) {
+    public void renderMissingEnchantList(Screen screen, GuiGraphicsExtractor graphics) {
         StringBuilder statusText = new StringBuilder("&cRemaining:\n");
         for (Map.Entry<String, ItemInfo> entry : items.entrySet()) {
             String itemName = entry.getKey();
@@ -135,7 +135,7 @@ public class EnchantStep extends Step implements RenderScreenEvent, ClientTickEn
         itemsMissingEnchants.setString(statusText.toString()).draw(graphics, x, y);
     }
 
-    public void highlightUnfinishedItems(GuiGraphics graphics, NonNullList<Slot> slots) {
+    public void highlightUnfinishedItems(GuiGraphicsExtractor graphics, NonNullList<Slot> slots) {
         for (Slot slot : slots) {
             if (!(slot.container instanceof Inventory)) continue;
             ItemStack item = slot.getItem();
@@ -149,7 +149,7 @@ public class EnchantStep extends Step implements RenderScreenEvent, ClientTickEn
         }
     }
 
-    public void highlightMissingEnchants(GuiGraphics graphics, ItemStack enchantItem, NonNullList<Slot> slots) {
+    public void highlightMissingEnchants(GuiGraphicsExtractor graphics, ItemStack enchantItem, NonNullList<Slot> slots) {
         String enchantItemId = Skyblock.getID(enchantItem);
         if (enchantItemId.isEmpty()) return;
         if (!items.containsKey(enchantItemId)) return;

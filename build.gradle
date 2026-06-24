@@ -1,7 +1,7 @@
 plugins {
-	id "fabric-loom" version "${loom_version}"
+	id "net.fabricmc.fabric-loom" version "${loom_version}"
 	id "maven-publish"
-	id "com.gradleup.shadow" version "9.3.1"
+	id "com.gradleup.shadow" version "${shadow_version}"
 }
 
 configurations {
@@ -10,7 +10,7 @@ configurations {
 }
 
 configurations.implementation.extendsFrom configurations.shadowImpl
-configurations.modImplementation.extendsFrom configurations.shadowModImpl
+configurations.implementation.extendsFrom configurations.shadowModImpl
 
 version = "${project.mod_version}-mc${project.minecraft_version}"
 group = project.maven_group
@@ -49,41 +49,34 @@ repositories {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft("com.mojang:minecraft:${project.minecraft_version}")
-	mappings loom.officialMojangMappings()
-	modImplementation("net.fabricmc:fabric-loader:${project.loader_version}")
-	modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
+	implementation("net.fabricmc:fabric-loader:${project.loader_version}")
+	implementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}")
 
 	// Fabric Language Kotlin
 
-	modImplementation("net.fabricmc:fabric-language-kotlin:${project.fabric_language_kotlin_version}")
+	implementation("net.fabricmc:fabric-language-kotlin:${project.fabric_language_kotlin_version}")
 	
 	// DevAuth
 	
-	modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:${project.devauth_version}")
+	runtimeOnly("org.apache.httpcomponents:httpclient:4.5.14")
+	runtimeOnly("me.djtheredstoner:DevAuth-fabric:${project.devauth_version}")
 	
 	// HypixelModAPI
 
-	modImplementation("net.hypixel:mod-api:${project.hypixel_mod_api_version}")
+	implementation("net.hypixel:mod-api:${project.hypixel_mod_api_version}")
 	include("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")
 
 	// Vigilance
 
 	shadowImpl("gg.essential:vigilance:${project.vigilance_version}")
-	shadowModImpl("gg.essential:universalcraft-1.21.11-fabric:${project.universalcraft_version}") {
+	shadowModImpl("gg.essential:universalcraft-26.1-fabric:${project.universalcraft_version}") {
         exclude(group: "net.fabricmc")
 		exclude(group: "org.jetbrains.kotlin")
     }
 
 	// Json Schema Validator
-	
-	shadowImpl("com.networknt:json-schema-validator:${project.json_schema_validator_version}")
-}
 
-tasks.named('remapJar') {
-    archiveClassifier.set("")
-    dependsOn shadowJar
-    inputFile = shadowJar.archiveFile
-    destinationDirectory = rootProject.layout.buildDirectory.dir("libs")
+	shadowImpl("com.networknt:json-schema-validator:${project.json_schema_validator_version}")
 }
 
 tasks.named('shadowJar') {
@@ -115,7 +108,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
+	it.options.release = 25
 }
 
 java {
@@ -124,11 +117,12 @@ java {
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
+	enabled = false
 	archiveClassifier.set('nodeps')
 	inputs.property "archivesName", project.base.archivesName
 
@@ -136,7 +130,6 @@ jar {
 		rename { "${it}_${inputs.properties.archivesName}"}
 	}
 }
-assemble.dependsOn remapJar
 
 // configure the maven publication
 publishing {

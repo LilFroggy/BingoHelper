@@ -10,7 +10,7 @@ import io.github.lilfroggy.bingohelper.util.render.GlowingEntities;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import io.github.lilfroggy.bingohelper.util.render.RenderingEvent;
 import io.github.lilfroggy.bingohelper.util.render.RenderingEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
@@ -41,7 +41,7 @@ public class OutlineEntitiesProperty extends EntityPredicate implements ClientTi
     }
 
     @Override
-    public void render(WorldRenderContext context, PoseStack matrixStack, VertexConsumer consumer) {
+    public void render(LevelRenderContext context, PoseStack matrixStack, VertexConsumer consumer) {
         switch (super.line()) {
             case NONE:
                 return;
@@ -56,7 +56,7 @@ public class OutlineEntitiesProperty extends EntityPredicate implements ClientTi
         }
     }
 
-    private void renderLine(WorldRenderContext context, Entity entity) {
+    private void renderLine(LevelRenderContext context, Entity entity) {
         RenderLib.renderLineFromCursor(context, EntityUtils.getEntityMid(entity), DEFAULT_LINE_COLOR);
     }
 }
