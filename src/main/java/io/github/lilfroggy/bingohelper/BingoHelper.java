@@ -1,11 +1,13 @@
-package io.github.lilfroggy.bingohelper;
+ package io.github.lilfroggy.bingohelper;
 
 import io.github.lilfroggy.bingohelper.util.Version;
+import io.github.lilfroggy.bingohelper.util.PlayerRank;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket;
+import net.hypixel.modapi.packet.impl.clientbound.ClientboundPlayerInfoPacket;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 import net.minecraft.resources.Identifier;
 
@@ -21,10 +23,10 @@ public class BingoHelper implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
-		HypixelModAPI hypixelModAPI = HypixelModAPI.getInstance();
-		hypixelModAPI.subscribeToEventPacket(ClientboundLocationPacket.class);
-		hypixelModAPI.createHandler(ClientboundLocationPacket.class, Skyblock::onLocationPacket);
-		hypixelModAPI.createHandler(ClientboundHelloPacket.class, Skyblock::onHelloPacket);
+		HypixelModAPI.getInstance().subscribeToEventPacket(ClientboundLocationPacket.class);
+		HypixelModAPI.getInstance().createHandler(ClientboundLocationPacket.class, Skyblock::onLocationPacket);
+		HypixelModAPI.getInstance().createHandler(ClientboundHelloPacket.class, Skyblock::onHelloPacket);
+		HypixelModAPI.getInstance().createHandler(ClientboundPlayerInfoPacket.class, PlayerRank::onPlayerInfoPacket);
 	}
 	
 	public static Identifier id(String path) {

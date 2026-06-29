@@ -9,10 +9,16 @@ import io.github.lilfroggy.bingohelper.guide.step.properties.bingoRanks.BingoRan
 import io.github.lilfroggy.bingohelper.guide.step.properties.navTo.NavToProperty;
 import io.github.lilfroggy.bingohelper.util.Deserializer;
 import io.github.lilfroggy.bingohelper.util.Logger;
+import io.github.lilfroggy.bingohelper.util.item.EnchantList;
+import io.github.lilfroggy.bingohelper.util.item.HasList;
+import io.github.lilfroggy.bingohelper.util.item.ReforgeList;
 import net.minecraft.world.phys.Vec3;
 
 public class StepDeserializer {
     private static final Gson GSON = new GsonBuilder()
+        .registerTypeAdapter(HasList.class, new ItemListAdapter())
+        .registerTypeAdapter(ReforgeList.class, new ReforgeListAdapter())
+        .registerTypeAdapter(EnchantList.class, new EnchantListAdapter())
         .registerTypeAdapter(Vec3.class, new Vec3dAdapter())
         .registerTypeAdapter(BingoRanksProperty.class, new RanksPropertyAdapter())
         .registerTypeAdapter(NavToProperty.class, new NavToPropertyAdapter())
@@ -37,6 +43,7 @@ public class StepDeserializer {
                 .register("collection", CollectionStep.class)
                 .register("upgradeMinion", UpgradeMinionStep.class)
                 .register("mobTypes", MobTypesStep.class)
+                .register("supercraft", SupercraftStep.class)
         )
         .create();
 

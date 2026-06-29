@@ -1,0 +1,86 @@
+package io.github.lilfroggy.bingohelper.util.item;
+
+import java.util.Map;
+import java.util.Set;
+
+import io.github.lilfroggy.bingohelper.util.ScreenUtils;
+import io.github.lilfroggy.bingohelper.util.Skyblock;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+
+public class EnchantList {
+    private static final Minecraft CLIENT = Minecraft.getInstance();
+
+    private final Map<String, EnchantInfo> items;
+
+    public EnchantList(Map<String, EnchantInfo> items) {
+        this.items = items;
+    }
+
+    public EnchantInfo get(String id) {
+        return items.get(id);
+    }
+
+    public boolean contains(String id) {
+        return items.containsKey(id);
+    }
+
+    public Set<Map.Entry<String, EnchantInfo>> entrySet() {
+        return items.entrySet();
+    }
+
+    public Iterable<EnchantInfo> values() {
+        return items.values();
+    }
+
+    public void reset() {
+        items.values().forEach(EnchantInfo::reset);
+    }
+
+    public boolean allDone() {
+        return items.values().stream().allMatch(EnchantInfo::done);
+    }
+
+    public boolean allEnchanted() {
+        var containerSlots = ScreenUtils.getSlots();
+        if (containerSlots.isEmpty()) checkPlayerSlots();
+        else checkContainerSlots(containerSlots);
+        return allDone();
+    }
+
+    private void checkPlayerSlots() {
+        if (CLIENT.player == null) return;
+
+        for (ItemStack item : CLIENT.player.getInventory()) {
+            checkItem(item);
+        }
+    }
+
+    private void checkContainerSlots(NonNullList<Slot> slots) {
+        boolean inEnchantTable = ScreenUtils.getTitle().contains("Enchant Item");
+
+        for (Slot slot : slots) {
+            boolean isPlayerSlot = slot.container instanceof Inventory;
+            if (!inEnchantTable && !isPlayerSlot) continue;
+            checkItem(slot.getItem());
+        }
+    }
+
+    private void checkItem(ItemStack item) {
+        if (item == null || item.isEmpty()) return;
+        String id = Skyblock.getID(item);
+        if (id.isEmpty()) return;
+        if (!items.containsKey(id)) return;
+
+        EnchantInfo info = items.get(id);
+
+        String lore = Skyblock.getLore(item);
+        boolean hasAllEnchants = info.requiredEnchants().stream().allMatch(enchant -> 
+            lore.matches(".*\\b" + enchant.replace(" ", "\\s+") + "\\b.*"));
+        if (hasAllEnchants) info.done = true;
+        else info.done = false;
+    }
+}

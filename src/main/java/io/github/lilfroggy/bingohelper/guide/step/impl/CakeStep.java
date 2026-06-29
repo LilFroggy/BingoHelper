@@ -4,7 +4,8 @@ import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.MessageEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public class CakeStep extends Step implements MessageEvent {
     
-    public List<String> eaten;
+    transient public Set<String> eaten;
 
     @Override
     public String formattedInstruction() {
@@ -22,7 +23,7 @@ public class CakeStep extends Step implements MessageEvent {
 
     @Override
     public void onInit() {
-        // Nothing to reset
+        eaten = new HashSet<>();
     }
 
     @Override
@@ -49,7 +50,7 @@ public class CakeStep extends Step implements MessageEvent {
         if (!matcher.matches()) return;
         String cake = matcher.group(4);
 
-        if (!eaten.contains(cake)) eaten.add(cake);
+        if (!eaten.add(cake)) return;
 
         if (eaten.size() >= 16) complete();
     }

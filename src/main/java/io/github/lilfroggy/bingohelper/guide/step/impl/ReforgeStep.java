@@ -7,18 +7,17 @@ import io.github.lilfroggy.bingohelper.events.interfaces.CloseScreenEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.RenderScreenEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
+import io.github.lilfroggy.bingohelper.util.item.ReforgeInfo;
+import io.github.lilfroggy.bingohelper.util.item.ReforgeList;
 import io.github.lilfroggy.bingohelper.util.render.Display;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import io.github.lilfroggy.bingohelper.mixin.HandledScreenAccessorMixin;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
-import java.util.Map;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerInput;
@@ -27,12 +26,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEndEvent, ClickSlotEvent, CloseScreenEvent {
 
-    public Map<String, ItemInfo> items;
-
-    public static class ItemInfo {
-        public List<String> reforges;
-        public boolean done;
-    }
+    public ReforgeList items;
 
     private static final String REFORGE_SCREEN_TITLE = "Reforge Item";
 
@@ -51,9 +45,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
 
     @Override
     public void onReset() {
-        items.values().forEach(itemInfo -> {
-            itemInfo.done = false;
-        });
+        items.reset();
     }
 
     @Override
@@ -71,48 +63,20 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
 
     @Override
     public void onClientTickEnd(int tick) {
-        if (!(CLIENT.player instanceof LocalPlayer player)) return;
-
-        boolean allDone = true;
-
-        for (ItemStack stack : player.getInventory()) {
-            if (stack.isEmpty()) continue;
-
-            String id = Skyblock.getID(stack);
-            if (id.isEmpty()) continue;
-            if (!items.containsKey(id)) continue;
-
-            String itemReforge = Skyblock.getReforge(stack);
-            if (itemReforge == null) continue;
-
-            ItemInfo info = items.get(id);
-
-            boolean hasReforge = info.reforges.contains(itemReforge);
-            if (hasReforge) info.done = true;
-            else info.done = false;
-        }
-
-        for (ItemInfo info : items.values()) {
-            if (info.done) continue;
-            allDone = false;
-            break;
-        }
-
-        if (allDone) complete();
+        if (items.allReforged()) complete();
     }
 
     @Override
     public void onRenderScreen(GuiGraphicsExtractor graphics, Screen screen, String title, NonNullList<Slot> slots) {
         if (!title.contains(REFORGE_SCREEN_TITLE)) return;
 
-        renderMissingReforgeList(graphics);
+        if (isActive()) renderMissingReforgeList(graphics);
         
         ItemStack reforgeItem = slots.get(REFORGE_ITEM_SLOT_ID).getItem();
-
         String itemReforge = Skyblock.getReforge(reforgeItem);
 
-        if (itemReforge == null || reforgeItem.isEmpty()) highlightUnfinishedItems(graphics, slots);
-        else renderReforgeDisplay(screen, graphics, reforgeItem, itemReforge);
+        if (reforgeItem.isEmpty()) highlightUnfinishedItems(graphics, slots);
+        else if (itemReforge != null) renderReforgeDisplay(screen, graphics, reforgeItem, itemReforge);
     }
 
     private static final Display reforgeDisplay = new Display("");
@@ -130,9 +94,9 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
         
         // Check if reforge is valid for the specific item
         boolean isValidReforge = false;
-        if (items.containsKey(id)) {
-            ItemInfo info = items.get(id);
-            isValidReforge = info.reforges.contains(reforge);
+        if (items.contains(id)) {
+            ReforgeInfo info = items.get(id);
+            isValidReforge = info.isValidReforge(reforge);
             if (isValidReforge) info.done = true;
             else info.done = false;
         }
@@ -173,7 +137,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
         StringBuilder statusText = new StringBuilder("&cRemaining:\n");
         for (var entry : items.entrySet()) {
             String itemName = entry.getKey();
-            ItemInfo info = entry.getValue();
+            ReforgeInfo info = entry.getValue();
             if (!info.done) {
                 statusText.append("&f\n").append(itemName);
             }
@@ -196,7 +160,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
             if (item.isEmpty()) continue;
             String id = Skyblock.getID(item);
             if (id.isEmpty()) continue;
-            if (!items.containsKey(id)) continue;
+            if (!items.contains(id)) continue;
             if (items.get(id).done) continue;
 
             RenderLib.highlightSlot(graphics, slot, RenderLib.MINECRAFT_GOLD);
@@ -209,12 +173,10 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
         ItemStack reforgeItem = slot.container.getItem(REFORGE_ITEM_SLOT_ID);
         if (reforgeItem.isEmpty()) return;
         String itemId = Skyblock.getID(reforgeItem);
-        if (itemId.isEmpty() || !items.containsKey(itemId)) return;
-        ItemInfo info = items.get(itemId);
+        if (itemId.isEmpty() || !items.contains(itemId)) return;
+        ReforgeInfo info = items.get(itemId);
         String reforge = Skyblock.getReforge(reforgeItem);
-        if (reforge == null) return;
-        boolean isValidReforge = info.reforges.contains(reforge);
-        if(!isValidReforge) return;
+        if(!info.isValidReforge(reforge)) return;
             
         ci.cancel();
     }

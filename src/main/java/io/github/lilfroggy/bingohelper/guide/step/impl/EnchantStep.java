@@ -4,8 +4,9 @@ import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.RenderScreenEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
-import io.github.lilfroggy.bingohelper.util.ScreenUtils;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
+import io.github.lilfroggy.bingohelper.util.item.EnchantInfo;
+import io.github.lilfroggy.bingohelper.util.item.EnchantList;
 import io.github.lilfroggy.bingohelper.util.render.Display;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import java.util.List;
@@ -21,12 +22,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class EnchantStep extends Step implements RenderScreenEvent, ClientTickEndEvent {
 
-    public Map<String, ItemInfo> items;
-
-    public static class ItemInfo {
-        public List<String> enchants;
-        public boolean done;
-    }
+    EnchantList items;
 
     @Override
     public String formattedInstruction() {
@@ -40,9 +36,7 @@ public class EnchantStep extends Step implements RenderScreenEvent, ClientTickEn
 
     @Override
     public void onReset() {
-        items.values().forEach(itemInfo -> {
-            itemInfo.done = false;
-        });
+        items.reset();
     }
 
     @Override
@@ -59,46 +53,7 @@ public class EnchantStep extends Step implements RenderScreenEvent, ClientTickEn
 
     @Override
     public void onClientTickEnd(int tick) {
-        var containerSlots = ScreenUtils.getSlots();
-
-        if (containerSlots.isEmpty()) checkPlayerSlots();
-        else checkContainerSlots(containerSlots);
-
-        boolean allDone = items.values().stream().allMatch(info -> info.done);
-        if (allDone) complete();
-    }
-
-    private void checkPlayerSlots() {
-        if (CLIENT.player == null) return;
-
-        for (ItemStack item : CLIENT.player.getInventory()) {
-            checkItem(item);
-        }
-    }
-
-    private void checkContainerSlots(NonNullList<Slot> slots) {
-        boolean inEnchantTable = ScreenUtils.getTitle().contains("Enchant Item");
-
-        for (Slot slot : slots) {
-            boolean isPlayerSlot = slot.container instanceof Inventory;
-            if (!inEnchantTable && !isPlayerSlot) continue;
-            checkItem(slot.getItem());
-        }
-    }
-
-    private void checkItem(ItemStack item) {
-        if (item == null || item.isEmpty()) return;
-        String id = Skyblock.getID(item);
-        if (id.isEmpty()) return;
-        if (!items.containsKey(id)) return;
-
-        ItemInfo info = items.get(id);
-
-        String lore = Skyblock.getLore(item);
-        boolean hasAllEnchants = info.enchants.stream().allMatch(enchant -> 
-            lore.matches(".*\\b" + enchant.replace(" ", "\\s+") + "\\b.*"));
-        if (hasAllEnchants) info.done = true;
-        else info.done = false;
+        if (items.allEnchanted()) complete();
     }
 
     @Override
@@ -117,9 +72,9 @@ public class EnchantStep extends Step implements RenderScreenEvent, ClientTickEn
 
     public void renderMissingEnchantList(Screen screen, GuiGraphicsExtractor graphics) {
         StringBuilder statusText = new StringBuilder("&cRemaining:\n");
-        for (Map.Entry<String, ItemInfo> entry : items.entrySet()) {
+        for (Map.Entry<String, EnchantInfo> entry : items.entrySet()) {
             String itemName = entry.getKey();
-            ItemInfo info = entry.getValue();
+            EnchantInfo info = entry.getValue();
             if (!info.done) {
                 statusText.append("&f\n").append(itemName);
             }
@@ -142,7 +97,7 @@ public class EnchantStep extends Step implements RenderScreenEvent, ClientTickEn
             if (item.isEmpty()) continue;
             String itemId = Skyblock.getID(item);
             if (itemId.isEmpty()) continue;
-            if (!items.containsKey(itemId)) continue;
+            if (!items.contains(itemId)) continue;
             if (items.get(itemId).done) continue;
 
             RenderLib.highlightSlot(graphics, slot, RenderLib.MINECRAFT_GOLD);
@@ -152,8 +107,8 @@ public class EnchantStep extends Step implements RenderScreenEvent, ClientTickEn
     public void highlightMissingEnchants(GuiGraphicsExtractor graphics, ItemStack enchantItem, NonNullList<Slot> slots) {
         String enchantItemId = Skyblock.getID(enchantItem);
         if (enchantItemId.isEmpty()) return;
-        if (!items.containsKey(enchantItemId)) return;
-        List<String> requiredEnchants = items.get(enchantItemId).enchants;
+        if (!items.contains(enchantItemId)) return;
+        List<String> requiredEnchants = items.get(enchantItemId).requiredEnchants();
 
         for (Slot slot : slots) {
             if (slot.container instanceof Inventory) continue;

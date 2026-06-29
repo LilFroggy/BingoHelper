@@ -45,4 +45,8 @@ public class GlowingEntities {
     public static boolean contains(Entity entity) {
         return GLOWING_ENTITIES.containsKey(entity);
     }
+
+    public static boolean exists() {
+        return !GLOWING_ENTITIES.isEmpty();
+    }
 }

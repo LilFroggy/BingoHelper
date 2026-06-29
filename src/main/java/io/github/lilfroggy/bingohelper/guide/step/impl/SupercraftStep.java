@@ -2,14 +2,25 @@ package io.github.lilfroggy.bingohelper.guide.step.impl;
 
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
+import io.github.lilfroggy.bingohelper.events.interfaces.RenderScreenEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
+import io.github.lilfroggy.bingohelper.util.PlayerRank;
+import io.github.lilfroggy.bingohelper.util.SupercraftUtils;
 import io.github.lilfroggy.bingohelper.util.item.HasList;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.inventory.Slot;
 
-import net.minecraft.client.player.LocalPlayer;
+public class SupercraftStep extends Step implements ClientTickEndEvent, RenderScreenEvent {
 
-public class HasStep extends Step implements ClientTickEndEvent {
-        
+    // Provided from step
+
     public HasList items;
+
+    // internal
+
+    private String desiredId;
 
     @Override
     public String formattedInstruction() {
@@ -38,18 +49,31 @@ public class HasStep extends Step implements ClientTickEndEvent {
 
     @Override
     protected void onActivate() {
+        setNextDesiredId();
+        
         Events.CLIENT_TICK_END.register(this);
+        Events.RENDER_SCREEN.register(this);
     }
 
     @Override
     protected void onDeactivate() {
         Events.CLIENT_TICK_END.unregister(this);
+        Events.RENDER_SCREEN.unregister(this);
     }
 
     @Override
     public void onClientTickEnd(int tick) {
-        if (!(CLIENT.player instanceof LocalPlayer player)) return;
-        if (player.tickCount < 20) return;
         if (items.hasAll()) complete();
+        else if (items.get(desiredId).done()) setNextDesiredId();
+    }
+
+    @Override
+    public void onRenderScreen(GuiGraphicsExtractor graphics, Screen screen, String title, NonNullList<Slot> slots) {
+        SupercraftUtils.highlightSlot(graphics, slots, desiredId);
+    }
+
+    private void setNextDesiredId() {
+        desiredId = items.anUnfinishedId();
+        command = PlayerRank.canSupercraft() ? "/viewrecipe " + desiredId : "/craft";
     }
 }

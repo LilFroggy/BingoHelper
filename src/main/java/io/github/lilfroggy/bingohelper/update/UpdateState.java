@@ -29,24 +29,10 @@ public enum UpdateState {
     }
 
     public static UpdateState fromString(String updateState) {
-        switch (updateState) {
-            case "NONE":
-                return UpdateState.NONE;
-            case "CHECKING":
-                return UpdateState.CHECKING;
-            case "AVAILABLE":
-                return UpdateState.AVAILABLE;
-            case "DOWNLOADING":
-                return UpdateState.DOWNLOADING;
-            case "DOWNLOADED":
-                return UpdateState.DOWNLOADED;
-            case "INCOMPATIBLE":
-                return UpdateState.INCOMPATIBLE;
-            case "PARSE_ERROR":
-                return UpdateState.PARSE_ERROR;
-            case "DOWNLOAD_ERROR":
-                return UpdateState.DOWNLOAD_ERROR;
-            default: return UpdateState.NONE;
+        try {
+            return UpdateState.valueOf(updateState);
+        } catch (Exception e) {
+            return UpdateState.NONE;
         }
     }
 }

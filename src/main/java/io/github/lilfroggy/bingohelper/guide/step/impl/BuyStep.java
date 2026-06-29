@@ -8,8 +8,9 @@ import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.ScreenUtils;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
+import io.github.lilfroggy.bingohelper.util.item.HasInfo;
+import io.github.lilfroggy.bingohelper.util.item.HasList;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -22,28 +23,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public class BuyStep extends Step implements MessageEvent, RenderScreenEvent {
 
-    public Map<String, ItemInfo> items;
-
-    public static class ItemInfo {
-        public int count;
-        public int target;
-        public boolean done;
-    }
+    public HasList items;
 
     @Override
     public String formattedInstruction() {
         String formatted = instruction;
+        int i = 1;
 
-        int i = 0;
+        for (var entry : items.entrySet()) {
+            String placeholder = "%" + (i++) + "%";
+            var info = entry.getValue();
 
-        for (Map.Entry<String, ItemInfo> entry : items.entrySet()) {
-            int count = entry.getValue().count;
-            int target = entry.getValue().target;
-
-            if (count >= target) formatted = formatted.replace("%" + (++i) + "%", "&a(✔)");
-            else formatted = formatted.replace("%" + (++i) + "%", "(" + count + "/" + target + ")");
+            if (info.done()) formatted = formatted.replace(placeholder, "&a(✔)");
+            else formatted = formatted.replace(placeholder, "(" + info.count() + "/" + info.target() + ")");
         }
-
         return formatted;
     }
 
@@ -54,10 +47,7 @@ public class BuyStep extends Step implements MessageEvent, RenderScreenEvent {
 
     @Override
     public void onReset() {
-        items.values().forEach(itemInfo -> {
-            itemInfo.count = 0;
-            itemInfo.done = false;
-        });
+        items.reset();
     }
 
     @Override
@@ -114,8 +104,8 @@ public class BuyStep extends Step implements MessageEvent, RenderScreenEvent {
             if (item.isEmpty()) continue;
             String id = Skyblock.getID(item);
             if (id.isEmpty()) continue;
-            if (!items.containsKey(id)) continue;
-            ItemInfo itemInfo = items.get(id);
+            if (!items.contains(id)) continue;
+            HasInfo itemInfo = items.get(id);
 
             if (!itemInfo.done) {
                 if (title.equals("Shop Trading Options")) {
@@ -136,7 +126,6 @@ public class BuyStep extends Step implements MessageEvent, RenderScreenEvent {
             if (boughtName == null || boughtCount == null) continue;
 
             String itemName = item.getHoverName().getString();
-            if (itemName == null) continue;
             itemName = itemName.replaceAll("x\\d+", "").trim();
             if (!itemName.equals(boughtName)) continue;
 
@@ -150,6 +139,6 @@ public class BuyStep extends Step implements MessageEvent, RenderScreenEvent {
         if (!ScreenUtils.getCursorStack().isEmpty()) return;
         if (best == null) best = bestFallback;
         if (best != null) RenderLib.highlightSlot(context, best, RenderLib.MINECRAFT_GREEN);
-        if (items.values().stream().allMatch(info -> info.done)) complete();
+        if (items.allDone()) complete();
     }
 }

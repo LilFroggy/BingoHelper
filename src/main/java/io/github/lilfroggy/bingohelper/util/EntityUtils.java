@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -23,22 +22,6 @@ public class EntityUtils {
         if (typeOpt.isEmpty()) return List.of();
     
         return (List<Entity>) world.getEntities(typeOpt.get(), player.getBoundingBox().inflate(100), entity -> true);
-    }
-
-    public static List<AbstractClientPlayer> getPlayersWithSkin(String skin) {
-        ClientLevel world = CLIENT.level;
-        if (world == null) return List.of();
-    
-        return world.players().stream()
-            .filter(player -> getPlayerSkin(player).equals(skin))
-            .toList();
-    }
-
-    public static String getPlayerSkin(AbstractClientPlayer player) {
-        return player.getGameProfile().properties().get("textures").stream()
-            .findFirst()
-            .map(property -> property.value())
-            .orElse("");
     }
 
     public static Vec3 getEntityMid(Entity entity) {

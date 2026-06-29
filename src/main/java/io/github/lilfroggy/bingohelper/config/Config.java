@@ -9,6 +9,8 @@ import gg.essential.vigilance.data.PropertyData;
 import gg.essential.vigilance.data.PropertyType;
 import gg.essential.vigilance.data.SortingBehavior;
 import io.github.lilfroggy.bingohelper.guide.ActiveSteps;
+import net.hypixel.modapi.HypixelModAPI;
+import net.hypixel.modapi.packet.impl.serverbound.ServerboundPlayerInfoPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Util;
 
@@ -170,6 +172,23 @@ public class Config extends Vigilant {
         max = Integer.MAX_VALUE
     )
     public static int bingoRank = -1;
+
+    @Property(
+        type = PropertyType.TEXT,
+        name = "Hypixel Rank",
+        category = "Dev"
+    )
+    public static String hypixelRank = "";
+
+    @Property(
+        type = PropertyType.BUTTON,
+        name = "",
+        category = "Dev",
+        placeholder = "Update Hypixel Rank"
+    )
+    public static void updateHypixelRank() {
+        HypixelModAPI.getInstance().sendPacket(new ServerboundPlayerInfoPacket());
+    }
 
     @Property(
         type = PropertyType.SWITCH,

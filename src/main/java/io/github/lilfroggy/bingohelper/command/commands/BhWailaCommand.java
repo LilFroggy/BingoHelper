@@ -8,8 +8,8 @@ import com.mojang.brigadier.context.CommandContext;
 import io.github.lilfroggy.bingohelper.command.ClientCommand;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.ClipboardUtils;
-import io.github.lilfroggy.bingohelper.util.EntityUtils;
 import io.github.lilfroggy.bingohelper.util.JsonUtils;
+import io.github.lilfroggy.bingohelper.util.PlayerUtils;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
@@ -162,7 +162,7 @@ public class BhWailaCommand implements ClientCommand {
         pos.add(entity.getX()); pos.add(entity.getY()); pos.add(entity.getZ());
         obj.add("position", pos);
         if (entity instanceof AbstractClientPlayer player) {
-            String skin = EntityUtils.getPlayerSkin(player);
+            String skin = PlayerUtils.getSkin(player);
             obj.add("skin", new JsonPrimitive(skin));
         }
         return obj;

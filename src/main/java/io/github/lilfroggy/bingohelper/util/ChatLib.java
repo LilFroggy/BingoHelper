@@ -69,8 +69,6 @@ public class ChatLib {
     }
 
     public static void chat(Component message, boolean withPrefix) {
-        if (CLIENT.gui == null) return;
-
         final Component FINAL = withPrefix ? Component.literal(BingoHelper.PREFIX).append(message) : message;
 
         try {

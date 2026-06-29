@@ -1,6 +1,8 @@
 package io.github.lilfroggy.bingohelper.util.entity;
 
 import io.github.lilfroggy.bingohelper.util.EntityUtils;
+import io.github.lilfroggy.bingohelper.util.PlayerUtils;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -101,7 +103,7 @@ public class EntityPredicate {
     }
 
     public boolean matches(Entity entity) {
-        return isType(entity) && hasSkin(entity) && isAt(entity) && canSee(entity) && entity.isAlive();
+        return isType(entity) && hasSkin(entity) && isAt(entity) && entity.isAlive();
     }
 
     private boolean isType(Entity entity) {
@@ -114,10 +116,7 @@ public class EntityPredicate {
 
     private boolean hasSkin(Entity entity) {
         if (skin == null) return true;
-        return entity instanceof AbstractClientPlayer player && skin.equals(EntityUtils.getPlayerSkin(player));
-    }
-    private boolean canSee(Entity entity) {
-        return CLIENT.player != null && CLIENT.player.hasLineOfSight(entity) && !entity.isInvisible();
+        return entity instanceof AbstractClientPlayer player && skin.equals(PlayerUtils.getSkin(player));
     }
 
     public void incrementRef() {

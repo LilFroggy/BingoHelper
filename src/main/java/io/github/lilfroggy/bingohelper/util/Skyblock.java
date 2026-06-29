@@ -8,8 +8,10 @@ import org.jetbrains.annotations.Nullable;
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.Events;
 import net.hypixel.data.region.Environment;
+import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
+import net.hypixel.modapi.packet.impl.serverbound.ServerboundPlayerInfoPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.component.DataComponents;
@@ -46,10 +48,12 @@ public class Skyblock {
     public static void onHelloPacket(ClientboundHelloPacket packet) {
         if (Config.debug) Logger.info("packet received: " + packet.toString());
         var isAlpha = packet.getEnvironment() != Environment.PRODUCTION;
-       Events.JOIN_HYPIXEL.invoke(listener -> listener.onJoinHypixel(isAlpha));
+        Events.JOIN_HYPIXEL.invoke(listener -> listener.onJoinHypixel(isAlpha));
     }
 
     public static void onLocationPacket(ClientboundLocationPacket packet) {
+        HypixelModAPI.getInstance().sendPacket(new ServerboundPlayerInfoPacket());
+
         if (Config.debug) Logger.info("packet received: " + packet.toString());
 
         inSkyblock = packet.getServerType().get().getName().equals("SkyBlock");
