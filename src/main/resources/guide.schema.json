@@ -75,7 +75,7 @@
 							{
 								"$ref": "#/definitions/MobTypesStep"
 							},
-                            {
+							{
 								"$ref": "#/definitions/SupercraftStep"
 							}
 						],
@@ -121,7 +121,7 @@
 				"experience",
 				"upgradeMinion",
 				"mobTypes",
-                "supercraft"
+				"supercraft"
 			]
 		},
 		"Step": {
@@ -234,6 +234,9 @@
 					"properties": {
 						"entity": {
 							"$ref": "#/definitions/EntityPredicate"
+						},
+						"dwarvenEvent": {
+							"$ref": "#/definitions/DwarvenEvents"
 						}
 					},
 					"additionalProperties": false,
@@ -325,17 +328,8 @@
 			"properties": {
 				"type": {
 					"const": "cake"
-				},
-				"eaten": {
-					"type": "array",
-					"items": {
-						"type": "string"
-					}
 				}
-			},
-			"required": [
-				"eaten"
-			]
+			}
 		},
 		"SellStep": {
 			"properties": {
@@ -347,7 +341,7 @@
 					"items": {
 						"$ref": "#/definitions/ItemIds"
 					},
-                    "minItems": 1
+					"minItems": 1
 				}
 			},
 			"required": [
@@ -366,8 +360,8 @@
 					},
 					"additionalProperties": {
 						"type": "integer"
-                    },
-                    "minProperties": 1
+					},
+					"minProperties": 1
 				}
 			},
 			"required": [
@@ -387,7 +381,7 @@
 					"additionalProperties": {
 						"type": "integer"
 					},
-                    "minProperties": 1
+					"minProperties": 1
 				}
 			},
 			"required": [
@@ -432,12 +426,12 @@
 					},
 					"additionalProperties": {
 						"type": "array",
-                        "items": {
-                            "$ref": "#/definitions/Enchants"
-                        },
-                        "minItems": 1
+						"items": {
+							"$ref": "#/definitions/Enchants"
+						},
+						"minItems": 1
 					},
-                    "minProperties": 1
+					"minProperties": 1
 				}
 			},
 			"required": [
@@ -456,12 +450,12 @@
 					},
 					"additionalProperties": {
 						"type": "array",
-                        "items": {
-                            "$ref": "#/definitions/Reforges"
-                        },
-                        "minItems": 1
+						"items": {
+							"$ref": "#/definitions/Reforges"
+						},
+						"minItems": 1
 					},
-                    "minProperties": 1
+					"minProperties": 1
 				}
 			},
 			"required": [
@@ -578,7 +572,7 @@
 					"items": {
 						"$ref": "#/definitions/ItemIds"
 					},
-                    "minItems": 1
+					"minItems": 1
 				}
 			},
 			"required": [
@@ -595,7 +589,7 @@
 					"items": {
 						"$ref": "#/definitions/ItemIds"
 					},
-                    "minItems": 1
+					"minItems": 1
 				}
 			},
 			"required": [
@@ -646,14 +640,14 @@
 					"items": {
 						"$ref": "#/definitions/MobTypes"
 					},
-                    "minItems": 1
+					"minItems": 1
 				}
 			},
 			"required": [
 				"mobTypes"
 			]
 		},
-        "SupercraftStep": {
+		"SupercraftStep": {
 			"properties": {
 				"type": {
 					"const": "supercraft"
@@ -666,12 +660,15 @@
 					"additionalProperties": {
 						"type": "integer"
 					},
-                    "minProperties": 1
+					"minProperties": 1
 				}
 			},
 			"required": [
 				"items"
 			]
+		},
+		"DwarvenEvents": {
+			"type": "string"
 		},
 		"MobTypes": {
 			"type": "string"
