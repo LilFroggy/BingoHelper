@@ -68,8 +68,12 @@ public abstract class Step {
         return isAsync() ? async.isHidden() : false;
     }
 
+    public boolean hasRequirements() {
+        return async != null && async.hasRequirements();
+    }
+
     public boolean isPriority() {
-        return async != null && async.hasRequirements() && async.meetsRequirements();
+        return hasRequirements() && async.meetsRequirements();
     }
 
     public final String instruction() {

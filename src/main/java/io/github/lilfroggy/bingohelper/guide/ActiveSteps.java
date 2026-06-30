@@ -142,9 +142,9 @@ public class ActiveSteps {
     }
 
     @Nullable
-    public static String getAnyNonPriorityCommand() {
+    public static String getAnyCommand() {
         for (Step step : active) {
-            if (!step.isPriority() && step.command != null) {
+            if (!step.hasRequirements() && step.command != null) {
                 return step.command;
             }
         }
@@ -156,7 +156,7 @@ public class ActiveSteps {
         if (!priority.isEmpty()) return getPriorityCommand();
         String blockingCommand = getBlockingCommand();
         if (blockingCommand != null) return blockingCommand;
-        return getAnyNonPriorityCommand();
+        return getAnyCommand();
     }
 
     @Nullable
