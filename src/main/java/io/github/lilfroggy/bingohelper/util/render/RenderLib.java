@@ -159,15 +159,18 @@ public class RenderLib {
         graphics.fill(x + 16, y, x + 17, y + 16, borderColor);
     }
 
-    public static int getFormattedStringWidth(String input) {
+    public static int getWidth(String input) {
         input = ChatLib.replaceAmpersands(input);
-        Font textRenderer = CLIENT.font;
         
         int maxWidth = 0;
         for (String line : input.split("\n")) {
-            int width = textRenderer.width(line);
+            int width = CLIENT.font.width(line);
             maxWidth = Math.max(maxWidth, width);
         }
         return maxWidth;
+    }
+
+    public static int getHeight(String input) {
+        return input.split("\n").length * (CLIENT.font.lineHeight + Display.LINE_SPACING);
     }
 }

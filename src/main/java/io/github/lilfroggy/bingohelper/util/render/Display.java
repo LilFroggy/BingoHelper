@@ -10,7 +10,7 @@ import net.minecraft.network.chat.Component;
 public class Display {
     private static final Minecraft CLIENT = Minecraft.getInstance();
 
-    private static final int LINE_SPACING = 2;
+    public static final int LINE_SPACING = 2;
     private static final int FONT_HEIGHT_FALLBACK = 9;
     
     private MultiLineLabel text;
@@ -26,6 +26,24 @@ public class Display {
 
     public Display(String text) {
         setString(text);
+    }
+
+    public int getWidth() {
+        return (int) (RenderLib.getWidth(string) * scale);
+    }
+
+    public int getHeight() {
+        return (int) (RenderLib.getHeight(string) * scale);
+    }
+
+    public float titleX() {
+        float centerX = CLIENT.getWindow().getGuiScaledWidth() / 2f;
+        return centerX - (this.getWidth() / 2f);
+    }
+
+    public float titleY() {
+        float centerY = CLIENT.getWindow().getGuiScaledHeight() / 2f;
+        return centerY - this.getHeight();
     }
 
     private void ensureTextInitialized() {

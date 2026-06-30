@@ -103,11 +103,11 @@ public class ChatLib {
         hud.setTimes(fadeIn, stay, fadeOut);
     
         if (subtitle != null) {
-            hud.setSubtitle(Component.literal(subtitle));
+            hud.setSubtitle(Component.literal(replaceAmpersands(subtitle)));
         }
     
         if (title != null) {
-            hud.setTitle(Component.literal(title));
+            hud.setTitle(Component.literal(replaceAmpersands(title)));
         }
     }
 
@@ -245,7 +245,7 @@ public class ChatLib {
     }
 
     public static String removeFormatting(String string) {
-        return string.replaceAll("§[0-9a-fk-or]", "");
+        return string.replaceAll("[&§][0-9a-fk-or]", "");
     }
 
     public static String replaceAmpersands(String string) {

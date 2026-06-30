@@ -21,6 +21,7 @@ public class Guide {
     public static Step[] steps = EXAMPLE_GUIDE.steps();
     public static int stepIndex = EXAMPLE_GUIDE.stepIndex();
     public static long stepStartTime = System.currentTimeMillis();
+    public static boolean lerping = false;
 
     static {
         ActiveSteps.init();
@@ -67,39 +68,29 @@ public class Guide {
     }
 
     public static void reset() {
+        lerping = false;
         GuideNavigator.reset();
     }
 
     public static String getDisplayText() {
-        StringBuilder blockingBody = new StringBuilder();
-        StringBuilder blockingAsyncBody = new StringBuilder();
-        StringBuilder asyncBody = new StringBuilder();
-    
-        for (Step step : ActiveSteps.getInternalSet()) {
-            String instruction = step.instruction();
-            if (instruction == null || instruction.isBlank()) continue;
-            if (step.isHidden()) continue;
-            if (step.isBlocking() && !step.isAsync()) {
-                blockingBody.append("\n&f" + step.instruction());
-            } else if (step.isBlocking()) {
-                blockingAsyncBody.append("\n&f" + step.instruction());
-            } else {
-                asyncBody.append("\n&f" + step.instruction());
-            }
-        }
-    
-        if (ActiveSteps.getInternalSet().isEmpty()) {
+        if (ActiveSteps.none()) {
             return String.format(COMPLETED_DISPLAY_FORMAT, name);
         }
-    
-        String fullInstruction = blockingBody.toString() + blockingAsyncBody.toString() + asyncBody.toString();
+
+        if (lerping) return String.format(
+            ACTIVE_DISPLAY_FORMAT, 
+            name, 
+            stepIndex + 1, 
+            steps.length, 
+            ""
+        );
     
         return String.format(
             ACTIVE_DISPLAY_FORMAT, 
             name, 
             stepIndex + 1, 
             steps.length, 
-            fullInstruction
+            ActiveSteps.getCombinedInstructions()
         );
     }
 

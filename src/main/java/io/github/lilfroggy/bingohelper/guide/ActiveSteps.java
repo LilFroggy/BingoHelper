@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ActiveSteps {
     private static final Set<Step> active = ConcurrentHashMap.newKeySet();
+    private static final Set<Step> priority = ConcurrentHashMap.newKeySet();
 
     public static void init() {
         Events.JOIN_BINGO.register(ActiveSteps::onJoinBingo);
@@ -102,6 +103,10 @@ public class ActiveSteps {
         return active;
     }
 
+    public static boolean none() {
+        return active.isEmpty();
+    }
+
     public static boolean anyBlocking() {
         return active.stream().anyMatch(Step::isBlocking);
     }
@@ -117,13 +122,48 @@ public class ActiveSteps {
     }
 
     @Nullable
-    public static Step getBlockingStepWithCommand() {
-        for (Step step : active) {
-            if (step.isBlocking() && step.command != null) {
-                return step;
+    public static String getPriorityCommand() {
+        for (Step step : priority) {
+            if (step.command != null) {
+                return step.command;
             }
         }
         return null;
+    }
+
+    @Nullable
+    public static String getBlockingCommand() {
+        for (Step step : active) {
+            if (step.isBlocking() && step.command != null) {
+                return step.command;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    public static String getAnyCommand() {
+        for (Step step : active) {
+            if (step.command != null) {
+                return step.command;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    public static String getUnformattedCommand() {
+        if (!priority.isEmpty()) return getPriorityCommand();
+        String blockingCommand = getBlockingCommand();
+        if (blockingCommand != null) return blockingCommand;
+        return getAnyCommand();
+    }
+
+    @Nullable
+    public static String getCommand() {
+        String command = getUnformattedCommand();
+        if (command == null) return command;
+        return command.replaceAll("%visitIsland%", Config.visitIsland);
     }
 
     public static boolean anyOutlineEntityExists() {
@@ -136,5 +176,43 @@ public class ActiveSteps {
     public static void clear() {
         deactivateAll();
         active.clear();
+    }
+
+    public static Set<Step> prioritySteps() {
+        priority.clear();
+        for (Step step : active) {
+            if (step.isPriority()) {
+                priority.add(step);
+            }
+        }
+        return priority;
+    }
+
+    public static String getCombinedInstructions() {
+        String priorityBody = "";
+
+        if (!prioritySteps().isEmpty()) {
+            for (Step step : priority) {
+                priorityBody += "\n&f" + step.instruction();
+            }
+            return priorityBody;
+        }
+
+        String blockingBody = "";
+        String blockingAsyncBody = "";
+        String asyncBody = "";
+    
+        for (Step step : ActiveSteps.getInternalSet()) {
+            if (step.isHidden()) continue;
+            if (step.isBlocking() && !step.isAsync()) {
+                blockingBody += "\n&f" + step.instruction();
+            } else if (step.isBlocking()) {
+                blockingAsyncBody += "\n&f" + step.instruction();
+            } else {
+                asyncBody += "\n&f" + step.instruction();
+            }
+        }
+    
+        return blockingBody.toString() + blockingAsyncBody.toString() + asyncBody.toString();
     }
 }

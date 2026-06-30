@@ -111,7 +111,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
         int chestContainerHeight = chestHeight - playerInventoryHeight;
         
         // Calculate text dimensions
-        int textWidth = RenderLib.getFormattedStringWidth(displayText);
+        int textWidth = RenderLib.getWidth(displayText);
         int textHeight = CLIENT.font.lineHeight; // Use actual font height
         
         // Position text inside the chest menu
@@ -145,7 +145,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
 
         statusText.append("\n\n&7You may need to unequip\n&7armor or take items out\n&7of ender chest.");
 
-        int textWidth = RenderLib.getFormattedStringWidth(statusText.toString());
+        int textWidth = RenderLib.getWidth(statusText.toString());
         
         int x = -textWidth - 10; // 10 pixels gap between text and chest
         int y = 20; // Align with top of chest with small offset

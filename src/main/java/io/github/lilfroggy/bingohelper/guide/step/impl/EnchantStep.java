@@ -82,7 +82,7 @@ public class EnchantStep extends Step implements RenderScreenEvent, ClientTickEn
 
         statusText.append("\n\n&7You may need to level\n&7enchanting or visit the\n&7next page to view some\n&7enchants.");
 
-        int textWidth = RenderLib.getFormattedStringWidth(statusText.toString());
+        int textWidth = RenderLib.getWidth(statusText.toString());
         
         int x = -textWidth - 10; // 10 pixels gap between text and chest
         int y = 20; // Align with top of chest with small offset

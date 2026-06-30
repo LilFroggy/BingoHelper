@@ -68,6 +68,10 @@ public abstract class Step {
         return isAsync() ? async.isHidden() : false;
     }
 
+    public boolean isPriority() {
+        return async != null && async.hasRequirements() && async.meetsRequirements();
+    }
+
     public final String instruction() {
         String base = this.instruction != null ? this.instruction : "";
 
@@ -98,7 +102,7 @@ public abstract class Step {
         if (highlightSlots != null) highlightSlots.forEach(p -> p.register());
         if (waypoint != null) waypoint.register(outlineEntities);
         if (bingoRanks != null) bingoRanks.register(this);
-        if (async != null) async.register();
+        if (async != null) async.register(this);
 
         Guide.stepStartTime = System.currentTimeMillis();
 

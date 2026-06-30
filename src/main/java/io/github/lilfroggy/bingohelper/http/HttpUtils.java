@@ -44,6 +44,11 @@ public class HttpUtils {
         }, onError);
     }
 
+    public static void sendAsync(String url, Consumer<HttpResponse<String>> onSuccess) {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
+        sendAsync(request, onSuccess, error -> {});
+    }
+
     public static void sendAsync(String url, Consumer<HttpResponse<String>> onSuccess, Consumer<Throwable> onError) {
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
         sendAsync(request, onSuccess, onError);

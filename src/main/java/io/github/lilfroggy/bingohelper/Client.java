@@ -14,6 +14,7 @@ import io.github.lilfroggy.bingohelper.util.KeyBindings;
 import io.github.lilfroggy.bingohelper.util.Scoreboard;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.Tablist;
+import io.github.lilfroggy.bingohelper.util.dwarvenEvents.DwarvenEvents;
 import io.github.lilfroggy.bingohelper.util.render.GlowingEntities;
 import io.github.lilfroggy.bingohelper.util.render.RenderingEvents;
 import net.fabricmc.api.ClientModInitializer;
@@ -61,6 +62,8 @@ public class Client implements ClientModInitializer {
                 Events.CLOSE_SCREEN.invoke(listener -> listener.onScreenClose(removedScreen));
             });
         });
+
+        DwarvenEvents.update();
 
         RenderingEvents.init();
 

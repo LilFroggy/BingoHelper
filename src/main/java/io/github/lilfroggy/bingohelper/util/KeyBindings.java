@@ -33,10 +33,8 @@ public class KeyBindings {
         if (!Config.guide) return;
         if (Guide.isCompleted()) return;
 
-        Step blockingStep = ActiveSteps.getBlockingStepWithCommand();
-        if (blockingStep == null) return;
-
-        String command = blockingStep.command.replaceAll("%visitIsland%", Config.visitIsland);
+        String command = ActiveSteps.getCommand();
+        if (command == null) return;
         
         if (command.isEmpty() || !command.startsWith("/")) return;
         String keybindName = BINGO_GUIDE_ACTION.getTranslatedKeyMessage().getString();

@@ -23,7 +23,7 @@ public class GuideNavigator extends Guide {
         long seconds = durationMillis / 1000;
 
         String message = Messages.GUIDE_ADVANCE.formatted(
-            step.instruction().replaceAll("\n", " ").replaceAll("&", "§"), 
+            ChatLib.replaceAmpersands(step.instruction().replaceAll("\n", " ")), 
             ChatLib.formatDuration(seconds)
         );
 
