@@ -64,7 +64,7 @@ dependencies {
 	// HypixelModAPI
 
 	implementation("net.hypixel:mod-api:${project.hypixel_mod_api_version}")
-	include("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")
+	include("maven.modrinth:hypixel-mod-api:1.0.2+build.1+mc26.1")
 
 	// Vigilance
 
@@ -80,6 +80,7 @@ dependencies {
 }
 
 tasks.named('shadowJar') {
+	archiveClassifier.set('')
     configurations = [project.configurations.shadowImpl, project.configurations.shadowModImpl]
     exclude("META-INF/versions/**")
 	mergeServiceFiles()
