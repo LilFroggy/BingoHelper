@@ -1,6 +1,6 @@
 package io.github.lilfroggy.bingohelper.guide.deserializing;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.lang.reflect.Type;
@@ -18,7 +18,7 @@ import io.github.lilfroggy.bingohelper.util.item.ReforgeList;
 public class ReforgeListAdapter implements JsonDeserializer<ReforgeList> {
     @Override
     public ReforgeList deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        Map<String, ReforgeInfo> items = new HashMap<>();
+        Map<String, ReforgeInfo> items = new LinkedHashMap<>();
         JsonObject obj = json.getAsJsonObject();
         Type listType = new TypeToken<List<String>>(){}.getType();
 

@@ -23,7 +23,6 @@ public class AsyncRequirements implements RenderHudEvent {
     private transient final float NOTIFICATION_SCALE = 5;
     private transient boolean isNotifying = false;
 
-    public String notification;
     public EntityPredicate entity;
     public String dwarvenEvent;
 
@@ -33,13 +32,13 @@ public class AsyncRequirements implements RenderHudEvent {
 
     public void register(Step step) {
         this.step = step;
-        if (notification != null) Events.RENDER_HUD.register(this);
+        Events.RENDER_HUD.register(this);
         if (entity != null) entity.register();
     }
 
     public void unregister() {
         if (entity != null) entity.unregister();
-        if (notification != null) Events.RENDER_HUD.unregister(this);
+        Events.RENDER_HUD.unregister(this);
     }
 
     public boolean entityExists() {
@@ -71,7 +70,7 @@ public class AsyncRequirements implements RenderHudEvent {
     }
 
     private void sendNotification() {
-        if (notification == null || notification.isEmpty() || CLIENT.player == null) return;
+        if (CLIENT.player == null) return;
 
         CLIENT.player.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
         Guide.lerping = true;
