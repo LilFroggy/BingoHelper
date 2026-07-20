@@ -25,11 +25,13 @@ import io.github.lilfroggy.bingohelper.update.UpdateState;
 import io.github.lilfroggy.bingohelper.util.Logger;
 
 import java.awt.Color;
-import java.lang.reflect.Field;
 import java.util.function.Consumer;
 
 @Mixin(value = SettingsTitleBar.class, remap = false)
 public class SettingsTitleBarMixin {
+    private static final float dividerWidth = SettingsGui.dividerWidth;
+    private static final float sidebarWidth = 0.25f;
+
     private static final float DIVIDER_GAP = 10f;
     private static final float BUTTON_GAP = 5f;
     private static final float BUTTON_SIZE = 16f;
@@ -41,43 +43,35 @@ public class SettingsTitleBarMixin {
 
             // Make searchBar align left
 
-            Field searchDelegateField = this.getClass().getDeclaredField("searchBar$delegate");
-            searchDelegateField.setAccessible(true);
-            Object searchDelegate = searchDelegateField.get(this);
-            Field searchValueField = searchDelegate.getClass().getSuperclass().getDeclaredField("value");
-            searchValueField.setAccessible(true);
-            Searchbar searchbar = (Searchbar) searchValueField.get(searchDelegate);
-            AdditiveConstraint searchBarLeft = new AdditiveConstraint(new RelativeConstraint(0.25f), new PixelConstraint(SettingsGui.dividerWidth + 12f));
-            searchbar.setX(searchBarLeft);
+            Searchbar searchbar = Config.getField(this, "searchBar$delegate");
+            searchbar.setX(new AdditiveConstraint(new RelativeConstraint(sidebarWidth), new PixelConstraint(dividerWidth + 12f)));
 
-            // Get contentContainer
+            // Get UIBlock that buttons go on
 
-            Field containerDelegateField = this.getClass().getDeclaredField("contentContainer$delegate");
-            containerDelegateField.setAccessible(true);
-            Object containerDelegate = containerDelegateField.get(this);
-            Field valueField = containerDelegate.getClass().getSuperclass().getDeclaredField("value");
-            valueField.setAccessible(true);
-            UIBlock contentContainer = (UIBlock) valueField.get(containerDelegate);
+            UIBlock contentContainer = Config.getField(this, "contentContainer$delegate");
 
             // Social buttons
 
             UIImage discordBtn = UpdateButtons.button("/assets/bingohelper/textures/config/discord.png", () -> {
                 Config.openLink("https://discord.gg/rChEGmzXxa");
             });
-            discordBtn.setX(new AdditiveConstraint(new RelativeConstraint(0.25f), new PixelConstraint(SettingsGui.dividerWidth - DIVIDER_GAP - (BUTTON_SIZE * 1) - (BUTTON_GAP * 0))));
+
+            discordBtn.setX(new AdditiveConstraint(new RelativeConstraint(sidebarWidth), new PixelConstraint(dividerWidth - DIVIDER_GAP - (BUTTON_SIZE * 1) - (BUTTON_GAP * 0))));
             discordBtn.setY(new CenterConstraint());
             discordBtn.setChildOf(contentContainer);
 
             UIImage githubBtn = UpdateButtons.button("/assets/bingohelper/textures/config/github.png", () -> {
                 Config.openLink("https://github.com/LilFroggy/BingoHelper");
             });
-            githubBtn.setX(new AdditiveConstraint(new RelativeConstraint(0.25f), new PixelConstraint(SettingsGui.dividerWidth - DIVIDER_GAP - (BUTTON_SIZE * 2) - (BUTTON_GAP * 1))));
+
+            githubBtn.setX(new AdditiveConstraint(new RelativeConstraint(sidebarWidth), new PixelConstraint(dividerWidth - DIVIDER_GAP - (BUTTON_SIZE * 2) - (BUTTON_GAP * 1))));
             githubBtn.setY(new CenterConstraint());
             githubBtn.setChildOf(contentContainer);
 
             // Update buttons
 
             UIBlock updateBlock = new UIBlock();
+
             updateBlock.setX(new PixelConstraint(DIVIDER_GAP, true));
             updateBlock.setY(new CenterConstraint());
             updateBlock.setColor(VigilancePalette.INSTANCE.getComponentBackground());
@@ -86,6 +80,7 @@ public class SettingsTitleBarMixin {
             updateBlock.setChildOf(contentContainer);
 
             UIText updateTxt = new UIText("", true);
+
             updateTxt.setX(new PixelConstraint(16f + updateBlock.getWidth(), true));
             updateTxt.setY(new CenterConstraint());
             updateTxt.setColor(new Color(0, 80, 0));

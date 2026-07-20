@@ -6,6 +6,7 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import io.github.lilfroggy.bingohelper.command.ClientCommand;
+import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.ClipboardUtils;
 import io.github.lilfroggy.bingohelper.util.JsonUtils;
@@ -57,7 +58,7 @@ public class BhWailaCommand implements ClientCommand {
         if (hit == null || hit.getType() == HitResult.Type.MISS) return sendError("Not looking at anything!");
 
         JsonObject waypoint = createWaypointJson(hit);
-        String json = JsonUtils.toPretty(waypoint);
+        String json = JsonUtils.toPretty(waypoint, Config.jsonIndent);
 
         copyAndNotify(json, "waypoint data");
         return 1;
@@ -68,7 +69,7 @@ public class BhWailaCommand implements ClientCommand {
         if (hit == null || hit.getType() == HitResult.Type.MISS) return sendError("Not looking at anything!");
 
         JsonObject waypointFull = createWaypointFullJson(hit);
-        String json = removeRootBrackets(JsonUtils.toPretty(waypointFull));
+        String json = removeRootBrackets(JsonUtils.toPretty(waypointFull, Config.jsonIndent));
 
         copyAndNotify(json, "full waypoint data");
         return 1;
@@ -79,7 +80,7 @@ public class BhWailaCommand implements ClientCommand {
         if (target == null) return 0;
 
         JsonObject outline = createOutlineJson(target);
-        String json = JsonUtils.toPretty(outline);
+        String json = JsonUtils.toPretty(outline, Config.jsonIndent);
 
         copyAndNotify(json, "outline data");
         return 1;
@@ -90,7 +91,7 @@ public class BhWailaCommand implements ClientCommand {
         if (target == null) return 0;
 
         JsonObject outlineFull = createOutlineFullJson(target);
-        String json = removeRootBrackets(JsonUtils.toPretty(outlineFull));
+        String json = removeRootBrackets(JsonUtils.toPretty(outlineFull, Config.jsonIndent));
 
         copyAndNotify(json, "full outline data");
         return 1;
@@ -103,7 +104,7 @@ public class BhWailaCommand implements ClientCommand {
         JsonObject root = new JsonObject();
         root.add("waypoint", createWaypointFullJson(CLIENT.hitResult).get("waypoint"));
         root.add("outlineEntities", createOutlineFullJson(target).get("outlineEntities"));
-        String json = removeRootBrackets(JsonUtils.toPretty(root));
+        String json = removeRootBrackets(JsonUtils.toPretty(root, Config.jsonIndent));
 
         copyAndNotify(json, "full outline waypoint data");
         return 1;

@@ -28,11 +28,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 
 public class Client implements ClientModInitializer {
+    public static final Minecraft MINECRAFT = Minecraft.getInstance();
 
     private static int currentTick = 0;
 
     @Override
     public void onInitializeClient() {
+
+        Config.init(); // Load config before anything uses it
 
         // Events
 
@@ -66,8 +69,6 @@ public class Client implements ClientModInitializer {
         DwarvenEvents.update();
 
         RenderingEvents.init();
-
-        Config.init(); // Load config before anything uses it
 
         GlowingEntities.init();
         Bingo.init();

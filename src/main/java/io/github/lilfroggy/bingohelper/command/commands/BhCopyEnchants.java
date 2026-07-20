@@ -36,7 +36,7 @@ public class BhCopyEnchants implements ClientCommand {
     private int execute(CommandContext<FabricClientCommandSource> context) {
         if (!(CLIENT.player instanceof LocalPlayer player)) return 0;
         ItemStack item = player.getMainHandItem();
-        if (item == null) {
+        if (item.isEmpty()) {
             ChatLib.chat("§cNo item in hand!");
             return 0;
         }

@@ -81,10 +81,10 @@ public class AsyncRequirements implements RenderHudEvent {
             display,
             display.titleX(),
             display.titleY(),
-            10,
-            12,
+            Guide.display.x(),
+            Guide.display.y(),
             NOTIFICATION_SCALE,
-            1,
+            Guide.display.scale(),
             1000,
             1000
         );

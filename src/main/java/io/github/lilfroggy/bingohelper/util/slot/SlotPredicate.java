@@ -66,10 +66,12 @@ public class SlotPredicate {
     }
 
     public Set<Slot> getMatches() {
+        if (cache == null) init();
         return getDelegateOrSelf().cache;
     }
 
     public boolean hasMatch() {
+        if (cache == null) init();
         return !getDelegateOrSelf().cache.isEmpty();
     }
 

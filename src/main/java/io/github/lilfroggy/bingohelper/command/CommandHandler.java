@@ -12,6 +12,7 @@ public class CommandHandler {
 
     public static void init() {
         registerCommand(new BhCommand());
+        registerCommand(new BhHudCommand());
         registerCommand(new BhImportCommand());
         registerCommand(new BhExportCommand());
         registerCommand(new BhSkipCommand());

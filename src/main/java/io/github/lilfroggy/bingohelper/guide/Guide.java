@@ -4,9 +4,9 @@ import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.guide.deserializing.StepDeserializer;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
+import io.github.lilfroggy.bingohelper.hud.HudDisplay;
 import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
-import io.github.lilfroggy.bingohelper.util.render.Display;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
@@ -34,11 +34,12 @@ public class Guide {
         GuideImporter.importFromSave();
     }
 
-    private static final Display display = new Display("");
+    public static final HudDisplay display = new HudDisplay("", "guide", () -> Config.guide);
 
     private static void onHudRender(GuiGraphicsExtractor graphics, DeltaTracker tickDelta) {
         if (!Config.guide || !Skyblock.inBingo()) return;
-        display.setString(getDisplayText()).draw(graphics, 10, 10);
+        display.setString(getDisplayText());
+        display.draw(graphics);
     }
 
     private static void onCreateBingoProfile() {

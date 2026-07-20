@@ -9,7 +9,6 @@ import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.guide.ActiveSteps;
 import io.github.lilfroggy.bingohelper.guide.Guide;
-import io.github.lilfroggy.bingohelper.guide.step.Step;
 
 public class KeyBindings {
     public static final KeyMapping.Category BINGO_HELPER_CATEGORY = KeyMapping.Category.register(BingoHelper.id("main"));

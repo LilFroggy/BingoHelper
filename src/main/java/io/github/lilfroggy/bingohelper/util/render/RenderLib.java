@@ -1,6 +1,8 @@
 package io.github.lilfroggy.bingohelper.util.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+
 import io.github.lilfroggy.bingohelper.util.ChatLib;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.minecraft.client.Minecraft;
@@ -13,6 +15,8 @@ import net.minecraft.util.ARGB;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public class RenderLib {
@@ -172,5 +176,60 @@ public class RenderLib {
 
     public static int getHeight(String input) {
         return input.split("\n").length * (CLIENT.font.lineHeight + Display.LINE_SPACING);
+    }
+
+    private static void quad(Matrix4f matrix,
+            VertexConsumer consumer,
+            double x1, double y1, double z1,
+            double x2, double y2, double z2,
+            double x3, double y3, double z3,
+            double x4, double y4, double z4,
+
+            float r, float g, float b, float a) {
+
+        consumer.addVertex(matrix, (float) x1, (float) y1, (float) z1)
+        .setColor(r, g, b, a)
+        .setNormal(0, 1, 0);
+
+        consumer.addVertex(matrix, (float) x2, (float) y2, (float) z2)
+        .setColor(r, g, b, a)
+        .setNormal(0, 1, 0);
+
+        consumer.addVertex(matrix, (float) x3, (float) y3, (float) z3)
+        .setColor(r, g, b, a)
+        .setNormal(0, 1, 0);
+
+        consumer.addVertex(matrix, (float) x4, (float) y4, (float) z4)
+        .setColor(r, g, b, a)
+        .setNormal(0, 1, 0);
+
+    }
+
+    public static void renderFilledBox(PoseStack matrices, VertexConsumer consumer, AABB box, float[] rgba) {
+
+        if (rgba[3] == 0) return;
+        float r = rgba[0];
+        float g = rgba[1];
+        float b = rgba[2];
+        float a = rgba[3];
+
+        Matrix4f matrix = matrices.last().pose();
+
+        double minX = box.minX;
+        double minY = box.minY;
+        double minZ = box.minZ;
+        double maxX = box.maxX;
+        double maxY = box.maxY;
+        double maxZ = box.maxZ;
+
+        quad(matrix, consumer, minX, minY, minZ, minX, maxY, minZ, maxX, maxY, minZ, maxX, minY, minZ, r, g, b, a);
+        quad(matrix, consumer, maxX, minY, minZ, maxX, maxY, minZ, maxX, maxY, maxZ, maxX, minY, maxZ, r, g, b, a);
+
+        quad(matrix, consumer, maxX, minY, maxZ, maxX, maxY, maxZ, minX, maxY, maxZ, minX, minY, maxZ, r, g, b, a);
+        quad(matrix, consumer, minX, minY, maxZ, minX, maxY, maxZ, minX, maxY, minZ, minX, minY, minZ, r, g, b, a);
+
+        quad(matrix, consumer, minX, maxY, minZ, minX, maxY, maxZ, maxX, maxY, maxZ, maxX, maxY, minZ, r, g, b, a);
+        quad(matrix, consumer, maxX, minY, minZ, maxX, minY, maxZ, minX, minY, maxZ, minX, minY, minZ, r, g, b, a);
+
     }
 }

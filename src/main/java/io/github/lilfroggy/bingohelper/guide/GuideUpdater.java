@@ -17,7 +17,7 @@ public class GuideUpdater {
     public static void check(boolean update) {
         HttpUtils.sendAsyncWithEtag(GUIDE_URL, Config.latestGuideETag,
             () -> {
-                String latest = FileLib.read(GuideSaver.LATEST_SAVE_PATH);
+                String latest = FileLib.read(GuideSaver.LATEST_SAVE_PATH, null);
                 GuideData data = GuideParser.toGuideData(latest);
                 if (data == null) return;
                 if (!isNewGuide(data.name(), data.version())) return;

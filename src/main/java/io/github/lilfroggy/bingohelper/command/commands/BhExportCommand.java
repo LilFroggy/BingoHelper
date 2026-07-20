@@ -29,7 +29,7 @@ public class BhExportCommand implements ClientCommand {
     }
 
     private int execute(CommandContext<FabricClientCommandSource> context) {
-        String guide = FileLib.read(GuideSaver.ACTIVE_SAVE_PATH);
+        String guide = FileLib.read(GuideSaver.ACTIVE_SAVE_PATH, null);
         if (guide == null) return 1;
         ClipboardUtils.setClipboard(guide);
         ChatLib.chat("§aCopied guide to clipboard!");

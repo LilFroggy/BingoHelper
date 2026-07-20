@@ -20,7 +20,7 @@ public class GuideImporter {
     }
 
     public static void importFromSave() {
-        String saved = FileLib.read(GuideSaver.ACTIVE_SAVE_PATH);
+        String saved = FileLib.read(GuideSaver.ACTIVE_SAVE_PATH, null);
         GuideData data = GuideParser.toGuideData(saved);
         if (data == null) return;
         GuideInfo old = new GuideInfo(Guide.name, Guide.version);

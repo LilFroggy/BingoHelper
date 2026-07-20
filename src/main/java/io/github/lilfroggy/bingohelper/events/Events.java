@@ -6,6 +6,7 @@ public class Events {
 
     // Minecraft
 
+    public static final EventHandler<ServerTickEvent> SERVER_TICK = new EventHandler<>();
     public static final EventHandler<ClientTickStartEvent> CLIENT_TICK_START = new EventHandler<>();
     public static final EventHandler<ClientTickEndEvent> CLIENT_TICK_END = new EventHandler<>();
     public static final EventHandler<WorldChangeEvent> CHANGE_WORLD = new EventHandler<>();
@@ -18,6 +19,8 @@ public class Events {
     public static final EventHandler<CloseScreenEvent> CLOSE_SCREEN = new EventHandler<>();
 
     public static final EventHandler<EntityStateUpdateEvent> ENTITY_STATE_UPDATE = new EventHandler<>();
+    public static final EventHandler<ParticleSpawnEvent> PARTICLE_SPAWN = new EventHandler<>();
+    public static final EventHandler<BlockUpdateEvent> BLOCK_UPDATE = new EventHandler<>();
 
     // Bingo
 

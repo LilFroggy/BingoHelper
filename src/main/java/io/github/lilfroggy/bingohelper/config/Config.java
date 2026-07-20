@@ -15,6 +15,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.Util;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -22,6 +23,10 @@ import java.util.Map;
 
 public class Config extends Vigilant {
     private static final Minecraft CLIENT = Minecraft.getInstance();
+
+    public static Config getInstance() {
+        return INSTANCE;
+    } 
 
     // CREDITS
 
@@ -252,6 +257,18 @@ public class Config extends Vigilant {
 
     public static void openLink(String url) {
         Util.getPlatform().openUri(url);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getField(Object instance, String fieldName) throws Exception {
+        Field delegateField = instance.getClass().getDeclaredField(fieldName);
+        delegateField.setAccessible(true);
+        Object delegate = delegateField.get(instance);
+
+        Field valueField = delegate.getClass().getSuperclass().getDeclaredField("value");
+        valueField.setAccessible(true);
+
+        return (T) valueField.get(delegate);
     }
 
     public static void init() {}

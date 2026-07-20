@@ -63,15 +63,18 @@ public class EntityPredicate {
     }
 
     public Set<Entity> getMatches() {
+        if (cache == null) init();
         return getDelegateOrSelf().cache;
     }
 
     @Nullable
     public Entity getClosest() {
+        if (closest == null) init();
         return getDelegateOrSelf().closest;
     }
 
     public boolean hasMatch() {
+        if (cache == null) init();
         return !getDelegateOrSelf().cache.isEmpty();
     }
 

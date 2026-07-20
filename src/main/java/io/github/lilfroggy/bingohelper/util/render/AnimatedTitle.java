@@ -7,9 +7,10 @@ public class AnimatedTitle {
     private long startTime;
     private long duration;
     private long delay;
-    private float startX, startY, endX, endY, startScale, endScale;
+    private double startX, startY, endX, endY;
+    private float startScale, endScale;
 
-    public AnimatedTitle(Display display, float startX, float startY, float endX, float endY, float startScale, float endScale, long duration, long delay) {
+    public AnimatedTitle(Display display, double startX, double startY, double endX, double endY, float startScale, float endScale, long duration, long delay) {
         this.display = display;
         this.startX = startX;
         this.startY = startY;
@@ -43,11 +44,11 @@ public class AnimatedTitle {
         
         float t = 1.0f - (float) Math.pow(1.0f - progress, 3);
 
-        float currentX = startX + (endX - startX) * t;
-        float currentY = startY + (endY - startY) * t;
+        double currentX = startX + (endX - startX) * t;
+        double currentY = startY + (endY - startY) * t;
         float currentScale = startScale + (endScale - startScale) * t;
 
         display.setScale(currentScale);
-        display.draw(graphics, (int) currentX, (int) currentY);
+        display.draw(graphics, (int) Math.round(currentX), (int) Math.round(currentY));
     }
 }
