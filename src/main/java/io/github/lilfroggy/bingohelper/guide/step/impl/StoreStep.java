@@ -4,7 +4,7 @@ import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.RenderSlotEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
-import io.github.lilfroggy.bingohelper.util.Skyblock;
+import io.github.lilfroggy.bingohelper.util.ItemUtils;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -56,7 +56,7 @@ public class StoreStep extends Step implements ClientTickEndEvent, RenderSlotEve
         for (ItemStack stack : stacks) {
             if (stack.isEmpty()) continue;
 
-            String id = Skyblock.getID(stack);
+            String id = ItemUtils.getId(stack);
             if(id.isEmpty() || !items.contains(id)) continue;
 
             hasItems = true;
@@ -70,7 +70,7 @@ public class StoreStep extends Step implements ClientTickEndEvent, RenderSlotEve
         if (!(slot.container instanceof Inventory)) return;
         ItemStack item = slot.getItem();
         if (item.isEmpty()) return;
-        String itemId = Skyblock.getID(item);
+        String itemId = ItemUtils.getId(item);
         if (itemId.isEmpty() || !items.contains(itemId)) return;
 
         RenderLib.highlightSlot(graphics, slot, RenderLib.MINECRAFT_AQUA);

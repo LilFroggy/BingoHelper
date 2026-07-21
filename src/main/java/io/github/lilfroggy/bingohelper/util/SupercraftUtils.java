@@ -45,7 +45,7 @@ public class SupercraftUtils {
     }
 
     public static CraftState getCraftState(NonNullList<Slot> slots) {
-        String lore = Skyblock.getLore(slots.get(SUPERCRAFT_BUTTON_INDEX).getItem());
+        String lore = ItemUtils.getLore(slots.get(SUPERCRAFT_BUTTON_INDEX).getItem());
         if (lore.contains("Missing ingredients!")) {
             if (isNextPage(slots)) return CraftState.CHECK_NEXT_PAGE;
             else return CraftState.MISSING_INGREDIENTS;
@@ -62,7 +62,7 @@ public class SupercraftUtils {
         if (!(CLIENT.screen instanceof ContainerScreen screen)) return false;
         if (slots.size() < NEXT_PAGE_INDEX) return false;
         ItemStack outputItem = slots.get(OUTPUT_ITEM_INDEX).getItem();
-        String outputId = Skyblock.getID(outputItem);
+        String outputId = ItemUtils.getId(outputItem);
         if (!outputId.equals(desiredId)) return false;
         String outputName = outputItem.getHoverName().getString();
         return screen.getTitle().getString().equals(outputName);

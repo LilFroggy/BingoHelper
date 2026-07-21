@@ -59,7 +59,7 @@ public class Tablist {
             island = matcher.group(1);
             if (island.equals(oldIsland)) break;
             Events.CHANGE_ISLAND.invoke(listener -> listener.onIslandChange(oldIsland, oldIsland));
-            Logger.info("" + oldIsland + " -> " + island, !Config.debug);
+            Logger.info("Island changed: " + oldIsland + " -> " + island, !Config.debug);
             break;
         }
     }

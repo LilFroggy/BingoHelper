@@ -1,8 +1,8 @@
 package io.github.lilfroggy.bingohelper.util.slot;
 
 import io.github.lilfroggy.bingohelper.util.ColorUtils;
+import io.github.lilfroggy.bingohelper.util.ItemUtils;
 import io.github.lilfroggy.bingohelper.util.ScreenUtils;
-import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import java.util.HashSet;
 import java.util.List;
@@ -77,7 +77,7 @@ public class SlotPredicate {
 
     public void scanInventory() {
         cache.clear();
-        for (Slot slot : ScreenUtils.getSlots()) {
+        for (Slot slot : ScreenUtils.slots.ALL) {
             if (matches(slot)) {
                 cache.add(slot);
             }
@@ -89,7 +89,7 @@ public class SlotPredicate {
     }
 
     private boolean matchesName() {
-        return guiName == null || ScreenUtils.getTitle().startsWith(guiName);
+        return guiName == null || ScreenUtils.title.startsWith(guiName);
     }
 
     private boolean matchesIndex(Slot slot) {
@@ -97,20 +97,20 @@ public class SlotPredicate {
     }
 
     private boolean matchesSkyblockId(Slot slot) {
-        return skyblockId == null || skyblockId.equals(Skyblock.getID(slot.getItem()));
+        return skyblockId == null || skyblockId.equals(ItemUtils.getId(slot.getItem()));
     }
 
     private boolean has(Slot slot) {
         if (has == null) return true;
         ItemStack item = slot.getItem();
         String name = item.getHoverName().getString();
-        String lore = Skyblock.getLore(item);
+        String lore = ItemUtils.getLore(item);
         return has.stream().allMatch(line -> lore.contains(line) || name.contains(line));
     }
 
     private boolean doesntHave(Slot slot) {
         if (doesntHave == null) return true;
-        String lore = Skyblock.getLore(slot.getItem());
+        String lore = ItemUtils.getLore(slot.getItem());
         return doesntHave.stream().allMatch(line -> !lore.contains(line));
     }
 

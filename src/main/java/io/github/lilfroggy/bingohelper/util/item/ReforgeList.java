@@ -3,7 +3,7 @@ package io.github.lilfroggy.bingohelper.util.item;
 import java.util.Map;
 import java.util.Set;
 
-import io.github.lilfroggy.bingohelper.util.Skyblock;
+import io.github.lilfroggy.bingohelper.util.ItemUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -47,10 +47,10 @@ public class ReforgeList {
         for (ItemStack item : player.getInventory()) {
             if (item.isEmpty()) continue;
     
-            String id = Skyblock.getID(item);
+            String id = ItemUtils.getId(item);
             if (!contains(id)) continue;
     
-            String reforge = Skyblock.getReforge(item);
+            String reforge = ItemUtils.getReforge(item);
             ReforgeInfo info = items.get(id);
 
             if (info.isValidReforge(reforge)) {

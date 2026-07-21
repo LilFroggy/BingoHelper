@@ -3,12 +3,13 @@
 	"package": "io.github.lilfroggy.bingohelper.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"mixins": [
+		"accessor.AbstractContainerScreenAccessor",
+
 		"ConnectionMixin",
 		"LevelChunkMixin",
 		"ClientPacketListenerMixin",
 		"ChatInterceptorMixin",
-		"HandledScreenAccessorMixin",
-		"HandledScreenMixin",
+		"AbstractContainerScreenMixin",
 		"EntityRendererMixin",
 		"EntityMixin",
 

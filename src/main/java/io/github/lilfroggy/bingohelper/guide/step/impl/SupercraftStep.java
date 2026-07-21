@@ -6,11 +6,10 @@ import io.github.lilfroggy.bingohelper.events.interfaces.RenderScreenEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.util.PlayerRank;
 import io.github.lilfroggy.bingohelper.util.SupercraftUtils;
+import io.github.lilfroggy.bingohelper.util.ScreenUtils.ScreenSlots;
 import io.github.lilfroggy.bingohelper.util.item.HasList;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.NonNullList;
-import net.minecraft.world.inventory.Slot;
 
 public class SupercraftStep extends Step implements ClientTickEndEvent, RenderScreenEvent {
 
@@ -68,8 +67,8 @@ public class SupercraftStep extends Step implements ClientTickEndEvent, RenderSc
     }
 
     @Override
-    public void onRenderScreen(GuiGraphicsExtractor graphics, Screen screen, String title, NonNullList<Slot> slots) {
-        SupercraftUtils.highlightSlot(graphics, slots, desiredId);
+    public void onRenderScreen(GuiGraphicsExtractor graphics, Screen screen, String title, ScreenSlots slots) {
+        SupercraftUtils.highlightSlot(graphics, slots.CONTAINER, desiredId);
     }
 
     private void setNextDesiredId() {

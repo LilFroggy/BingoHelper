@@ -1,30 +1,24 @@
 package io.github.lilfroggy.bingohelper.util;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import org.jetbrains.annotations.Nullable;
 
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.Events;
 import net.hypixel.data.region.Environment;
+import net.hypixel.data.type.ServerType;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundPlayerInfoPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomData;
-import net.minecraft.world.item.component.ItemLore;
 
 public class Skyblock {
     private static final Minecraft CLIENT = Minecraft.getInstance();
+
+    public static final char AREA = '\uE067';
+	public static final char RIFT_AREA = '\uE020';
+    private static final String AREA_ICON_REGEX = String.format("[%s%s]", AREA, RIFT_AREA);
 
     private static final String BINGO_SYMBOL = "Ⓑ";
     private static final String IRONMAN_SYMBOL = "♲";
@@ -56,14 +50,16 @@ public class Skyblock {
 
         if (Config.debug) Logger.info("packet received: " + packet.toString());
 
-        inSkyblock = packet.getServerType().get().getName().equals("SkyBlock");
+        ServerType serverType = packet.getServerType().orElse(null);
+        if (serverType == null || serverType.getName() == null) inSkyblock = false;
+        else inSkyblock = serverType.getName().equals("SkyBlock");
 
         String oldArea = area;
         area = packet.getMap().orElse(null);
-        if (Config.debug) Logger.info("New location: " + area);
 
         if ((oldArea == null && area != null) || (oldArea != null && !oldArea.equals(area))) {
             Events.CHANGE_AREA.invoke(listener -> listener.onAreaChange(area, oldArea));
+            if (Config.debug) Logger.info("New area: " + area);
         }
     }
 
@@ -71,13 +67,14 @@ public class Skyblock {
         String oldSubArea = subArea;
         String newSubArea = null;
         for (String line : lines) {
-            if (!line.contains("⏣") && !line.contains("ф")) continue;
-            newSubArea = line.replaceAll("[⏣ф]", "").strip();
+            if (line.indexOf(AREA) == -1 && line.indexOf(RIFT_AREA) == -1) continue;
+            newSubArea = line.replaceAll(AREA_ICON_REGEX, "").strip();
             break;
         }
         subArea = newSubArea;
         if ((oldSubArea == null && newSubArea != null) || (oldSubArea != null && !oldSubArea.equals(newSubArea))) {
             Events.CHANGE_SUB_AREA.invoke(listener -> listener.onSubAreaChange(subArea, oldSubArea));
+            if (Config.debug) Logger.info("New subArea: " + newSubArea);
         }
     }
 
@@ -127,140 +124,5 @@ public class Skyblock {
 
     public static String subArea() {
         return subArea;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * Extracts the Skyblock item ID from an ItemStack's NBT data.
-     * For enchanted books, returns "ENCHANTMENT_NAME_LEVEL" format.
-     *
-     * @param item The ItemStack to extract ID from
-     * @return The Skyblock item ID, or an empty string if not found/invalid
-     */
-    public static String getID(ItemStack item) {
-        if (item == null || item.isEmpty()) return "";
-
-        CompoundTag nbt = getNbt(item);
-        if (nbt == null) return "";
-
-        return nbt.getString("id").orElse("");
-    }
-
-    @Nullable
-    public static CompoundTag getNbt(ItemStack item) {
-        if (item == null || item.isEmpty()) return null;
-
-        CustomData nbtComponent = item.get(DataComponents.CUSTOM_DATA);
-        if (nbtComponent == null || nbtComponent.isEmpty()) return null;
-
-        CompoundTag nbt = nbtComponent.copyTag();
-        if (nbt == null || nbt.isEmpty()) return null;
-        return nbt;
-    }
-
-    @Nullable
-    public static List<String> getEnchants(ItemStack item) {
-        CompoundTag nbt = getNbt(item);
-    
-        if (nbt == null) return null;
-
-        CompoundTag enchants = nbt.getCompound("enchantments").orElse(null);
-
-        if (enchants == null) return null;
-
-        List<String> enchantmentList = new ArrayList<>();
-
-        for (String key : enchants.keySet()) {
-            int level = enchants.getIntOr(key, 0);
-            enchantmentList.add(key.toUpperCase() + "_" + level);
-        }
-        
-        return enchantmentList;
-    }
-
-    /**
-     * Extracts the Skyblock item reforge from an ItemStack's NBT data.
-     *
-     * @param item The ItemStack to extract ID from
-     * @return The Skyblock item ID, or null if not found/invalid
-     */
-    @Nullable
-    public static String getReforge(ItemStack item) {
-        if (item == null || item.isEmpty()) return null;
-
-        CompoundTag nbt = getNbt(item);
-    
-        if (nbt == null) return null;
-
-        return ChatLib.toTitleCase(nbt.getString("modifier").orElse(null));
-    }
-
-    /**
-     * Extracts Skyblock item lore from an ItemStack's NBT data.
-     *
-     * @param item The ItemStack to extract lore from
-     * @return The Skyblock item lore as a single string, or null if not found/invalid
-     */
-    public static String getLore(ItemStack item) {
-        if (item == null || item.isEmpty()) return "";
-
-        ItemLore loreComponent = item.get(DataComponents.LORE);
-        if (loreComponent == null) return "";
-
-        // Convert lore lines to a single string with spaces
-        return loreComponent.lines().stream()
-                .map(text -> text.getString())
-                .collect(java.util.stream.Collectors.joining(" "));
-    }
-
-    /**
-     * Returns the total number of items in the player's inventory whose Skyblock ID matches the given id.
-     * Uses the getID method for comparison. Returns 0 if no items are found.
-     *
-     * @param id The Skyblock item ID to search for
-     * @return The total count of matching items in the player's inventory
-     */
-    public static int getItemCount(String id) {
-        if (id == null) return 0;
-        int count = 0;
-
-        if (!(CLIENT.player instanceof LocalPlayer player)) return 0;
-        if (!(player.containerMenu instanceof AbstractContainerMenu handler)) return 0;
-
-        var slots = handler.slots;
-
-        for (Slot slot : slots) {
-            if (!(slot.container instanceof Inventory)) continue;
-            ItemStack stack = slot.getItem();
-            if (stack == null || stack.isEmpty()) continue;
-            String itemId = getID(stack);
-            if (id.equals(itemId)) {
-                count += stack.getCount();
-            }
-        }
-
-        return count;
     }
 }

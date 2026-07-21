@@ -4,12 +4,12 @@ import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.ClickSlotEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.RenderScreenEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
+import io.github.lilfroggy.bingohelper.util.ScreenUtils.ScreenSlots;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import io.github.lilfroggy.bingohelper.util.slot.SlotPredicate;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.NonNullList;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -60,10 +60,10 @@ public class ClickSlotStep extends Step implements ClickSlotEvent, RenderScreenE
     }
 
     @Override
-    public void onRenderScreen(GuiGraphicsExtractor graphics, Screen screen, String title, NonNullList<Slot> slots) {
+    public void onRenderScreen(GuiGraphicsExtractor graphics, Screen screen, String title, ScreenSlots slots) {
         if (guiName != null && !title.contains(guiName)) return;
 
-        for (Slot slot : slots) {
+        for (Slot slot : slots.ALL) {
             if (!predicate.matches(slot)) continue;
             RenderLib.highlightSlot(graphics, slot, RenderLib.MINECRAFT_GREEN);
         }

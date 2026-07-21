@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.jetbrains.annotations.Nullable;
 
-import io.github.lilfroggy.bingohelper.util.Skyblock;
+import io.github.lilfroggy.bingohelper.util.ItemUtils;
 
 public class HasList {
     private final Map<String, HasInfo> items;
@@ -46,7 +46,7 @@ public class HasList {
         boolean hasAll = true;
         
         for (HasInfo info : values()) {
-            info.count = Skyblock.getItemCount(info.id());
+            info.count = ItemUtils.getCount(info.id());
 
             if (info.done()) continue;
 

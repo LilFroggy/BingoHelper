@@ -3,10 +3,9 @@ package io.github.lilfroggy.bingohelper.guide.step.properties.highlightSlots;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.NonNullList;
-import net.minecraft.world.inventory.Slot;
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.RenderScreenEvent;
+import io.github.lilfroggy.bingohelper.util.ScreenUtils.ScreenSlots;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
 import io.github.lilfroggy.bingohelper.util.slot.SlotPredicate;
 
@@ -27,7 +26,7 @@ public class HighlightSlotsProperty extends SlotPredicate implements RenderScree
     }
 
     @Override
-    public void onRenderScreen(GuiGraphicsExtractor graphics, Screen screen, String title, NonNullList<Slot> slots) {
+    public void onRenderScreen(GuiGraphicsExtractor graphics, Screen screen, String title, ScreenSlots slots) {
         super.getMatches().forEach(slot -> {
             RenderLib.highlightSlot(graphics, slot, super.highlightColor());
         });

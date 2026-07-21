@@ -5,9 +5,10 @@ import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.MessageEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.RenderScreenEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
+import io.github.lilfroggy.bingohelper.util.ItemUtils;
 import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.ScreenUtils;
-import io.github.lilfroggy.bingohelper.util.Skyblock;
+import io.github.lilfroggy.bingohelper.util.ScreenUtils.ScreenSlots;
 import io.github.lilfroggy.bingohelper.util.item.HasInfo;
 import io.github.lilfroggy.bingohelper.util.item.HasList;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
@@ -15,8 +16,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.NonNullList;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -92,17 +91,16 @@ public class BuyStep extends Step implements MessageEvent, RenderScreenEvent {
     }
 
     @Override
-    public void onRenderScreen(GuiGraphicsExtractor context, Screen screen, String title, NonNullList<Slot> slots) {
+    public void onRenderScreen(GuiGraphicsExtractor context, Screen screen, String title, ScreenSlots slots) {
         int lowest = Integer.MAX_VALUE;
         int highest = 0;
         Slot best = null;
         Slot bestFallback = null;
 
-        for (Slot slot : slots) {
-            if (slot.container instanceof Inventory) continue;
+        for (Slot slot : slots.CONTAINER) {
             ItemStack item = slot.getItem();
             if (item.isEmpty()) continue;
-            String id = Skyblock.getID(item);
+            String id = ItemUtils.getId(item);
             if (id.isEmpty()) continue;
             if (!items.contains(id)) continue;
             HasInfo itemInfo = items.get(id);

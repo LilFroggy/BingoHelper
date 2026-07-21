@@ -13,16 +13,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public class CakeStep extends Step implements MessageEvent {
     
+    private static int totalCakes;
     transient public Set<String> eaten;
 
     @Override
     public String formattedInstruction() {
         return instruction
-                .replaceAll("%cakes%", "(" + eaten.size() + "/16)");
+                .replaceAll("%cakes%", "(" + eaten.size() + "/" + totalCakes + ")");
     }
 
     @Override
     public void onInit() {
+        totalCakes = 20;
         eaten = new HashSet<>();
     }
 
@@ -52,6 +54,6 @@ public class CakeStep extends Step implements MessageEvent {
 
         if (!eaten.add(cake)) return;
 
-        if (eaten.size() >= 16) complete();
+        if (eaten.size() >= totalCakes) complete();
     }
 }

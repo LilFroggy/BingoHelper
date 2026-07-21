@@ -13,8 +13,18 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AbstractContainerScreen.class)
-public class HandledScreenMixin {
+public class AbstractContainerScreenMixin {
     private static final Minecraft CLIENT = Minecraft.getInstance();
+
+    @Inject(method = "init", at = @At("TAIL"))
+    private void onInit(CallbackInfo ci) {
+        ScreenUtils.update();
+    }
+
+    @Inject(method = "removed", at = @At("TAIL"))
+    private void onRemoved(CallbackInfo ci) {
+        ScreenUtils.clear();
+    }
 
     @Inject(method = "slotClicked", at = @At("HEAD"), cancellable = true)
     private void onMouseClick(Slot slot, int slotId, int button, ContainerInput clickType, CallbackInfo ci) {
@@ -34,7 +44,6 @@ public class HandledScreenMixin {
     @Inject(method = "extractSlots", at = @At("TAIL"))
     private void onDrawSlots(GuiGraphicsExtractor graphics, int mouseX, int mouseY, CallbackInfo ci) {
         if (Events.RENDER_SCREEN.getListeners().isEmpty()) return;
-
-        Events.RENDER_SCREEN.invoke(listener -> listener.onRenderScreen(graphics, CLIENT.screen, ScreenUtils.getTitle(), ScreenUtils.getSlots()));
+        Events.RENDER_SCREEN.invoke(listener -> listener.onRenderScreen(graphics, CLIENT.screen, ScreenUtils.title, ScreenUtils.slots));
     }
 }

@@ -5,7 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import io.github.lilfroggy.bingohelper.command.ClientCommand;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.ClipboardUtils;
-import io.github.lilfroggy.bingohelper.util.Skyblock;
+import io.github.lilfroggy.bingohelper.util.ItemUtils;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
@@ -39,7 +39,7 @@ public class BhCopyNbt implements ClientCommand {
             ChatLib.chat("§cNo item in hand!");
             return 0;
         }
-        CompoundTag nbt = Skyblock.getNbt(item);
+        CompoundTag nbt = ItemUtils.getNbt(item);
         if (nbt == null) {
             ChatLib.chat("§cItem seems to not have NBT!");
             return 0;

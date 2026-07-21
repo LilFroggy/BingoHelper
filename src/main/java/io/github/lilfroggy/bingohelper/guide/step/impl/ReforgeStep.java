@@ -6,12 +6,14 @@ import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.CloseScreenEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.RenderScreenEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
-import io.github.lilfroggy.bingohelper.util.Skyblock;
+import io.github.lilfroggy.bingohelper.mixin.accessor.AbstractContainerScreenAccessor;
+import io.github.lilfroggy.bingohelper.util.ItemUtils;
+import io.github.lilfroggy.bingohelper.util.ScreenUtils.ScreenSlots;
 import io.github.lilfroggy.bingohelper.util.item.ReforgeInfo;
 import io.github.lilfroggy.bingohelper.util.item.ReforgeList;
 import io.github.lilfroggy.bingohelper.util.render.Display;
 import io.github.lilfroggy.bingohelper.util.render.RenderLib;
-import io.github.lilfroggy.bingohelper.mixin.HandledScreenAccessorMixin;
+
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -19,7 +21,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.core.NonNullList;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -67,27 +68,27 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
     }
 
     @Override
-    public void onRenderScreen(GuiGraphicsExtractor graphics, Screen screen, String title, NonNullList<Slot> slots) {
+    public void onRenderScreen(GuiGraphicsExtractor graphics, Screen screen, String title, ScreenSlots slots) {
         if (!title.contains(REFORGE_SCREEN_TITLE)) return;
 
         if (isActive()) renderMissingReforgeList(graphics);
         
-        ItemStack reforgeItem = slots.get(REFORGE_ITEM_SLOT_ID).getItem();
-        String itemReforge = Skyblock.getReforge(reforgeItem);
+        ItemStack reforgeItem = slots.ALL.get(REFORGE_ITEM_SLOT_ID).getItem();
+        String itemReforge = ItemUtils.getReforge(reforgeItem);
 
-        if (reforgeItem.isEmpty()) highlightUnfinishedItems(graphics, slots);
+        if (reforgeItem.isEmpty()) highlightUnfinishedItems(graphics, slots.INVENTORY);
         else if (itemReforge != null) renderReforgeDisplay(screen, graphics, reforgeItem, itemReforge);
     }
 
     private static final Display reforgeDisplay = new Display("");
 
     public void renderReforgeDisplay(Screen screen, GuiGraphicsExtractor graphics, ItemStack reforgeItem, String reforge) {
-        String id = Skyblock.getID(reforgeItem);
+        String id = ItemUtils.getId(reforgeItem);
         if (id.isEmpty()) return;
         
         // Check if we have a double chest open
         if (!(screen instanceof AbstractContainerScreen<?>)) return;
-        HandledScreenAccessorMixin accessor = (HandledScreenAccessorMixin) screen;
+        AbstractContainerScreenAccessor accessor = (AbstractContainerScreenAccessor) screen;
         
         // Get double chest position and dimensions
         int chestHeight = accessor.getBackgroundHeight();
@@ -155,10 +156,9 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
 
     public void highlightUnfinishedItems(GuiGraphicsExtractor graphics, NonNullList<Slot> slots) {
         for (Slot slot : slots) {
-            if (!(slot.container instanceof Inventory)) continue;
             ItemStack item = slot.getItem();
             if (item.isEmpty()) continue;
-            String id = Skyblock.getID(item);
+            String id = ItemUtils.getId(item);
             if (id.isEmpty()) continue;
             if (!items.contains(id)) continue;
             if (items.get(id).done) continue;
@@ -172,10 +172,10 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
         if (slotId != REFORGE_BUTTON_SLOT_ID) return;
         ItemStack reforgeItem = slot.container.getItem(REFORGE_ITEM_SLOT_ID);
         if (reforgeItem.isEmpty()) return;
-        String itemId = Skyblock.getID(reforgeItem);
+        String itemId = ItemUtils.getId(reforgeItem);
         if (itemId.isEmpty() || !items.contains(itemId)) return;
         ReforgeInfo info = items.get(itemId);
-        String reforge = Skyblock.getReforge(reforgeItem);
+        String reforge = ItemUtils.getReforge(reforgeItem);
         if(!info.isValidReforge(reforge)) return;
             
         ci.cancel();

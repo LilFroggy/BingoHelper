@@ -3,11 +3,10 @@ package io.github.lilfroggy.bingohelper.util.item;
 import java.util.Map;
 import java.util.Set;
 
+import io.github.lilfroggy.bingohelper.util.ItemUtils;
 import io.github.lilfroggy.bingohelper.util.ScreenUtils;
-import io.github.lilfroggy.bingohelper.util.Skyblock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
@@ -45,7 +44,7 @@ public class EnchantList {
     }
 
     public boolean allEnchanted() {
-        var containerSlots = ScreenUtils.getSlots();
+        var containerSlots = ScreenUtils.slots.CONTAINER;
         if (containerSlots.isEmpty()) checkPlayerSlots();
         else checkContainerSlots(containerSlots);
         return allDone();
@@ -63,21 +62,20 @@ public class EnchantList {
         boolean inEnchantTable = ScreenUtils.getTitle().contains("Enchant Item");
 
         for (Slot slot : slots) {
-            boolean isPlayerSlot = slot.container instanceof Inventory;
-            if (!inEnchantTable && !isPlayerSlot) continue;
+            if (!inEnchantTable) continue;
             checkItem(slot.getItem());
         }
     }
 
     private void checkItem(ItemStack item) {
         if (item == null || item.isEmpty()) return;
-        String id = Skyblock.getID(item);
+        String id = ItemUtils.getId(item);
         if (id.isEmpty()) return;
         if (!items.containsKey(id)) return;
 
         EnchantInfo info = items.get(id);
 
-        String lore = Skyblock.getLore(item);
+        String lore = ItemUtils.getLore(item);
         boolean hasAllEnchants = info.requiredEnchants().stream().allMatch(enchant -> 
             lore.matches(".*\\b" + enchant.replace(" ", "\\s+") + "\\b.*"));
         if (hasAllEnchants) info.done = true;
