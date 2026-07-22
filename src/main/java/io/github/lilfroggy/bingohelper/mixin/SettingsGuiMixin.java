@@ -26,6 +26,7 @@ import java.awt.Color;
 @Mixin(value = SettingsGui.class, remap = false)
 public class SettingsGuiMixin {
     private static final float dividerWidth = SettingsGui.dividerWidth;
+    private static final float sidebarWidth = 0.25f;
 
     private static final Color BUTTON_CLICK_EFFECT_COLOR = new Color(255, 255, 255, 20);
     private static final Color TEXT_HOVERED_COLOR = new Color(0xFFFFFF);
@@ -59,7 +60,7 @@ public class SettingsGuiMixin {
             editHudBlock.enableEffect(new ExpandingClickEffect(BUTTON_CLICK_EFFECT_COLOR));
             editHudBlock.setColor(VigilancePalette.INSTANCE.getComponentBackground());
             editHudBlock.setX(new PixelConstraint(0f));
-            editHudBlock.setWidth(new PixelConstraint(sidebar.getWidth() + dividerWidth * 2)); // Match sidebar width
+            editHudBlock.setWidth(new AdditiveConstraint(new RelativeConstraint(sidebarWidth), new PixelConstraint(dividerWidth * 2))); // Match sidebar width
             editHudBlock.setHeight(new PixelConstraint(BUTTON_HEIGHT));
             editHudBlock.setY(new AdditiveConstraint(new RelativeConstraint(1.0f), new PixelConstraint(-BUTTON_HEIGHT + dividerWidth))); // Shift up from bottom
             editHudBlock.setChildOf(bottomContainer);
