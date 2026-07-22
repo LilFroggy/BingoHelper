@@ -4,12 +4,9 @@ import java.util.function.Supplier;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.platform.Window;
 
 import io.github.lilfroggy.bingohelper.Client;
-import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.render.Display;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
@@ -104,28 +101,20 @@ public class HudDisplay extends Display {
     }
 
     public void load() {
-        try {
-            JsonObject data = HudManager.data.get().getAsJsonObject(configName);
-            x = data.get("x").getAsDouble();
-            y = data.get("y").getAsDouble();
-            scale = data.get("scale").getAsFloat();
-            background = data.get("background").getAsBoolean();
-        } catch (Exception e) {
-            Logger.error("Failed to load hud data for " + configName, e);
-        }
+        var data = HudManager.data.getObject(configName);
+        if (data == null) return;
+        x = data.getDouble("x");
+        y = data.getDouble("y");
+        scale = data.getFloat("scale");
+        background = data.getBoolean("background");
     }
 
     public void save() {
-        try {
-            JsonObject obj = new JsonObject();
-            obj.add("x", new JsonPrimitive(x));
-            obj.add("y", new JsonPrimitive(y));
-            obj.add("scale", new JsonPrimitive(scale));
-            obj.add("background", new JsonPrimitive(background));
-            HudManager.data.get().add(configName, obj);
-        } catch (Exception e) {
-            Logger.error("Failed to save hud data for " + configName, e);
-        }
+        var data = HudManager.data.getOrCreateObject(configName);
+        data.set("x", x);
+        data.set("y", y);
+        data.set("scale", scale);
+        data.set("background", background);
     }
 
     public void setDefaultValues() {

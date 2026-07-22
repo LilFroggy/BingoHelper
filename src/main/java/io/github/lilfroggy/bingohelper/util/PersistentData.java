@@ -1,30 +1,25 @@
 package io.github.lilfroggy.bingohelper.util;
 
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class PersistentData {
+public class PersistentData extends JsonDataObject {
 
     final String path;
     final String defaultValue;
-    private JsonObject currentData;
 
     public PersistentData(String path, String defaultValue) {
+        super(JsonParser.parseString(defaultValue).getAsJsonObject());
         this.path = path;
         this.defaultValue = defaultValue;
         load();
     }
 
-    public JsonObject get() {
-        return currentData;
-    }
-
     public void load() {
         String content = FileLib.read(path, defaultValue);
-        currentData = JsonParser.parseString(content).getAsJsonObject();
+        json = JsonParser.parseString(content).getAsJsonObject();
     }
 
     public void save() {
-        FileLib.write(path, JsonUtils.toPretty(currentData));
+        FileLib.write(path, JsonUtils.toPretty(json));
     }
 }
