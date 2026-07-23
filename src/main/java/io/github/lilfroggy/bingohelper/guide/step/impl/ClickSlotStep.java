@@ -26,7 +26,7 @@ public class ClickSlotStep extends Step implements ClickSlotEvent, RenderScreenE
     private SlotPredicate predicate;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         return instruction;
     }
 

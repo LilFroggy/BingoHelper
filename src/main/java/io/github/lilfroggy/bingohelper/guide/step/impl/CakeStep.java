@@ -17,7 +17,7 @@ public class CakeStep extends Step implements MessageEvent {
     transient public Set<String> eaten;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         return instruction
                 .replaceAll("%cakes%", "(" + eaten.size() + "/" + totalCakes + ")");
     }

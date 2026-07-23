@@ -10,7 +10,7 @@ public class ExperienceStep extends Step implements ClientTickEndEvent {
     public int level;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         if (!(CLIENT.player instanceof LocalPlayer player)) return "(0/" + level + ")";
 
         int playerLevel = player.experienceLevel;

@@ -11,7 +11,7 @@ public class MessageStep extends Step implements MessageEvent {
     public String criteria;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         return instruction;
     }
 

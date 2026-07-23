@@ -12,7 +12,7 @@ public class HasStep extends Step implements ClientTickEndEvent {
     public HasList items;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         String formatted = instruction;
         int i = 1;
 

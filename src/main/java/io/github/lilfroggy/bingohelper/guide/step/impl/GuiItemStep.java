@@ -19,7 +19,7 @@ public class GuiItemStep extends Step implements ClientTickEndEvent {
     public SlotPredicate predicate;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         return instruction;
     }
 

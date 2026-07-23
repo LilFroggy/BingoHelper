@@ -6,6 +6,7 @@ import io.github.lilfroggy.bingohelper.guide.step.properties.bingoRanks.BingoRan
 import io.github.lilfroggy.bingohelper.guide.step.properties.highlightSlots.HighlightSlotsProperty;
 import io.github.lilfroggy.bingohelper.guide.step.properties.navTo.NavToProperty;
 import io.github.lilfroggy.bingohelper.guide.step.properties.outlineEntities.OutlineEntitiesProperty;
+import io.github.lilfroggy.bingohelper.guide.step.properties.prerequisites.PrerequisitesProperty;
 import io.github.lilfroggy.bingohelper.guide.step.properties.waypoint.WaypointProperty;
 
 import java.util.List;
@@ -18,13 +19,14 @@ import io.github.lilfroggy.bingohelper.util.render.GlowingEntities;
 public abstract class Step {
     protected static final Minecraft CLIENT = Minecraft.getInstance();
 
-    protected abstract String formattedInstruction();
+    protected abstract String locallyFormatted();
     protected abstract void onInit();
     protected abstract void onReset();
     protected abstract void onActivate();
     protected abstract void onDeactivate();
     private boolean isActive;
-    private int index;
+    public int index;
+    public Step parent;
 
     public String type;
     public String instruction;
@@ -35,13 +37,10 @@ public abstract class Step {
     public List<HighlightSlotsProperty> highlightSlots;
     public BingoRanksProperty bingoRanks;
     public AsyncProperty async;
+    public PrerequisitesProperty prerequisites;
 
     public void init() {
         onInit();
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
     }
 
     public boolean isActive() {
@@ -57,7 +56,7 @@ public abstract class Step {
     }
 
     public int registrationIndex() {
-        return this.index;
+        return index;
     }
 
     public int effectiveIndex() {
@@ -76,13 +75,21 @@ public abstract class Step {
         return hasRequirements() && async.meetsRequirements();
     }
 
+    public boolean isPrerequisite() {
+        return parent != null && parent.hasPrerequisites();
+    }
+
+    public boolean hasPrerequisites() {
+        return prerequisites != null;
+    }
+
     public final String instruction() {
-        String base = this.instruction != null ? this.instruction : "";
+        return hasPrerequisites() ? prerequisites.instruction() : globallyFormatted();
+    }
 
-        String formatted = formattedInstruction();
-        if (formatted == null) formatted = base;
-
-        return formatted.replaceAll("%visitIsland%", Config.visitIsland);
+    public final String globallyFormatted() {
+        return locallyFormatted()
+            .replaceAll("%visitIsland%", Config.visitIsland);
     }
 
     public final void reset() {
@@ -91,14 +98,23 @@ public abstract class Step {
         onReset();
     }
 
+    public final void previousPrerequisite() {
+        parent.prerequisites.previous();
+    }
+
+    public final void nextPrerequisite() {
+        parent.prerequisites.next();
+    }
+
     public final void complete() {
-        Guide.advance(this);
+        if (hasPrerequisites()) nextPrerequisite();
+        else Guide.advance(this);
     }
 
     public final void activate() {
         if (!Config.guide) return;
         if (!Skyblock.inBingo()) return;
-        if (isActive()) return;
+        if (isActive) return;
         isActive = true;
 
         if (navTo != null) navTo.register();
@@ -107,6 +123,7 @@ public abstract class Step {
         if (waypoint != null) waypoint.register(outlineEntities);
         if (bingoRanks != null) bingoRanks.register(this);
         if (async != null) async.register(this);
+        if (prerequisites != null) prerequisites.register(this);
 
         Guide.stepStartTime = System.currentTimeMillis();
 
@@ -115,7 +132,7 @@ public abstract class Step {
     }
 
     public final void deactivate() {
-        if (!isActive()) return;
+        if (!isActive) return;
         isActive = false;
 
         if (navTo != null) navTo.unregister();
@@ -124,6 +141,7 @@ public abstract class Step {
         if (waypoint != null) waypoint.unregister();
         if (bingoRanks != null) bingoRanks.unregister();
         if (async != null) async.unregister();
+        if (prerequisites != null) prerequisites.unregister();
         GlowingEntities.clear();
 
         onDeactivate();

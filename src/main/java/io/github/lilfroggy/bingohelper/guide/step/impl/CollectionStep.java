@@ -11,7 +11,7 @@ public class CollectionStep extends Step implements LevelCollectionEvent {
     public Integer level;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         return instruction;
     }
 

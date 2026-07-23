@@ -22,7 +22,7 @@ public class SupercraftStep extends Step implements ClientTickEndEvent, RenderSc
     private String desiredId;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         String formatted = instruction;
         int i = 1;
 

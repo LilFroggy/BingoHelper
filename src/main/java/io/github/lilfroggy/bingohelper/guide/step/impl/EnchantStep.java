@@ -24,7 +24,7 @@ public class EnchantStep extends Step implements RenderScreenEvent, ClientTickEn
     EnchantList items;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         return instruction;
     }
 

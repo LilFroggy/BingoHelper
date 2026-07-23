@@ -10,7 +10,7 @@ public class SkillStep extends Step implements LevelSkillEvent {
     public double level;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         return instruction;
     }
 

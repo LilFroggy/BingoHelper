@@ -19,7 +19,7 @@ public class RetrieveStep extends Step implements ClientTickEndEvent, RenderSlot
     public List<String> items;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         return instruction;
     }
 

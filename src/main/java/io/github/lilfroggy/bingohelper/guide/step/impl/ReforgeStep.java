@@ -35,7 +35,7 @@ public class ReforgeStep extends Step implements RenderScreenEvent, ClientTickEn
     private static final int REFORGE_BUTTON_SLOT_ID = 22;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         return instruction;
     }
 

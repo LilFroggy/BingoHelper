@@ -10,7 +10,7 @@ public class AreaStep extends Step implements AreaChangeEvent {
     public String area;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         return instruction;
     }
 

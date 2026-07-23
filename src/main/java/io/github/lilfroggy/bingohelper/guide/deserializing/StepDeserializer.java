@@ -7,6 +7,7 @@ import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.guide.step.impl.*;
 import io.github.lilfroggy.bingohelper.guide.step.properties.bingoRanks.BingoRanksProperty;
 import io.github.lilfroggy.bingohelper.guide.step.properties.navTo.NavToProperty;
+import io.github.lilfroggy.bingohelper.guide.step.properties.prerequisites.PrerequisitesProperty;
 import io.github.lilfroggy.bingohelper.util.Deserializer;
 import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.item.EnchantList;
@@ -22,6 +23,7 @@ public class StepDeserializer {
         .registerTypeAdapter(Vec3.class, new Vec3dAdapter())
         .registerTypeAdapter(BingoRanksProperty.class, new RanksPropertyAdapter())
         .registerTypeAdapter(NavToProperty.class, new NavToPropertyAdapter())
+        .registerTypeAdapter(PrerequisitesProperty.class, new PrerequisitesPropertyAdapter())
         .registerTypeAdapter(
             Step.class,
             new Deserializer<Step>("type")

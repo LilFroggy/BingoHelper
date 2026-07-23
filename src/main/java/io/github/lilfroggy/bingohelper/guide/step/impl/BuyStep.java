@@ -25,7 +25,7 @@ public class BuyStep extends Step implements MessageEvent, RenderScreenEvent {
     public HasList items;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         String formatted = instruction;
         int i = 1;
 

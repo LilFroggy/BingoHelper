@@ -47,7 +47,7 @@ public class GuideParser {
             .toArray(Step[]::new);
 
         for (int i = 0; i < steps.length; i++) {
-            steps[i].setIndex(i);
+            steps[i].index = i;
         }
 
         return steps;

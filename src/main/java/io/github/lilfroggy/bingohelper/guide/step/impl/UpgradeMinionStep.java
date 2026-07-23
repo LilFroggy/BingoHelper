@@ -33,7 +33,7 @@ public class UpgradeMinionStep extends Step implements ClientTickEndEvent, Click
     private String finalId;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         return instruction;
     }
 

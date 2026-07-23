@@ -18,7 +18,7 @@ public class StoreStep extends Step implements ClientTickEndEvent, RenderSlotEve
     public List<String> items;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         return instruction;
     }
 

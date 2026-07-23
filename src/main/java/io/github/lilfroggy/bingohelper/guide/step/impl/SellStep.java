@@ -18,7 +18,7 @@ public class SellStep extends Step implements ClientTickEndEvent, RenderSlotEven
     public List<String> items;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         return instruction;
     }
 

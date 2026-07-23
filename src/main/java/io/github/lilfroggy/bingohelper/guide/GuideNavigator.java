@@ -60,7 +60,6 @@ public class GuideNavigator extends Guide {
     }
 
     public static String back(int amount) {
-        // If we are at the very beginning, we can't go back
         if (stepIndex == 0) return Messages.GUIDE_BACK_NONE;
 
         int targetIndex = stepIndex - amount;

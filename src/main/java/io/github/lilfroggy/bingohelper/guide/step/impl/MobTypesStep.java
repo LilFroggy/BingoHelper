@@ -11,7 +11,7 @@ public class MobTypesStep extends Step implements UnlockMobTypeEvent {
     public List<String> mobTypes;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         return instruction;
     }
 

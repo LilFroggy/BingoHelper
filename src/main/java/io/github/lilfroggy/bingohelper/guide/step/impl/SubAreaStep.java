@@ -10,7 +10,7 @@ public class SubAreaStep extends Step implements SubAreaChangeEvent {
     public String subArea;
 
     @Override
-    public String formattedInstruction() {
+    public String locallyFormatted() {
         return instruction;
     }
 
