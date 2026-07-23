@@ -13,6 +13,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 public class SlotPredicate {
+    private static final int DEFAULT_COLOR = RenderLib.MINECRAFT_GREEN;
 
     public String guiName;
     public Integer slotIndex;
@@ -24,9 +25,11 @@ public class SlotPredicate {
 
     public SlotPredicate delegate;
     
-    public transient Set<Slot> cache;
+    public transient Set<Slot> cache = new HashSet<>();;
     public int color;
     public int refCount;
+
+    public SlotPredicate() {}
 
     public SlotPredicate(String guiName, Integer slotIndex, String skyblockId, List<String> has, List<String> doesntHave, Boolean playerInv, String highlightColor) {
         this.guiName = guiName;
@@ -39,8 +42,7 @@ public class SlotPredicate {
     }
 
     public void init() {
-        cache = new HashSet<>();
-        color = ColorUtils.hexToInt(highlightColor, RenderLib.MINECRAFT_AQUA);
+        color = ColorUtils.hexToInt(highlightColor, DEFAULT_COLOR);
     }
 
     public void register() {
@@ -66,12 +68,10 @@ public class SlotPredicate {
     }
 
     public Set<Slot> getMatches() {
-        if (cache == null) init();
         return getDelegateOrSelf().cache;
     }
 
     public boolean hasMatch() {
-        if (cache == null) init();
         return !getDelegateOrSelf().cache.isEmpty();
     }
 

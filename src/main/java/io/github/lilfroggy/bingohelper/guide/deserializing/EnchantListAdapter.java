@@ -18,15 +18,15 @@ import io.github.lilfroggy.bingohelper.util.item.EnchantList;
 public class EnchantListAdapter implements JsonDeserializer<EnchantList> {
     @Override
     public EnchantList deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+
         Map<String, EnchantInfo> items = new LinkedHashMap<>();
         JsonObject obj = json.getAsJsonObject();
-        Type listType = new TypeToken<List<String>>(){}.getType();
 
-        for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
+        for (var entry : obj.entrySet()) {
             String id = entry.getKey();
-            List<String> validEnchants = context.deserialize(entry.getValue(), listType);
-            
-            items.put(id, new EnchantInfo(id, validEnchants));
+            List<String> validEnchants = context.deserialize(entry.getValue(), new TypeToken<List<String>>(){}.getType());
+
+            items.put(id, new EnchantInfo(validEnchants));
         }
 
         return new EnchantList(items);

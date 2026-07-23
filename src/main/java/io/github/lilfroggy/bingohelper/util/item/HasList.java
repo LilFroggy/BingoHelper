@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import io.github.lilfroggy.bingohelper.util.ItemUtils;
 
 public class HasList {
-    private final Map<String, HasInfo> items;
+    private Map<String, HasInfo> items;
 
     public HasList(Map<String, HasInfo> items) {
         this.items = items;
@@ -45,8 +45,11 @@ public class HasList {
     public boolean hasAll() {
         boolean hasAll = true;
         
-        for (HasInfo info : values()) {
-            info.count = ItemUtils.getCount(info.id());
+        for (var item : entrySet()) {
+            String id = item.getKey();
+            HasInfo info = item.getValue();
+
+            info.count = ItemUtils.getCount(id);
 
             if (info.done()) continue;
 
@@ -61,10 +64,11 @@ public class HasList {
 
     @Nullable
     public String anUnfinishedId() {
-        return items.values().stream()
-            .filter(info -> !info.done())
-            .findFirst()
-            .map(HasInfo::id)
-            .orElse(null);
+        for (var item : entrySet()) {
+            HasInfo info = item.getValue();
+            if (info.done()) continue;
+            return item.getKey();
+        }
+        return null;
     }
 }

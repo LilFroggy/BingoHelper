@@ -26,9 +26,8 @@ public class AreaStep extends Step implements AreaChangeEvent {
 
     @Override
     protected void onActivate() {
+        if (area.equals(Skyblock.area())) complete(); // Initial check
         Events.CHANGE_AREA.register(this);
-
-        if (area.equals(Skyblock.area())) complete(); // initial check
     }
 
     @Override

@@ -30,8 +30,10 @@ public class EntityPredicate {
     public EntityPredicate delegate;
     public transient Entity closest;
     
-    public transient Set<Entity> cache;
+    public transient Set<Entity> cache = new HashSet<>();
     public int refCount;
+
+    public EntityPredicate() {}
 
     public EntityPredicate(Line line, String type, Vec3 position, String skin) {
         this.line = line;
@@ -40,13 +42,8 @@ public class EntityPredicate {
         this.skin = skin;
     }
 
-    public void init() {
-        cache = new HashSet<>();
-    }
-
     public void register() {
         if (delegate == null) {
-            init();
             this.delegate = EntityRegistry.getOrCreate(this);
         }
     }
@@ -63,18 +60,15 @@ public class EntityPredicate {
     }
 
     public Set<Entity> getMatches() {
-        if (cache == null) init();
         return getDelegateOrSelf().cache;
     }
 
     @Nullable
     public Entity getClosest() {
-        if (closest == null) init();
         return getDelegateOrSelf().closest;
     }
 
     public boolean hasMatch() {
-        if (cache == null) init();
         return !getDelegateOrSelf().cache.isEmpty();
     }
 

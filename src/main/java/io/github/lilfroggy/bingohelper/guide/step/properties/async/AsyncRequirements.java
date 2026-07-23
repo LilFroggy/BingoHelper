@@ -15,20 +15,20 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.sounds.SoundEvents;
 
 public class AsyncRequirements implements RenderHudEvent {
-    private transient static final Minecraft CLIENT = Minecraft.getInstance();
+    private static final Minecraft CLIENT = Minecraft.getInstance();
 
     public Step step;
-    private transient AnimatedTitle activeTitle;
-    private transient Display display;
-    private transient final float NOTIFICATION_SCALE = 5;
-    private transient boolean isNotifying = false;
+    private AnimatedTitle activeTitle;
+    private Display display;
+    private final float NOTIFICATION_SCALE = 5;
+    private boolean isNotifying = false;
 
     public EntityPredicate entity;
     public String dwarvenEvent;
 
-    private transient boolean wasMet = false;
-    private transient long lastNotified = 0;
-    private transient static final long COOLDOWN_MS = 10000;
+    private boolean wasMet = false;
+    private long lastNotified = 0;
+    private static final long COOLDOWN_MS = 10000;
 
     public void register(Step step) {
         this.step = step;

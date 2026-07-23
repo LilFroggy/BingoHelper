@@ -8,6 +8,7 @@ import io.github.lilfroggy.bingohelper.events.interfaces.UnlockMobTypeEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 
 public class MobTypesStep extends Step implements UnlockMobTypeEvent {
+
     public List<String> mobTypes;
 
     @Override
@@ -27,9 +28,8 @@ public class MobTypesStep extends Step implements UnlockMobTypeEvent {
 
     @Override
     protected void onActivate() {
+        if (MobTypes.hasUnlocked(mobTypes)) complete(); // Initial check
         Events.UNLOCK_MOB_TYPE.register(this);
-
-        if (MobTypes.hasUnlocked(mobTypes)) complete(); // initial check
     }
 
     @Override
@@ -41,5 +41,4 @@ public class MobTypesStep extends Step implements UnlockMobTypeEvent {
     public void onUnlockMobType() {
         if (MobTypes.hasUnlocked(mobTypes)) complete();
     }
-    
 }

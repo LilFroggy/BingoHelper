@@ -8,7 +8,6 @@ import io.github.lilfroggy.bingohelper.guide.step.impl.*;
 import io.github.lilfroggy.bingohelper.guide.step.properties.bingoRanks.BingoRanksProperty;
 import io.github.lilfroggy.bingohelper.guide.step.properties.navTo.NavToProperty;
 import io.github.lilfroggy.bingohelper.guide.step.properties.prerequisites.PrerequisitesProperty;
-import io.github.lilfroggy.bingohelper.util.Deserializer;
 import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.item.EnchantList;
 import io.github.lilfroggy.bingohelper.util.item.HasList;
@@ -16,17 +15,17 @@ import io.github.lilfroggy.bingohelper.util.item.ReforgeList;
 import net.minecraft.world.phys.Vec3;
 
 public class StepDeserializer {
-    private static final Gson GSON = new GsonBuilder()
-        .registerTypeAdapter(HasList.class, new ItemListAdapter())
+    private static final Gson GSON = new GsonBuilder().disableJdkUnsafe()
+        .registerTypeAdapter(HasList.class, new HasListAdapter())
         .registerTypeAdapter(ReforgeList.class, new ReforgeListAdapter())
         .registerTypeAdapter(EnchantList.class, new EnchantListAdapter())
         .registerTypeAdapter(Vec3.class, new Vec3dAdapter())
-        .registerTypeAdapter(BingoRanksProperty.class, new RanksPropertyAdapter())
+        .registerTypeAdapter(BingoRanksProperty.class, new BingoRanksPropertyAdapter())
         .registerTypeAdapter(NavToProperty.class, new NavToPropertyAdapter())
         .registerTypeAdapter(PrerequisitesProperty.class, new PrerequisitesPropertyAdapter())
         .registerTypeAdapter(
             Step.class,
-            new Deserializer<Step>("type")
+            new StepAdapter<Step>("type")
                 .register("message", MessageStep.class)
                 .register("cake", CakeStep.class)
                 .register("sell", SellStep.class)

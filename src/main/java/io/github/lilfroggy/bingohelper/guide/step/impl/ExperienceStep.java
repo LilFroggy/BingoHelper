@@ -13,10 +13,8 @@ public class ExperienceStep extends Step implements ClientTickEndEvent {
     public String locallyFormatted() {
         if (!(CLIENT.player instanceof LocalPlayer player)) return "(0/" + level + ")";
 
-        int playerLevel = player.experienceLevel;
-
         return instruction
-        .replaceAll("%level%", "(" + playerLevel + "/" + level + ")");
+        .replaceAll("%level%", "(" + player.experienceLevel + "/" + level + ")");
     }
 
     @Override
@@ -42,10 +40,7 @@ public class ExperienceStep extends Step implements ClientTickEndEvent {
     @Override
     public void onClientTickEnd(int tick) {
         if (!(CLIENT.player instanceof LocalPlayer player)) return;
-
-        int playerLevel = player.experienceLevel;
-    
-        if (playerLevel >= level) complete();
+        if (player.experienceLevel >= level) complete();
     }
 
 }

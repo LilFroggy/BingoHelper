@@ -13,17 +13,18 @@ import com.google.gson.JsonParseException;
 import io.github.lilfroggy.bingohelper.util.item.HasList;
 import io.github.lilfroggy.bingohelper.util.item.HasInfo;
 
-public class ItemListAdapter implements JsonDeserializer<HasList> {
+public class HasListAdapter implements JsonDeserializer<HasList> {
     @Override
     public HasList deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        
         Map<String, HasInfo> items = new LinkedHashMap<>();
         JsonObject obj = json.getAsJsonObject();
 
-        for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
+        for (var entry : obj.entrySet()) {
             String id = entry.getKey();
             int target = entry.getValue().getAsInt();
 
-            items.put(id, new HasInfo(id, target));
+            items.put(id, new HasInfo(target));
         }
 
         return new HasList(items);

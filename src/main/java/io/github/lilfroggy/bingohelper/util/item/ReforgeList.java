@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
 public class ReforgeList {
     private static final Minecraft CLIENT = Minecraft.getInstance();
 
-    private final Map<String, ReforgeInfo> items;
+    private Map<String, ReforgeInfo> items;
 
     public ReforgeList(Map<String, ReforgeInfo> items) {
         this.items = items;
@@ -53,12 +53,7 @@ public class ReforgeList {
             String reforge = ItemUtils.getReforge(item);
             ReforgeInfo info = items.get(id);
 
-            if (info.isValidReforge(reforge)) {
-                info.done = true;
-            }
-            else {
-                info.done = false;
-            }
+            info.done = info.isValidReforge(reforge);
         }
         return allDone();
     }

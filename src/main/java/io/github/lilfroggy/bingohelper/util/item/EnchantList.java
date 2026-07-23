@@ -13,7 +13,7 @@ import net.minecraft.world.item.ItemStack;
 public class EnchantList {
     private static final Minecraft CLIENT = Minecraft.getInstance();
 
-    private final Map<String, EnchantInfo> items;
+    private Map<String, EnchantInfo> items;
 
     public EnchantList(Map<String, EnchantInfo> items) {
         this.items = items;
@@ -78,7 +78,6 @@ public class EnchantList {
         String lore = ItemUtils.getLore(item);
         boolean hasAllEnchants = info.requiredEnchants().stream().allMatch(enchant -> 
             lore.matches(".*\\b" + enchant.replace(" ", "\\s+") + "\\b.*"));
-        if (hasAllEnchants) info.done = true;
-        else info.done = false;
+        info.done = hasAllEnchants;
     }
 }

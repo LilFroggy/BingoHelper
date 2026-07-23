@@ -11,7 +11,7 @@ import com.google.gson.reflect.TypeToken;
 
 import io.github.lilfroggy.bingohelper.guide.step.properties.bingoRanks.BingoRanksProperty;
 
-public class RanksPropertyAdapter implements JsonDeserializer<BingoRanksProperty> {
+public class BingoRanksPropertyAdapter implements JsonDeserializer<BingoRanksProperty> {
     @Override
     public BingoRanksProperty deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         

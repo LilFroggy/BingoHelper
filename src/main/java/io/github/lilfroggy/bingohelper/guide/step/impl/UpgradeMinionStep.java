@@ -39,20 +39,18 @@ public class UpgradeMinionStep extends Step implements ClientTickEndEvent, Click
 
     @Override
     public void onInit() {
-        // Nothing to reset
+        desiredBaseId = minionId + "_GENERATOR_"; // COBBLESTONE_GENERATOR_
+        finalId = desiredBaseId + toLevel;
+        setDesiredLevel(fromLevel + 1);
     }
 
     @Override
     public void onReset() {
-        // Do nothing
+        setDesiredLevel(fromLevel + 1);
     }
 
     @Override
     protected void onActivate() {
-        desiredBaseId = minionId + "_GENERATOR_"; // COBBLESTONE_GENERATOR_
-        finalId = desiredBaseId + toLevel;
-        setDesiredLevel(fromLevel + 1);
-
         Events.CLIENT_TICK_END.register(this);
         Events.CLICK_SLOT.register(this);
         Events.RENDER_SCREEN.register(this);

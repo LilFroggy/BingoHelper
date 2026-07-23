@@ -3,17 +3,11 @@ package io.github.lilfroggy.bingohelper.util.item;
 import java.util.List;
 
 public class EnchantInfo {
-    public String id;
     public List<String> requiredEnchants;
     public boolean done;
 
-    public EnchantInfo(String id, List<String> requiredEnchants) {
-        this.id = id;
+    public EnchantInfo(List<String> requiredEnchants) {
         this.requiredEnchants = requiredEnchants;
-    }
-
-    public String id() {
-        return id;
     }
 
     public List<String> requiredEnchants() {

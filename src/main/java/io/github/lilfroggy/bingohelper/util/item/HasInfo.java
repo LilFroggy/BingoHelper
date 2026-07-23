@@ -1,18 +1,12 @@
 package io.github.lilfroggy.bingohelper.util.item;
 
 public class HasInfo {
-    public String id;
     public int count;
     public int target;
     public boolean done;
 
-    public HasInfo(String id, Integer target) {
-        this.id = id;
+    public HasInfo(Integer target) {
         this.target = target;
-    }
-
-    public String id() {
-        return id;
     }
 
     public int count() {

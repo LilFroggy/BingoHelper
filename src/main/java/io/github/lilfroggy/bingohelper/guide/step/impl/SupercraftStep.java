@@ -38,18 +38,17 @@ public class SupercraftStep extends Step implements ClientTickEndEvent, RenderSc
 
     @Override
     public void onInit() {
-        // Nothing to reset
+        setNextDesiredId();
     }
 
     @Override
     public void onReset() {
         items.reset();
+        setNextDesiredId();
     }
 
     @Override
     protected void onActivate() {
-        setNextDesiredId();
-        
         Events.CLIENT_TICK_END.register(this);
         Events.RENDER_SCREEN.register(this);
     }

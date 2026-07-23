@@ -12,14 +12,9 @@ import io.github.lilfroggy.bingohelper.util.render.RenderingEvent;
 import io.github.lilfroggy.bingohelper.util.render.RenderingEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.phys.Vec3;
 
 public class OutlineEntitiesProperty extends EntityPredicate implements ClientTickEndEvent, RenderingEvent {
     private static final int DEFAULT_LINE_COLOR = RenderLib.MINECRAFT_AQUA;
-
-    public OutlineEntitiesProperty(Line line, String type, Vec3 position, String skin) {
-        super(line, type, position, skin);
-    }
 
     public void register() {
         super.register();
@@ -35,7 +30,7 @@ public class OutlineEntitiesProperty extends EntityPredicate implements ClientTi
 
     @Override
     public void onClientTickEnd(int tick) {
-        super.getMatches().forEach(entity -> {
+        getMatches().forEach(entity -> {
             GlowingEntities.add(entity, 0, 255, 255, 255);
         });
     }
@@ -43,20 +38,14 @@ public class OutlineEntitiesProperty extends EntityPredicate implements ClientTi
     @Override
     public void render(LevelRenderContext context, PoseStack matrixStack, VertexConsumer consumer) {
         switch (super.line()) {
-            case NONE:
-                return;
-            case NEAREST:
-                Entity closest = super.getClosest();
-                if (closest == null) return;
-                renderLine(context, closest);
-                break;
-            case ALL:
-                super.getMatches().forEach(entity -> renderLine(context, entity));
-                break;
+            case NONE: return;
+            case NEAREST: renderLine(context, getClosest());
+            case ALL: super.getMatches().forEach(entity -> renderLine(context, entity));
         }
     }
 
     private void renderLine(LevelRenderContext context, Entity entity) {
+        if (entity == null) return;
         RenderLib.renderLineFromCursor(context, EntityUtils.getEntityMid(entity), DEFAULT_LINE_COLOR);
     }
 }

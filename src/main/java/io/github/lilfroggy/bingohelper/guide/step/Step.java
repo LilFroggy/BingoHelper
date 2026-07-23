@@ -29,7 +29,7 @@ public abstract class Step {
     public Step parent;
 
     public String type;
-    public String instruction;
+    public String instruction = "";
     public String command;
     public NavToProperty navTo;
     public WaypointProperty waypoint;

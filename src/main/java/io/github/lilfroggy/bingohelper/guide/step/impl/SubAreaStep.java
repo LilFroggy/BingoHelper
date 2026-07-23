@@ -6,7 +6,7 @@ import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 
 public class SubAreaStep extends Step implements SubAreaChangeEvent {
-    
+
     public String subArea;
 
     @Override
@@ -26,9 +26,8 @@ public class SubAreaStep extends Step implements SubAreaChangeEvent {
 
     @Override
     protected void onActivate() {
+        if (subArea.equals(Skyblock.subArea())) complete(); // Initial check
         Events.CHANGE_SUB_AREA.register(this);
-
-        if(subArea.equals(Skyblock.subArea())) complete(); // initial check
     }
 
     @Override
@@ -38,6 +37,6 @@ public class SubAreaStep extends Step implements SubAreaChangeEvent {
 
     @Override
     public void onSubAreaChange(String newSubArea, String oldSubArea) {
-        if (newSubArea.equals(subArea)) complete();
+        if (subArea.equals(newSubArea)) complete();
     }
 }

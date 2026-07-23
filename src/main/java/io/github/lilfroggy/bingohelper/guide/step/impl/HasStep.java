@@ -8,7 +8,7 @@ import io.github.lilfroggy.bingohelper.util.item.HasList;
 import net.minecraft.client.player.LocalPlayer;
 
 public class HasStep extends Step implements ClientTickEndEvent {
-        
+
     public HasList items;
 
     @Override

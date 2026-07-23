@@ -27,10 +27,8 @@ public class CollectionStep extends Step implements LevelCollectionEvent {
 
     @Override
     protected void onActivate() {
+        if (Collections.getLevel(collection) >= level) complete(); // Initial check
         Events.LEVEL_COLLECTION.register(this);
-
-        Integer currentLevel = Collections.getLevel(collection);
-        if (currentLevel != null && currentLevel >= level) complete(); // initial check
     }
 
     @Override
@@ -43,5 +41,4 @@ public class CollectionStep extends Step implements LevelCollectionEvent {
         if (!collection.equals(updatedCollection)) return;
         if (newLevel >= level) complete();
     }
-    
 }

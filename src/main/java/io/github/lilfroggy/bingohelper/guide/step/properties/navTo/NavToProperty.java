@@ -10,8 +10,8 @@ public class NavToProperty implements ClientTickEndEvent, IslandChangeEvent {
 
     public String navTo;
 
-    private boolean isNavigating;
-    private int cooldown;
+    private boolean isNavigating = false;
+    private int cooldown = 0;
 
     public void register() {
         isNavigating = false;

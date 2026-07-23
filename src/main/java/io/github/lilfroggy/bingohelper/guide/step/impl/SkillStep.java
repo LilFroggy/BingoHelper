@@ -6,6 +6,7 @@ import io.github.lilfroggy.bingohelper.events.interfaces.LevelSkillEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 
 public class SkillStep extends Step implements LevelSkillEvent {
+
     public String skill;
     public double level;
 
@@ -26,10 +27,8 @@ public class SkillStep extends Step implements LevelSkillEvent {
 
     @Override
     protected void onActivate() {
+        if (Skills.getLevel(skill) >= level) complete(); // Initial check
         Events.LEVEL_SKILL.register(this);
-
-        double currentLevel = Skills.getLevel(skill);
-        if (currentLevel >= level) complete(); // initial check
     }
 
     @Override
@@ -42,5 +41,4 @@ public class SkillStep extends Step implements LevelSkillEvent {
         if (!skill.equals(updatedSkill)) return;
         if (newLevel >= level) complete();
     }
-    
 }

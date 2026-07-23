@@ -7,7 +7,7 @@ import io.github.lilfroggy.bingohelper.events.interfaces.MessageEvent;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 
 public class MessageStep extends Step implements MessageEvent {
-    
+
     public String criteria;
 
     @Override

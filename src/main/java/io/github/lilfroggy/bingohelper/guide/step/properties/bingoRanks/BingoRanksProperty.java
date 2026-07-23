@@ -10,6 +10,7 @@ import io.github.lilfroggy.bingohelper.util.Bingo;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
 
 public class BingoRanksProperty implements ClientTickEndEvent {
+    
     public Step step;
     public List<Integer> ranks;
 
