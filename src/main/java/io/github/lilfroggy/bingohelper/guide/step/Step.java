@@ -94,7 +94,7 @@ public abstract class Step {
 
     public final void reset() {
         if (waypoint != null) waypoint.reset();
-
+        if (prerequisites != null) prerequisites.reset();
         onReset();
     }
 
@@ -107,7 +107,7 @@ public abstract class Step {
     }
 
     public final void complete() {
-        if (hasPrerequisites()) nextPrerequisite();
+        if (isPrerequisite()) nextPrerequisite();
         else Guide.advance(this);
     }
 

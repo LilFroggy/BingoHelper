@@ -33,8 +33,13 @@ public class PrerequisitesProperty {
         setCurrent(steps[++index]);
     }
 
+    public void reset() {
+        index = 0;
+    }
+
     private void setCurrent(Step step) {
-        step.parent = this.parent;
+        step.parent = parent;
+        step.reset();
         step.activate();
         current = step;
     }
