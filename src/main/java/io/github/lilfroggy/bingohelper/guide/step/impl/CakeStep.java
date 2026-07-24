@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public class CakeStep extends Step implements MessageEvent {
-    private static final Pattern CAKE_REGEX = Pattern.compile("^(?:Big )?Yum! You (?:gain|refresh) \\+(\\d+). (.*) for 48 hours!$");
+    private static final Pattern CAKE_PATTERN = Pattern.compile("^(?:Big )?Yum! You (?:gain|refresh) \\+(?:\\d+). (?<cake>.*) for 48 hours!$");
 
     private static int totalCakes = 20;
     transient public Set<String> eaten = new HashSet<>();
@@ -46,12 +46,10 @@ public class CakeStep extends Step implements MessageEvent {
 
     @Override
     public void onMessage(String formattedMsg, String unformattedMsg, CallbackInfo ci) {
-        Matcher matcher = CAKE_REGEX.matcher(unformattedMsg);
+        Matcher matcher = CAKE_PATTERN.matcher(unformattedMsg);
         if (!matcher.matches()) return;
-        String cake = matcher.group(4);
-
+        String cake = matcher.group("cake");
         if (!eaten.add(cake)) return;
-
         if (eaten.size() >= totalCakes) complete();
     }
 }
