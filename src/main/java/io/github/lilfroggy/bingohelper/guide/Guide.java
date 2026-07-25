@@ -19,7 +19,6 @@ public class Guide {
     public static int version = EXAMPLE_GUIDE.version();
     public static Step[] steps = EXAMPLE_GUIDE.steps();
     public static int stepIndex = EXAMPLE_GUIDE.stepIndex();
-    public static long stepStartTime = System.currentTimeMillis();
     public static boolean lerping = false;
 
     public static void init() {
@@ -37,8 +36,8 @@ public class Guide {
         display.draw(graphics);
     }
 
-    public static void advance(Step step) {
-        GuideNavigator.advance(step);
+    public static void advance() {
+        GuideNavigator.advance();
     }
 
     public static String skip() {

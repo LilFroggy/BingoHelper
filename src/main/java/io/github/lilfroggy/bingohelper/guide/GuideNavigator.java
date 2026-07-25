@@ -1,40 +1,17 @@
 package io.github.lilfroggy.bingohelper.guide;
 
-import java.util.concurrent.TimeUnit;
-import net.minecraft.client.Minecraft;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.messages.Messages;
-import io.github.lilfroggy.bingohelper.util.ChatLib;
-import io.github.lilfroggy.bingohelper.util.Scheduler;
 
 public class GuideNavigator extends Guide {
-    private static final Minecraft CLIENT = Minecraft.getInstance();
 
     public static void reset() {
         ActiveSteps.clear();
         goToStep(0);
     }
 
-    public static void advance(Step step) {
-        ActiveSteps.remove(step);
-
-        long currentTime = System.currentTimeMillis();
-        long durationMillis = currentTime - stepStartTime;
-        long seconds = durationMillis / 1000;
-
-        String message = Messages.GUIDE_ADVANCE.formatted(
-            ChatLib.replaceAmpersands(step.globallyFormatted().replaceAll("\n", " ")), 
-            ChatLib.formatDuration(seconds)
-        );
-
-        Scheduler.SCHEDULER.schedule(() -> {
-            CLIENT.execute(() -> {
-                ChatLib.chat(message);
-            });
-        }, 250, TimeUnit.MILLISECONDS);
-
+    public static void advance() {
         if (ActiveSteps.anyBlocking()) return;
-
         goToStep(stepIndex + 1);
     }
 
@@ -81,8 +58,6 @@ public class GuideNavigator extends Guide {
             // Going backward: Safely unregister everything we are retreating through
             ActiveSteps.removeAllRegisteredAfter(index);
         }
-
-        stepStartTime = System.currentTimeMillis();
     
         activateStep(index);
     }
