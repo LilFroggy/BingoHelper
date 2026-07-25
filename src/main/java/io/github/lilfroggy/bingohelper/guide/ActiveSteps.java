@@ -124,9 +124,8 @@ public class ActiveSteps {
     @Nullable
     public static String getPriorityCommand() {
         for (Step step : priority) {
-            if (step.command != null) {
-                return step.command;
-            }
+            String command = step.command();
+            if (command != null) return command;
         }
         return null;
     }
@@ -134,9 +133,9 @@ public class ActiveSteps {
     @Nullable
     public static String getBlockingCommand() {
         for (Step step : active) {
-            if (step.isBlocking() && step.command != null) {
-                return step.command;
-            }
+            if (!step.isBlocking()) continue;
+            String command = step.command();
+            if (command != null) return command;
         }
         return null;
     }
@@ -144,9 +143,9 @@ public class ActiveSteps {
     @Nullable
     public static String getAnyCommand() {
         for (Step step : active) {
-            if (!step.hasRequirements() && step.command != null) {
-                return step.command;
-            }
+            if (step.hasRequirements()) continue; // active async commands are caught in getPriorityCommand()
+            String command = step.command();
+            if (command != null) return command;
         }
         return null;
     }

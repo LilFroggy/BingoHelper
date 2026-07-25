@@ -10,6 +10,9 @@ import io.github.lilfroggy.bingohelper.guide.step.properties.prerequisites.Prere
 import io.github.lilfroggy.bingohelper.guide.step.properties.waypoint.WaypointProperty;
 
 import java.util.List;
+
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.client.Minecraft;
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.util.Logger;
@@ -85,6 +88,11 @@ public abstract class Step {
 
     public final String instruction() {
         return hasPrerequisites() ? prerequisites.instruction() : globallyFormatted();
+    }
+
+    @Nullable
+    public final String command() {
+        return hasPrerequisites() ? prerequisites.command() : command;
     }
 
     public final String globallyFormatted() {

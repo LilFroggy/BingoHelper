@@ -47,4 +47,8 @@ public class PrerequisitesProperty {
     public String instruction() {
         return current.globallyFormatted();
     }
+
+    public String command() {
+        return current.command;
+    }
 }
