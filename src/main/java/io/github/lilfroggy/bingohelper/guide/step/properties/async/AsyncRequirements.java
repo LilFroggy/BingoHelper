@@ -5,6 +5,7 @@ import io.github.lilfroggy.bingohelper.events.interfaces.RenderHudEvent;
 import io.github.lilfroggy.bingohelper.guide.ActiveSteps;
 import io.github.lilfroggy.bingohelper.guide.Guide;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
+import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.dwarvenEvents.DwarvenEvents;
 import io.github.lilfroggy.bingohelper.util.entity.EntityPredicate;
 import io.github.lilfroggy.bingohelper.util.render.AnimatedTitle;
@@ -25,6 +26,7 @@ public class AsyncRequirements implements RenderHudEvent {
 
     public EntityPredicate entity;
     public String dwarvenEvent;
+    public Integer skyblockLevel;
 
     private boolean wasMet = false;
     private long lastNotified = 0;
@@ -49,8 +51,12 @@ public class AsyncRequirements implements RenderHudEvent {
         return dwarvenEvent == null || DwarvenEvents.isActive(dwarvenEvent);
     }
 
+    public boolean isSkyblockLevel() {
+        return skyblockLevel == null || Skyblock.level() >= skyblockLevel;
+    }
+
     public boolean areMet() {
-        boolean met = entityExists() && dwarvenEventActive();
+        boolean met = entityExists() && dwarvenEventActive() && isSkyblockLevel();
 
         if (isNotifying) return met;
         

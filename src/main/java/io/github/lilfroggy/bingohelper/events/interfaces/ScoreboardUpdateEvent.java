@@ -1,7 +1,7 @@
 package io.github.lilfroggy.bingohelper.events.interfaces;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface ScoreboardUpdateEvent {
-    void onScoreboardUpdate(ArrayList<String> lines);
+    void onScoreboardUpdate(List<String> lines);
 }

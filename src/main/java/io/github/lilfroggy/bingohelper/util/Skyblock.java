@@ -1,6 +1,8 @@
 package io.github.lilfroggy.bingohelper.util;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.Events;
@@ -11,7 +13,6 @@ import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundPlayerInfoPacket;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 
 public class Skyblock {
     private static final Minecraft CLIENT = Minecraft.getInstance();
@@ -19,6 +20,8 @@ public class Skyblock {
     public static final char AREA = '\uE067';
 	public static final char RIFT_AREA = '\uE020';
     private static final String AREA_ICON_REGEX = String.format("[%s%s]", AREA, RIFT_AREA);
+
+    private static final Pattern SB_LEVEL_REGEX = Pattern.compile("SB Level: \\[(?<level>\\d+)\\] (?<xp>\\d+).*");
 
     private static final String BINGO_SYMBOL = "Ⓑ";
     private static final String IRONMAN_SYMBOL = "♲";
@@ -34,9 +37,16 @@ public class Skyblock {
     private static String area = null;
     private static String subArea = null;
 
+    private static int level = 0;
+
     public static void init() {
         Events.SCOREBOARD_UPDATE.register(Skyblock::onScoreboardUpdate);
+        Events.TABLIST_UPDATE.register(Skyblock::onTablistUpdate);
         Events.CLIENT_TICK_END.register(Skyblock::onClientTickEnd);
+    }
+
+    public static void reset() {
+        level = 0;
     }
 
     public static void onHelloPacket(ClientboundHelloPacket packet) {
@@ -63,7 +73,7 @@ public class Skyblock {
         }
     }
 
-    public static void onScoreboardUpdate(ArrayList<String> lines) {
+    public static void onScoreboardUpdate(List<String> lines) {
         String oldSubArea = subArea;
         String newSubArea = null;
         for (String line : lines) {
@@ -75,6 +85,22 @@ public class Skyblock {
         if ((oldSubArea == null && newSubArea != null) || (oldSubArea != null && !oldSubArea.equals(newSubArea))) {
             Events.CHANGE_SUB_AREA.invoke(listener -> listener.onSubAreaChange(subArea, oldSubArea));
             if (Config.debug) Logger.info("New subArea: " + newSubArea);
+        }
+    }
+
+    public static void onTablistUpdate(List<String> lines) {
+        if (!inBingo) return;
+
+        for (String line : lines) {
+            Matcher matcher = SB_LEVEL_REGEX.matcher(line);
+            if (!matcher.matches()) continue;
+            String lvl = matcher.group("level");
+            if (lvl == null) continue;
+            int newLevel = Integer.valueOf(lvl).intValue();
+            if (newLevel == level) continue;
+            Events.SKYBLOCK_LEVEL_UP.invoke(listener -> listener.onSkyblockLevelUp(newLevel));
+            if (Config.debug) ChatLib.chat("Sb Level Up: " + level + " -> " + newLevel);
+            level = newLevel;
         }
     }
 
@@ -102,8 +128,8 @@ public class Skyblock {
     }
 
     private static boolean bingoInName() {
-        if (!(CLIENT.player instanceof LocalPlayer player)) return false;
-        return player.getDisplayName().getString().contains(symbols[Config.gamemodeIndex]);
+        String displayName = PlayerUtils.getDisplayName(CLIENT.player); 
+        return displayName.contains(symbols[Config.gamemodeIndex]);
     }
 
     private static boolean bingoInTab() {
@@ -124,5 +150,9 @@ public class Skyblock {
 
     public static String subArea() {
         return subArea;
+    }
+
+    public static int level() {
+        return level;
     }
 }

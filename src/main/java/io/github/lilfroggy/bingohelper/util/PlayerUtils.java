@@ -23,4 +23,9 @@ public class PlayerUtils {
             .map(property -> property.value())
             .orElse("");
     }
+
+    public static String getDisplayName(AbstractClientPlayer player) {
+        if (!(CLIENT.player instanceof AbstractClientPlayer p)) return "";
+        return p.getDisplayName().getString();
+    }
 }

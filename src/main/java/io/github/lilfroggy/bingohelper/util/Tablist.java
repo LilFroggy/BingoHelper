@@ -5,14 +5,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
+import io.github.lilfroggy.bingohelper.Client;
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.Events;
 
-// Shoutout Skyblocker
+// Shoutout Skyblocker and SkyHanni
 
 public class Tablist {
     private static final Pattern ISLAND_REGEX = Pattern.compile("(?:Area|Dungeon): (.*)");
@@ -20,9 +22,11 @@ public class Tablist {
     private static String island;
 
     private static List<String> lines = new ArrayList<>();
+    private static boolean dirty = false;
 
     static {
         Events.CLIENT_TICK_END.register(Tablist::onClientTickEnd);
+        Events.PACKET_RECEIVED.register(Tablist::onPacketReceived);
     }
 
     public static void init() {
@@ -30,13 +34,14 @@ public class Tablist {
     }
 
     private static void onClientTickEnd(int tick) {
-        if(tick % 20 != 0) return;
+        if (!dirty) return;
+        dirty = false;
         update();
         updateIsland();
     }
 
     private static void update() {
-        ClientPacketListener networkHandler = Minecraft.getInstance().getConnection();
+        ClientPacketListener networkHandler = Client.MINECRAFT.getConnection();
         
 		if (networkHandler == null) return;
 
@@ -47,6 +52,8 @@ public class Tablist {
             .map(Component::getString)
             .map(String::strip)
             .toList();
+
+        Events.TABLIST_UPDATE.invoke(listener -> listener.onTablistUpdate(lines));
     }
 
     private static void updateIsland() {
@@ -66,5 +73,9 @@ public class Tablist {
 
     public static List<String> getLines() {
         return lines;
+    }
+
+    public static void onPacketReceived(Packet<?> packet) {
+        if (packet instanceof ClientboundPlayerInfoUpdatePacket) dirty = true;
     }
 }

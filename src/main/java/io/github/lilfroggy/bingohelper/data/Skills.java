@@ -25,14 +25,8 @@ public class Skills {
     private static final Map<String, Double> skills = new HashMap<>();
 
     public static void init() {
-        Events.CREATE_BINGO_PROFILE.register(Skills::onCreateBingoProfile);
         Events.MESSAGE.register(Skills::onGameMessage);
         Events.ACTION_BAR_MESSAGE.register(Skills::onActionBarMessage);
-    }
-
-    public static void onCreateBingoProfile() {
-        reset();
-        if (Config.debug) Logger.info("Skills reset");
     }
     
     public static void onGameMessage(String formattedMsg, String unformattedMsg, CallbackInfo ci) {
@@ -98,5 +92,6 @@ public class Skills {
 
     public static void reset() {
         skills.clear();
+        if (Config.debug) Logger.info("Skills reset");
     }
 }

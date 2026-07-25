@@ -5,7 +5,6 @@ import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.guide.deserializing.StepDeserializer;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.hud.HudDisplay;
-import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -23,15 +22,11 @@ public class Guide {
     public static long stepStartTime = System.currentTimeMillis();
     public static boolean lerping = false;
 
-    static {
-        ActiveSteps.init();
-        Events.RENDER_HUD.register(Guide::onHudRender);
-        Events.CREATE_BINGO_PROFILE.register(Guide::onCreateBingoProfile);
-    }
-
     public static void init() {
         Events.JOIN_HYPIXEL.register(GuideUpdater::onJoinHypixel);
+        Events.RENDER_HUD.register(Guide::onHudRender);
         GuideImporter.importFromSave();
+        ActiveSteps.init();
     }
 
     public static final HudDisplay display = new HudDisplay("", "guide", () -> Config.guide);
@@ -40,12 +35,6 @@ public class Guide {
         if (!Config.guide || !Skyblock.inBingo()) return;
         display.setString(getDisplayText());
         display.draw(graphics);
-    }
-
-    private static void onCreateBingoProfile() {
-        if (Config.debug) Logger.info("Created bingo profile");
-        GuideUpdater.check(Config.autoImport);
-        Guide.reset();
     }
 
     public static void advance(Step step) {

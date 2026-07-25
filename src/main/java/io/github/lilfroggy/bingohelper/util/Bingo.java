@@ -9,8 +9,12 @@ import java.util.regex.Pattern;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import io.github.lilfroggy.bingohelper.config.Config;
+import io.github.lilfroggy.bingohelper.data.Collections;
+import io.github.lilfroggy.bingohelper.data.Skills;
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
+import io.github.lilfroggy.bingohelper.guide.Guide;
+import io.github.lilfroggy.bingohelper.guide.GuideUpdater;
 
 public class Bingo {
     private static final Minecraft CLIENT = Minecraft.getInstance();
@@ -20,6 +24,17 @@ public class Bingo {
 
     public static void init() {
         Events.CLIENT_TICK_END.register(UPDATE_RANK);
+        Events.CREATE_BINGO_PROFILE.register(Bingo::onCreateBingoProfile);
+    }
+
+    public static void onCreateBingoProfile() {
+        Skills.reset();
+        Collections.reset();
+        Skyblock.reset();
+
+        GuideUpdater.check(Config.autoImport);
+        Guide.reset();
+        if (Config.debug) Logger.info("Created bingo profile");
     }
 
     public static void updateRank(int tick) {
@@ -31,7 +46,7 @@ public class Bingo {
         if (!matcher.find()) return;
         
         char colorCode = matcher.group(1).charAt(0);
-        ChatFormatting formatting = ChatFormatting.getByCode(colorCode);        
+        ChatFormatting formatting = ChatFormatting.getByCode(colorCode);     
         
         if (formatting == null) return;
         

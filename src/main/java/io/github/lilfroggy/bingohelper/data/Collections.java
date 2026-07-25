@@ -21,13 +21,7 @@ public class Collections {
     private static final Map<String, Integer> collections = new HashMap<>();
 
     public static void init() {
-        Events.CREATE_BINGO_PROFILE.register(Collections::onCreateBingoProfile);
         Events.MESSAGE.register(Collections::onGameMessage);
-    }
-
-    public static void onCreateBingoProfile() {
-        reset();
-        if (Config.debug) Logger.info("Collections reset");
     }
     
     public static void onGameMessage(String formattedMsg, String unformattedMsg, CallbackInfo ci) {
@@ -75,5 +69,6 @@ public class Collections {
 
     public static void reset() {
         collections.clear();
+        if (Config.debug) Logger.info("Collections reset");
     }
 }

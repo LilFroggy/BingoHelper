@@ -202,7 +202,7 @@ public class ActiveSteps {
         String blockingBody = "";
         String blockingAsyncBody = "";
         String asyncBody = "";
-    
+
         for (Step step : ActiveSteps.getInternalSet()) {
             if (step.isHidden()) continue;
             if (step.isBlocking() && !step.isAsync()) {

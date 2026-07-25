@@ -1,28 +1,37 @@
 package io.github.lilfroggy.bingohelper.util;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import io.github.lilfroggy.bingohelper.events.Events;
+import net.minecraft.world.scores.criteria.ObjectiveCriteria;
+import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket;
+import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket;
+import net.minecraft.network.protocol.game.ClientboundSetScorePacket;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.scores.DisplaySlot;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.ScoreHolder;
 
-// Shoutout Skyblocker
+// Shoutout Skyblocker and SkyHanni
 
 public class Scoreboard {
     private static final Minecraft CLIENT = Minecraft.getInstance();
 
-    public static ArrayList<Component> TEXT_LINES = new ArrayList<>();
-    public static ArrayList<String> STRING_LINES = new ArrayList<>();
+    public static List<Component> TEXT_LINES = new ArrayList<>();
+    public static List<String> STRING_LINES = new ArrayList<>();
+    public static boolean dirty = false;
 
     static {
         Events.CLIENT_TICK_END.register(Scoreboard::onClientTickEnd);
+        Events.PACKET_RECEIVED.register(Scoreboard::onPacketReceived);
     }
 
     public static void init() {
@@ -30,7 +39,8 @@ public class Scoreboard {
     }
 
     public static void onClientTickEnd(int tick) {
-        if(tick % 20 != 0) return;
+        if (!dirty) return;
+        dirty = false;
         update();
     }
 
@@ -68,6 +78,33 @@ public class Scoreboard {
             Collections.reverse(TEXT_LINES);
         }
         
-        Events.SCOREBOARD_UPDATE.invoke(listener -> listener.onScoreboardUpdate(new ArrayList<>(STRING_LINES)));
+        Events.SCOREBOARD_UPDATE.invoke(listener -> listener.onScoreboardUpdate(STRING_LINES));
+    }
+
+    public static void onPacketReceived(Packet<?> packet) {
+        switch (packet) {
+            case ClientboundSetScorePacket p: {
+                if (p.objectiveName() == "update") {
+                    dirty = true;
+                }
+                break;
+            }
+            case ClientboundSetPlayerTeamPacket p: {
+                if (p.getName().startsWith("team_")) {
+                    dirty = true;
+                }
+                break;
+            }
+            case ClientboundSetObjectivePacket p: {
+                var type = p.getRenderType();
+                if (type != ObjectiveCriteria.RenderType.INTEGER) return;
+                String objectiveName = p.getObjectiveName();
+                if (objectiveName.equals("health")) return;
+                var objectiveValue = p.getDisplayName().getString().strip();
+                Events.SCOREBOARD_TITLE_UPDATE.invoke(listener -> listener.onScoreboardTitleUpdate(objectiveValue, objectiveName));
+                break;
+            }
+            default: return;
+        }
     }
 }

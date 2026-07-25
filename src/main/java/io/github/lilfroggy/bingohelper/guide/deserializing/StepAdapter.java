@@ -11,24 +11,25 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
+import io.github.lilfroggy.bingohelper.guide.step.Step;
 import io.github.lilfroggy.bingohelper.util.Logger;
 
-public class StepAdapter<T> implements JsonDeserializer<T> {
+public class StepAdapter<T> implements JsonDeserializer<Step> {
     private final String typeFieldName;
-    private final Map<String, Class<? extends T>> registry = new HashMap<>();
+    private final Map<String, Class<? extends Step>> registry = new HashMap<>();
 
     public StepAdapter(String typeFieldName) {
         this.typeFieldName = typeFieldName;
     }
 
-    public StepAdapter<T> register(String label, Class<? extends T> subtype) {
+    public StepAdapter<T> register(String label, Class<? extends Step> subtype) {
         registry.put(label, subtype);
         return this;
     }
 
     @Override
     @SuppressWarnings("null")
-    public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public Step deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         try {
             JsonObject jsonObject = json.getAsJsonObject();
             
@@ -37,14 +38,14 @@ public class StepAdapter<T> implements JsonDeserializer<T> {
             }
             
             String type = jsonObject.get(typeFieldName).getAsString();
-            Class<? extends T> implClass = registry.get(type);
+            Class<? extends Step> implClass = registry.get(type);
             
             if (implClass == null) {
                 Logger.warn("Unknown step type: " + type);
                 return null;
             }
             
-            T instance = implClass.getDeclaredConstructor().newInstance();
+            Step instance = implClass.getDeclaredConstructor().newInstance();
             
             for (var entry : jsonObject.entrySet()) {
                 String fieldName = entry.getKey();
@@ -56,7 +57,7 @@ public class StepAdapter<T> implements JsonDeserializer<T> {
                 } catch (NoSuchFieldException e1) {
                     try {
                         Class<?> abstractClass = implClass.getSuperclass();
-                            field = abstractClass.getDeclaredField(fieldName);
+                        field = abstractClass.getDeclaredField(fieldName);
                     } catch (NoSuchFieldException e2) {
                         continue;
                     }
@@ -70,6 +71,7 @@ public class StepAdapter<T> implements JsonDeserializer<T> {
                 }
             }
 
+            instance.init();
             return instance;
         } catch (Exception e) {
             Logger.error("Failed to parse step: " + json, e);

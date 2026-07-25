@@ -16,10 +16,13 @@ public class Events {
 
     public static final EventHandler<ClickSlotEvent> CLICK_SLOT = new EventHandler<>();
     public static final EventHandler<ScoreboardUpdateEvent> SCOREBOARD_UPDATE = new EventHandler<>();
+    public static final EventHandler<ScoreboardTitleUpdateEvent> SCOREBOARD_TITLE_UPDATE = new EventHandler<>();
+    public static final EventHandler<TablistUpdateEvent> TABLIST_UPDATE = new EventHandler<>();
     public static final EventHandler<CloseScreenEvent> CLOSE_SCREEN = new EventHandler<>();
 
     public static final EventHandler<EntityStateUpdateEvent> ENTITY_STATE_UPDATE = new EventHandler<>();
     public static final EventHandler<ParticleSpawnEvent> PARTICLE_SPAWN = new EventHandler<>();
+    public static final EventHandler<PacketReceivedEvent> PACKET_RECEIVED = new EventHandler<>();
     public static final EventHandler<BlockUpdateEvent> BLOCK_UPDATE = new EventHandler<>();
 
     // Bingo
@@ -44,6 +47,7 @@ public class Events {
     public static final EventHandler<UnlockMobTypeEvent> UNLOCK_MOB_TYPE = new EventHandler<>();
     public static final EventHandler<LevelCollectionEvent> LEVEL_COLLECTION = new EventHandler<>();
     public static final EventHandler<LevelSkillEvent> LEVEL_SKILL = new EventHandler<>();
+    public static final EventHandler<SkyblockLevelUpEvent> SKYBLOCK_LEVEL_UP = new EventHandler<>();
 
     // this is based off tablist (not hypixelmodapi packets)
     public static final EventHandler<IslandChangeEvent> CHANGE_ISLAND = new EventHandler<>();

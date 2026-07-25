@@ -3,6 +3,8 @@ package io.github.lilfroggy.bingohelper.mixin;
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.network.Connection;
+import net.minecraft.network.PacketListener;
+import net.minecraft.network.protocol.BundlePacket;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundPingPacket;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,5 +18,16 @@ public abstract class ConnectionMixin {
     @Inject(method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/protocol/Packet;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Connection;genericsFtw(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;)V"), cancellable = true)
     private void channelRead0(ChannelHandlerContext channelHandlerContext, Packet<?> packet, CallbackInfo ci) {
         if (packet instanceof ClientboundPingPacket pingPacket && pingPacket.getId() != 0) Events.SERVER_TICK.invoke(listener -> listener.onServerTick());
+    }
+
+    @Inject(method = "genericsFtw", at = @At(value = "HEAD"))
+    private static void handlePacket$Inject$HEAD(Packet<?> packet, PacketListener packetListener, CallbackInfo ci) {
+        if (packet instanceof BundlePacket<?> bundle) {
+            for (Packet<?> subPacket : bundle.subPackets()) {
+                Events.PACKET_RECEIVED.invoke(listener -> listener.onPacketReceived(subPacket));
+            }
+        } else {
+            Events.PACKET_RECEIVED.invoke(listener -> listener.onPacketReceived(packet));
+        }
     }
 }
