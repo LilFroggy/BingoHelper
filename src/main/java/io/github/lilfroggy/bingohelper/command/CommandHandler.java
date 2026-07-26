@@ -2,6 +2,7 @@ package io.github.lilfroggy.bingohelper.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import io.github.lilfroggy.bingohelper.command.commands.*;
 
 import java.util.ArrayList;
@@ -41,5 +42,11 @@ public class CommandHandler {
 
     public static List<ClientCommand> getCommands() {
         return new ArrayList<>(commands);
+    }
+    
+    public static boolean exists(String command) {
+        var dispatcher = ClientCommands.getActiveDispatcher();
+        if (dispatcher == null) return false;
+        return dispatcher.getRoot().getChild(command) != null;
     }
 }
