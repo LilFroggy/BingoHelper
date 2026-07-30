@@ -1,17 +1,21 @@
 package io.github.lilfroggy.bingohelper.guide.step.properties.prerequisites;
 
+import io.github.lilfroggy.bingohelper.guide.ActiveSteps;
+import io.github.lilfroggy.bingohelper.guide.GuideSaver;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 
 public class PrerequisitesProperty {
+    private static final String PREREQUISITE_DISPLAY_FORMAT = "&f%s\n&f- %s&f";
+
     private Step current;
     private Step parent;
-    private int index;
+    public int index;
 
     public Step[] steps;
 
     public void register(Step parent) {
         this.parent = parent;
-        setCurrent(steps[index]);
+        setCurrent();
     }
 
     public void unregister() {
@@ -22,30 +26,50 @@ public class PrerequisitesProperty {
 
     public void previous() {
         current.deactivate();
-        if (index <= 0) return;
-        setCurrent(steps[--index]);
+        setIndex(index - 1);
+        setCurrent();
     }
 
     public void next() {
         current.deactivate();
-        current = parent;
-        if (index >= steps.length - 1) return;
-        setCurrent(steps[++index]);
+        parent.lastProgressMs = System.currentTimeMillis();
+        setIndex(index + 1);
+        setCurrent();
     }
 
     public void reset() {
         index = 0;
     }
 
-    private void setCurrent(Step step) {
-        step.parent = parent;
-        step.reset();
-        step.activate();
-        current = step;
+    public void setIndex(int index) {
+        if (index < 0) index = 0;
+        if (index >= steps.length) index = steps.length;
+        this.index = index;
+        GuideSaver.saveUserProgress();
+    }
+
+    private void setCurrent() {
+        current = current();
+        current.parent = parent;
+        current.reset();
+        current.activate();
+    }
+
+    private Step current() {
+        return index >= steps.length ? parent : steps[index];
     }
 
     public String instruction() {
-        return current.globallyFormatted();
+        if (ActiveSteps.priorityAmount() <= 1) {
+            return current.globallyFormatted();
+        } else if (current == parent) {
+            return parent.globallyFormatted();
+        } else {
+            return PREREQUISITE_DISPLAY_FORMAT.formatted(
+                parent.globallyFormatted(),
+                current.globallyFormatted().replaceAll("\n", "\n&f- ")
+            );
+        }
     }
 
     public String command() {

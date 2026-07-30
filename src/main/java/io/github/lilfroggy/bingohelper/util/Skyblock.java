@@ -50,7 +50,7 @@ public class Skyblock {
     }
 
     public static void onHelloPacket(ClientboundHelloPacket packet) {
-        if (Config.debug) Logger.info("packet received: " + packet.toString());
+        Logger.debug("packet received: " + packet.toString());
         var isAlpha = packet.getEnvironment() != Environment.PRODUCTION;
         Events.JOIN_HYPIXEL.invoke(listener -> listener.onJoinHypixel(isAlpha));
     }
@@ -58,7 +58,7 @@ public class Skyblock {
     public static void onLocationPacket(ClientboundLocationPacket packet) {
         HypixelModAPI.getInstance().sendPacket(new ServerboundPlayerInfoPacket());
 
-        if (Config.debug) Logger.info("packet received: " + packet.toString());
+        Logger.debug("packet received: " + packet.toString());
 
         ServerType serverType = packet.getServerType().orElse(null);
         if (serverType == null || serverType.getName() == null) inSkyblock = false;
@@ -69,7 +69,7 @@ public class Skyblock {
 
         if ((oldArea == null && area != null) || (oldArea != null && !oldArea.equals(area))) {
             Events.CHANGE_AREA.invoke(listener -> listener.onAreaChange(area, oldArea));
-            if (Config.debug) Logger.info("New area: " + area);
+            Logger.debug("New area: " + area);
         }
     }
 
@@ -84,7 +84,7 @@ public class Skyblock {
         subArea = newSubArea;
         if ((oldSubArea == null && newSubArea != null) || (oldSubArea != null && !oldSubArea.equals(newSubArea))) {
             Events.CHANGE_SUB_AREA.invoke(listener -> listener.onSubAreaChange(subArea, oldSubArea));
-            if (Config.debug) Logger.info("New subArea: " + newSubArea);
+            Logger.debug("New subArea: " + newSubArea);
         }
     }
 
@@ -98,9 +98,9 @@ public class Skyblock {
             if (lvl == null) continue;
             int newLevel = Integer.valueOf(lvl).intValue();
             if (newLevel == level) continue;
-            Events.SKYBLOCK_LEVEL_UP.invoke(listener -> listener.onSkyblockLevelUp(newLevel));
-            if (Config.debug) ChatLib.chat("Sb Level Up: " + level + " -> " + newLevel);
+            Logger.debug("Skyblock Level Changed: " + level + " -> " + newLevel);
             level = newLevel;
+            Events.SKYBLOCK_LEVEL_CHANGE.invoke(listener -> listener.onSkyblockLevelChange(newLevel));
         }
     }
 
@@ -120,7 +120,7 @@ public class Skyblock {
         if (inBingo) Events.JOIN_BINGO.invoke(listener -> listener.onJoinBingo());
         else Events.LEAVE_BINGO.invoke(listener -> listener.onLeaveBingo());
         
-        if (Config.debug) Logger.info("In Bingo: " + (inBingo ? "§a" : "§c") + inBingo);
+        Logger.debug("In Bingo: " + (inBingo ? "§a" : "§c") + inBingo);
     }
 
     private static boolean alwaysBingo() {

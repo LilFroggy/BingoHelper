@@ -16,10 +16,10 @@ public class PersistentData extends JsonDataObject {
 
     public void load() {
         String content = FileLib.read(path, defaultValue);
-        json = JsonParser.parseString(content).getAsJsonObject();
+        object = JsonParser.parseString(content).getAsJsonObject();
     }
 
     public void save() {
-        FileLib.write(path, JsonUtils.toPretty(json));
+        FileLib.write(path, toString());
     }
 }

@@ -3,6 +3,7 @@ package io.github.lilfroggy.bingohelper.util;
 import org.slf4j.LoggerFactory;
 
 import io.github.lilfroggy.bingohelper.BingoHelper;
+import io.github.lilfroggy.bingohelper.config.Config;
 
 public class Logger {
     public static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(BingoHelper.MOD_ID);
@@ -44,5 +45,10 @@ public class Logger {
     public static void info(String msg, boolean consoleOnly) {
         LOGGER.info(ChatLib.removeFormatting(msg));
         if (!consoleOnly) ChatLib.chatNoPrefix(INFO_PREFIX + msg);
+    }
+
+    /* === Debug === */
+    public static void debug(String msg) {
+        info(msg, !Config.debug);
     }
 }

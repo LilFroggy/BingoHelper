@@ -6,7 +6,6 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import org.jetbrains.annotations.Nullable;
@@ -63,7 +62,7 @@ public class UpdateManager {
         
         if (Config.performedLastMinuteCheck) return;
 
-        if (Config.debug) Logger.info("Performing last minute update check");
+        Logger.debug("Performing last minute update check");
         
         check();
         Config.performedLastMinuteCheck = true;
@@ -127,29 +126,27 @@ public class UpdateManager {
         if (latestRelease == null || state != UpdateState.AVAILABLE) return;
         setState(UpdateState.DOWNLOADING);
 
-        CompletableFuture.runAsync(() -> {
-            try {
-                URL url = URI.create(latestRelease.DOWNLOAD_URL).toURL();
-                File modsFolder = new File(FabricLoader.getInstance().getGameDir().toFile(), "mods");
-                
-                File targetFile = new File(modsFolder, latestRelease.FILE_NAME);
-    
-                try (InputStream in = url.openStream()) {
-                    Files.copy(in, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                }
+        try {
+            URL url = URI.create(latestRelease.DOWNLOAD_URL).toURL();
+            File modsFolder = new File(FabricLoader.getInstance().getGameDir().toFile(), "mods");
+            
+            File targetFile = new File(modsFolder, latestRelease.FILE_NAME);
 
-                File currentJar = new File(UpdateManager.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-                
-                currentJar.deleteOnExit();
-
-                Config.updateInfo = ""; // So state is NONE instead of AVAILABLE on next launch
-                Config.save();
-                setState(UpdateState.DOWNLOADED);
-            } catch (Exception e) {
-                Logger.error("Error downloading update", e);
-                setState(UpdateState.DOWNLOAD_ERROR);
+            try (InputStream in = url.openStream()) {
+                Files.copy(in, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
-        });
+
+            File currentJar = new File(UpdateManager.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            
+            currentJar.deleteOnExit();
+
+            Config.updateInfo = ""; // So state is NONE instead of AVAILABLE on next launch
+            Config.save();
+            setState(UpdateState.DOWNLOADED);
+        } catch (Exception e) {
+            Logger.error("Error downloading update", e);
+            setState(UpdateState.DOWNLOAD_ERROR);
+        }
     }
 
     private static void sendUpdateNotification(UpdateState state) {

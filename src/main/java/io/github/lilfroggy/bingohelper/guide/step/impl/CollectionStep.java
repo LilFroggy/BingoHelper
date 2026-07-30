@@ -40,5 +40,6 @@ public class CollectionStep extends Step implements LevelCollectionEvent {
     public void onLevelCollection(String updatedCollection, Integer previousLevel, Integer newLevel) {
         if (!collection.equals(updatedCollection)) return;
         if (newLevel >= level) complete();
+        onProgress();
     }
 }

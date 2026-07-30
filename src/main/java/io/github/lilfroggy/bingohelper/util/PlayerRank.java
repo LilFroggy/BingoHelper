@@ -7,7 +7,7 @@ import net.hypixel.modapi.packet.impl.clientbound.ClientboundPlayerInfoPacket;
 public class PlayerRank {
 
     public static void onPlayerInfoPacket(ClientboundPlayerInfoPacket packet) {
-        if (Config.debug) Logger.info("packet received: " + packet.toString());
+        Logger.debug("packet received: " + packet.toString());
     
         String newRank;
     

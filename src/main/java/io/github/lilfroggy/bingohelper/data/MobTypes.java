@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import io.github.lilfroggy.bingohelper.Client;
-import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.mixin.accessor.AbstractContainerScreenAccessor;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
@@ -150,7 +149,7 @@ public class MobTypes {
             foundAny = true;
             String id = ChatLib.toSnakeCase(prospectName);
             unlocked.add(id);
-            Logger.info("Unlocked Mob Type: " + id, !Config.debug);
+            Logger.debug("Unlocked Mob Type: " + id);
         }
 
         if (!foundAny) return;

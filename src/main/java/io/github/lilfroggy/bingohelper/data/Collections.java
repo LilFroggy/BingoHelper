@@ -1,6 +1,5 @@
 package io.github.lilfroggy.bingohelper.data;
 
-import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
@@ -44,7 +43,7 @@ public class Collections {
         Integer oldLevel = getLevel(id);
         collections.put(id, newLevel);
 
-        if (Config.debug) Logger.info("Collection updated: " + id + " " + oldLevel + " -> " + newLevel);
+        Logger.debug("Collection updated: " + id + " " + oldLevel + " -> " + newLevel);
         
         Events.LEVEL_COLLECTION.invoke(listener -> listener.onLevelCollection(id, oldLevel, newLevel));
     }
@@ -69,6 +68,6 @@ public class Collections {
 
     public static void reset() {
         collections.clear();
-        if (Config.debug) Logger.info("Collections reset");
+        Logger.debug("Collections reset");
     }
 }

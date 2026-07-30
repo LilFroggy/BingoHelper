@@ -251,4 +251,10 @@ public class ChatLib {
     public static String replaceAmpersands(String string) {
         return string.replaceAll("&([0-9a-fk-or])", "§$1");
     }
+
+    public static String toBold(String string) {
+        return "§l" + string
+            .replaceAll("([&§][0-9a-fk-or])", "$0§l")
+            .replaceAll("[&§]r", "§f");
+    }
 }

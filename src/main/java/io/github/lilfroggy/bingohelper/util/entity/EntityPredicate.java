@@ -5,6 +5,8 @@ import io.github.lilfroggy.bingohelper.util.PlayerUtils;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -29,6 +31,9 @@ public class EntityPredicate {
 
     public EntityPredicate delegate;
     public transient Entity closest;
+    private boolean hasMatch;
+    private Consumer<Boolean> callback;
+    private Set<Consumer<Boolean>> callbacks = new HashSet<>();
     
     public transient Set<Entity> cache = new HashSet<>();
     public int refCount;
@@ -43,33 +48,38 @@ public class EntityPredicate {
     }
 
     public void register() {
-        if (delegate == null) {
-            this.delegate = EntityRegistry.getOrCreate(this);
-        }
+        register(null);
+    }
+
+    public void register(Consumer<Boolean> onMatchChange) {
+        if (delegate != null) return;
+        this.callback = onMatchChange;
+        this.delegate = EntityRegistry.getOrCreate(this);
+        if (callback != null) delegate.callbacks.add(callback);
     }
 
     public void unregister() {
-        if (delegate != null) {
-            EntityRegistry.release(delegate);
-            delegate = null;
-        }
+        if (delegate == null) return;
+        delegate.callbacks.remove(callback);
+        EntityRegistry.release(delegate);
+        delegate = null;
     }
 
-    public EntityPredicate getDelegateOrSelf() {
+    public EntityPredicate delegate() {
         return delegate != null ? delegate : this;
     }
 
     public Set<Entity> getMatches() {
-        return getDelegateOrSelf().cache;
+        return delegate().cache;
     }
 
     @Nullable
     public Entity getClosest() {
-        return getDelegateOrSelf().closest;
+        return delegate().closest;
     }
 
     public boolean hasMatch() {
-        return !getDelegateOrSelf().cache.isEmpty();
+        return !delegate().cache.isEmpty();
     }
 
     public void scanWorld() {
@@ -91,6 +101,14 @@ public class EntityPredicate {
                     closest = entity;
                 }
             }
+        }
+
+        boolean newState = !cache.isEmpty();
+        if (hasMatch == newState) return;
+        
+        hasMatch = newState;
+        for (var action : callbacks) {
+            action.accept(hasMatch);
         }
     }
 

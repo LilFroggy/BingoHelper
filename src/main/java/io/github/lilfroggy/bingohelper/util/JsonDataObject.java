@@ -1,41 +1,39 @@
 package io.github.lilfroggy.bingohelper.util;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 public class JsonDataObject {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+    private final Map<String, JsonDataObject> cachedObjects = new HashMap<>();
+    private final Map<String, JsonDataArray> cachedArrays = new HashMap<>();
 
-    protected JsonObject json;
-    private final Map<String, JsonDataObject> cached = new HashMap<>();
+    protected JsonObject object;
 
     public JsonDataObject() {
-        this.json = new JsonObject();
+        this.object = new JsonObject();
     }
 
-    public JsonDataObject(JsonObject json) {
-        this.json = json != null ? json : new JsonObject();
+    public JsonDataObject(JsonObject object) {
+        this.object = object != null ? object : new JsonObject();
     }
 
     public <T> JsonDataObject set(String key, T value) {
         switch (value) {
-            case Boolean v -> json.addProperty(key, v);
-            case String v -> json.addProperty(key, v);
-            case Character v -> json.addProperty(key, v);
-            case Number v -> json.addProperty(key, v);
-            case JsonArray v -> json.add(key, v);
-            case JsonObject v -> json.add(key, v);
-            case JsonDataObject v -> json.add(key, v.json);
+            case Boolean v -> object.addProperty(key, v);
+            case String v -> object.addProperty(key, v);
+            case Character v -> object.addProperty(key, v);
+            case Number v -> object.addProperty(key, v);
+            case JsonArray v -> object.add(key, v);
+            case JsonObject v -> object.add(key, v);
+            case JsonDataArray v -> object.add(key, v.array);
+            case JsonDataObject v -> object.add(key, v.object);
             case null, default -> Logger.warn("Tried to set " + key + " to " + value);
         }
         return this;
@@ -78,34 +76,44 @@ public class JsonDataObject {
     }
 
     @Nullable
-    public List<?> getList(String key) {
-        JsonElement element = json.get(key);
-        return (element != null && element.isJsonArray()) ? element.getAsJsonArray().asList() : null;
-    }
-
-    @Nullable
-    public Map<?, ?> getMap(String key) {
-        JsonElement element = json.get(key);
-        return (element != null && element.isJsonObject()) ? element.getAsJsonObject().asMap() : null;
+    public JsonDataArray getArray(String key) {
+        JsonElement element = object.get(key);
+        if (element != null && element.isJsonArray()) {
+            return cachedArrays.computeIfAbsent(key, k -> new JsonDataArray(element.getAsJsonArray()));
+        }
+        return null;
     }
 
     @Nullable
     public JsonDataObject getObject(String key) {
-        JsonElement element = json.get(key);
+        JsonElement element = object.get(key);
         if (element != null && element.isJsonObject()) {
-            return cached.computeIfAbsent(key, k -> new JsonDataObject(element.getAsJsonObject()));
+            return cachedObjects.computeIfAbsent(key, k -> new JsonDataObject(element.getAsJsonObject()));
         }
         return null;
     }
+
+    public JsonDataArray getOrCreateArray(String key) {
+        return cachedArrays.computeIfAbsent(key, k -> {
+            JsonElement element = object.get(k);
+            JsonArray arr = (element != null && element.isJsonArray()) ? element.getAsJsonArray() : null;
+            
+            if (arr == null) {
+                arr = new JsonArray();
+                object.add(k, arr);
+            }
+            return new JsonDataArray(arr);
+        });
+    }
     
     public JsonDataObject getOrCreateObject(String key) {
-        return cached.computeIfAbsent(key, k -> {
-            JsonElement element = json.get(k);
+        return cachedObjects.computeIfAbsent(key, k -> {
+            JsonElement element = object.get(k);
             JsonObject obj = (element != null && element.isJsonObject()) ? element.getAsJsonObject() : null;
             
             if (obj == null) {
                 obj = new JsonObject();
-                json.add(k, obj);
+                object.add(k, obj);
             }
             return new JsonDataObject(obj);
         });
@@ -113,11 +121,11 @@ public class JsonDataObject {
     
     @Nullable
     private JsonPrimitive getAsPrimitive(String key) {
-        JsonElement element = json.get(key);
+        JsonElement element = object.get(key);
         return (element != null && element.isJsonPrimitive()) ? element.getAsJsonPrimitive() : null;
     }
 
     public String toString() {
-        return GSON.toJson(json);
+        return JsonUtils.toPretty(object);
     }
 }

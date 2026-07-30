@@ -1,6 +1,5 @@
 package io.github.lilfroggy.bingohelper.guide.step.impl;
 
-import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.MessageEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.RenderScreenEvent;
@@ -78,14 +77,14 @@ public class BuyStep extends Step implements MessageEvent, RenderScreenEvent {
             int count = Integer.parseInt(countStr);
             boughtName = name;
             boughtCount = count;
-            if (Config.debug) Logger.info("Bought: " + boughtName + " - " + boughtCount);
+            Logger.debug("Bought: " + boughtName + " - " + boughtCount);
             return;
         }
         if (singleMatcher.find()) {
             String name = singleMatcher.group(1);
             boughtName = name;
             boughtCount = 1;
-            if (Config.debug) Logger.info("Bought: " + boughtName + " - " + boughtCount);
+            Logger.debug("Bought: " + boughtName + " - " + boughtCount);
             return;
         }
     }
@@ -129,6 +128,7 @@ public class BuyStep extends Step implements MessageEvent, RenderScreenEvent {
 
             itemInfo.count += boughtCount;
             if (itemInfo.count >= itemInfo.target) itemInfo.done = true;
+            onProgress();
 
             boughtName = null;
             boughtCount = null;

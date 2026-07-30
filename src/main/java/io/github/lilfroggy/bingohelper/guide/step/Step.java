@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.Minecraft;
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
+import io.github.lilfroggy.bingohelper.util.JsonDataObject;
 import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.Scheduler;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
@@ -32,11 +33,14 @@ public abstract class Step {
     protected abstract void onReset();
     protected abstract void onActivate();
     protected abstract void onDeactivate();
+
     private boolean isActive;
     private boolean isComplete;
     public int index;
     public Step parent;
     public long startTimeMs;
+    public long lastProgressMs;
+    public boolean isPriority;
 
     public String type;
     public String instruction = "";
@@ -55,6 +59,19 @@ public abstract class Step {
 
     public boolean isActive() {
         return isActive;
+    }
+
+    public long startTimeMs() {
+        return startTimeMs;
+    }
+
+    public long lastProgressMs() {
+        return lastProgressMs;
+    }
+
+    public void onProgress() {
+        lastProgressMs = System.currentTimeMillis();
+        ActiveSteps.dirty = true;
     }
 
     public boolean isAsync() {
@@ -82,7 +99,7 @@ public abstract class Step {
     }
 
     public boolean isPriority() {
-        return hasRequirements() && async.meetsRequirements();
+        return isPriority;
     }
 
     public boolean isPrerequisite() {
@@ -103,8 +120,10 @@ public abstract class Step {
     }
 
     public final String globallyFormatted() {
-        return locallyFormatted()
+        String formatted = locallyFormatted()
             .replaceAll("%visitIsland%", Config.visitIsland);
+
+        return isPriority ? ChatLib.toBold(formatted) : formatted;
     }
 
     public final void reset() {
@@ -153,18 +172,18 @@ public abstract class Step {
         isActive = true;
         isComplete = false;
 
+        if (prerequisites != null) prerequisites.register(this);
         if (navTo != null) navTo.register();
         if (outlineEntities != null) outlineEntities.forEach(p -> p.register());
         if (highlightSlots != null) highlightSlots.forEach(p -> p.register());
         if (waypoint != null) waypoint.register(outlineEntities);
         if (bingoRanks != null) bingoRanks.register(this);
         if (async != null) async.register(this);
-        if (prerequisites != null) prerequisites.register(this);
 
         startTimeMs = System.currentTimeMillis();
 
         onActivate();
-        if (Config.debug) Logger.info("Activated: " + this.getClass().getSimpleName() + this.hashCode());
+        Logger.debug("Activated: " + this.getClass().getSimpleName() + this.hashCode());
     }
 
     public final void deactivate() {
@@ -181,6 +200,17 @@ public abstract class Step {
         GlowingEntities.clear();
 
         onDeactivate();
-        if (Config.debug) Logger.info("Deactivated: " + this.getClass().getSimpleName() + this.hashCode());
+        Logger.debug("Deactivated: " + this.getClass().getSimpleName() + this.hashCode());
+    }
+
+    public final JsonDataObject state() {
+        JsonDataObject state = new JsonDataObject();
+        state.set("index", registrationIndex());
+
+        if (hasPrerequisites()) {
+            state.set("prerequisites$index", prerequisites.index);
+        }
+        
+        return state;
     }
 }

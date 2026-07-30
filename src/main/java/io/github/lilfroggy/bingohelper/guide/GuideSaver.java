@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
 
-import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.util.FileLib;
 
 public class GuideSaver {
@@ -25,7 +24,6 @@ public class GuideSaver {
     }
 
     public static void saveUserProgress() {
-        Config.savedIndex = Guide.stepIndex;
         ActiveSteps.save();
     }
 }

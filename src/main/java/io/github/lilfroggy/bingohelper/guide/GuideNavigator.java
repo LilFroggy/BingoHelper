@@ -64,7 +64,9 @@ public class GuideNavigator extends Guide {
 
     private static void activateStep(int index) {
         setIndex(index);
+
         if (!isValidIndex(index())) return;
+
         Step step = steps[index()];
         step.reset();
 

@@ -42,9 +42,9 @@ public class HasList {
      * Updates all items based on current inventory state.
      * Returns true if all items in the list are now complete.
      */
-    public boolean hasAll() {
-        boolean hasAll = true;
-        
+    public boolean update() {
+        boolean updated = false;
+
         for (var item : entrySet()) {
             String id = item.getKey();
             HasInfo info = item.getValue();
@@ -55,11 +55,10 @@ public class HasList {
 
             if (info.hasEnough()) {
                 info.done = true;
-            } else {
-                hasAll = false;
+                updated = true;
             }
         }
-        return hasAll;
+        return updated;
     }
 
     @Nullable

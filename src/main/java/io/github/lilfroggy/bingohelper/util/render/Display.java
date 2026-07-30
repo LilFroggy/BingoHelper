@@ -54,6 +54,10 @@ public class Display {
         return (int) (RenderLib.getHeight(string) * scale);
     }
 
+    public double lineHeight() {
+        return lineHeight * scale;
+    }
+
     public float titleX() {
         float centerX = CLIENT.getWindow().getGuiScaledWidth() / 2f;
         return centerX - (this.width() / 2f);
@@ -65,14 +69,14 @@ public class Display {
     }
 
     private void ensureTextInitialized() {
-        if (this.text == null && CLIENT.font != null) {
-            this.text = MultiLineLabel.create(
+        if (text == null && CLIENT.font != null) {
+            text = MultiLineLabel.create(
                 CLIENT.font,
                 Component.literal(ChatLib.replaceAmpersands(string)),
                 Integer.MAX_VALUE
             );
-            lineCount = this.text.getLineCount();
-            maxWidth = this.text.getWidth();
+            lineCount = text.getLineCount();
+            maxWidth = text.getWidth();
             lineHeight = CLIENT.font.lineHeight + LINE_SPACING;
         }
     }

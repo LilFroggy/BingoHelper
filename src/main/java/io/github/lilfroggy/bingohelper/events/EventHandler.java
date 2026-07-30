@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.util.Logger;
 
 public class EventHandler<T> {
@@ -13,21 +12,21 @@ public class EventHandler<T> {
 
     public void register(T listener) {
         if (listeners.contains(listener)) {
-            Logger.info("Listener has already been registered once: " + listener.getClass().getSimpleName(), !Config.debug);
+            Logger.debug("Listener has already been registered once: " + listener.getClass().getSimpleName());
             return;
         }
         
         listeners.add(listener);
-        Logger.info("Registered listener: " + listener.getClass().getSimpleName(), !Config.debug);
+        Logger.debug("Registered listener: " + listener.getClass().getSimpleName());
     }
 
     public void unregister(T listener) {
         if (!listeners.remove(listener)) {
-            Logger.info("Listener was not registered in the first place: " + listener.getClass().getSimpleName(), !Config.debug);
+            Logger.debug("Listener was not registered in the first place: " + listener.getClass().getSimpleName());
             return;
         }
         
-        Logger.info("Unregistered listener: " + listener.getClass().getSimpleName(), !Config.debug);
+        Logger.debug("Unregistered listener: " + listener.getClass().getSimpleName());
     }
 
     public void invoke(Consumer<T> action) {

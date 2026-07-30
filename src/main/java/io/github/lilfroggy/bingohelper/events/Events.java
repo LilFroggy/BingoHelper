@@ -47,7 +47,7 @@ public class Events {
     public static final EventHandler<UnlockMobTypeEvent> UNLOCK_MOB_TYPE = new EventHandler<>();
     public static final EventHandler<LevelCollectionEvent> LEVEL_COLLECTION = new EventHandler<>();
     public static final EventHandler<LevelSkillEvent> LEVEL_SKILL = new EventHandler<>();
-    public static final EventHandler<SkyblockLevelUpEvent> SKYBLOCK_LEVEL_UP = new EventHandler<>();
+    public static final EventHandler<SkyblockLevelChangeEvent> SKYBLOCK_LEVEL_CHANGE = new EventHandler<>();
 
     // this is based off tablist (not hypixelmodapi packets)
     public static final EventHandler<IslandChangeEvent> CHANGE_ISLAND = new EventHandler<>();

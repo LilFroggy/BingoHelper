@@ -40,5 +40,6 @@ public class SkillStep extends Step implements LevelSkillEvent {
     public void onLevelSkill(String updatedSkill, double previousLevel, double newLevel) {
         if (!skill.equals(updatedSkill)) return;
         if (newLevel >= level) complete();
+        onProgress();
     }
 }

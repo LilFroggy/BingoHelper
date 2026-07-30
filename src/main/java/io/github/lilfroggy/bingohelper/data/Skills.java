@@ -1,6 +1,5 @@
 package io.github.lilfroggy.bingohelper.data;
 
-import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.Logger;
@@ -72,7 +71,7 @@ public class Skills {
         double oldLevel = getLevel(id);
         if (oldLevel == level) return;
         skills.put(id, level);
-        if (Config.debug) Logger.info("Skill updated: " + id + ": " + oldLevel + " -> " + level);
+        Logger.debug("Skill updated: " + id + ": " + oldLevel + " -> " + level);
         Events.LEVEL_SKILL.invoke(listener -> listener.onLevelSkill(id, oldLevel, level));
     }
 
@@ -92,6 +91,6 @@ public class Skills {
 
     public static void reset() {
         skills.clear();
-        if (Config.debug) Logger.info("Skills reset");
+        Logger.debug("Skills reset");
     }
 }

@@ -51,5 +51,6 @@ public class CakeStep extends Step implements MessageEvent {
         String cake = matcher.group("cake");
         if (!eaten.add(cake)) return;
         if (eaten.size() >= totalCakes) complete();
+        onProgress();
     }
 }

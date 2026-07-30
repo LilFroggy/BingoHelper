@@ -61,7 +61,9 @@ public class SupercraftStep extends Step implements ClientTickEndEvent, RenderSc
 
     @Override
     public void onClientTickEnd(int tick) {
-        if (items.hasAll()) complete();
+        if (!items.update()) return;
+        onProgress();
+        if (items.allDone()) complete();
         else if (items.get(desiredId).done()) setNextDesiredId();
     }
 

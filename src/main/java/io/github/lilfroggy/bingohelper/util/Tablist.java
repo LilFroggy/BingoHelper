@@ -11,7 +11,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import io.github.lilfroggy.bingohelper.Client;
-import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.Events;
 
 // Shoutout Skyblocker and SkyHanni
@@ -66,7 +65,7 @@ public class Tablist {
             island = matcher.group(1);
             if (island.equals(oldIsland)) break;
             Events.CHANGE_ISLAND.invoke(listener -> listener.onIslandChange(oldIsland, oldIsland));
-            Logger.info("Island changed: " + oldIsland + " -> " + island, !Config.debug);
+            Logger.debug("Island changed: " + oldIsland + " -> " + island);
             break;
         }
     }

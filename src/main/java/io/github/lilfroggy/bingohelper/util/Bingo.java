@@ -34,7 +34,7 @@ public class Bingo {
 
         GuideUpdater.check(Config.autoImport);
         Guide.reset();
-        if (Config.debug) Logger.info("Created bingo profile");
+        Logger.debug("Created bingo profile");
     }
 
     public static void updateRank(int tick) {
@@ -52,7 +52,7 @@ public class Bingo {
         
         Config.bingoRank = getRankFromFormatting(formatting);
         Events.CLIENT_TICK_END.unregister(UPDATE_RANK);
-        Logger.info("Set bingo rank: " + Config.bingoRank, !Config.debug);
+        Logger.debug("Set bingo rank: " + Config.bingoRank);
     }
 
     private static int getRankFromFormatting(ChatFormatting formatting) {

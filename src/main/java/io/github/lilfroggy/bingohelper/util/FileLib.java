@@ -2,7 +2,6 @@ package io.github.lilfroggy.bingohelper.util;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.CompletableFuture;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -28,17 +27,15 @@ public class FileLib {
     }
 
     public static void write(String path, String string) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                Path p = Path.of(path);
-                Path parent = p.getParent();
-                if (parent != null) {
-                    Files.createDirectories(parent);
-                }
-                Files.writeString(p, string);
-            } catch (Exception e) {
-                Logger.error("Error writing to " + path, e);
+        try {
+            Path p = Path.of(path);
+            Path parent = p.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
             }
-        });
+            Files.writeString(p, string);
+        } catch (Exception e) {
+            Logger.error("Error writing to " + path, e);
+        }
     }
 }

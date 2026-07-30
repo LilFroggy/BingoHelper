@@ -6,6 +6,7 @@ import io.github.lilfroggy.bingohelper.guide.step.Step;
 import net.minecraft.client.player.LocalPlayer;
 
 public class ExperienceStep extends Step implements ClientTickEndEvent {
+    private int previousLevel;
 
     public int level;
 
@@ -40,7 +41,10 @@ public class ExperienceStep extends Step implements ClientTickEndEvent {
     @Override
     public void onClientTickEnd(int tick) {
         if (!(CLIENT.player instanceof LocalPlayer player)) return;
+        if (player.experienceLevel == previousLevel) return;
         if (player.experienceLevel >= level) complete();
+        previousLevel = player.experienceLevel;
+        onProgress();
     }
 
 }

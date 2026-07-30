@@ -8,7 +8,6 @@ import gg.essential.vigilance.data.Property;
 import gg.essential.vigilance.data.PropertyData;
 import gg.essential.vigilance.data.PropertyType;
 import gg.essential.vigilance.data.SortingBehavior;
-import io.github.lilfroggy.bingohelper.guide.ActiveSteps;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundPlayerInfoPacket;
 import net.minecraft.client.Minecraft;
@@ -100,6 +99,14 @@ public class Config extends Vigilant {
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Instructions Only",
+        description = "Hides extra info about the guide",
+        category = "Guide"
+    )
+    public static boolean instructionsOnly = false;
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Puzzler Solver",
         description = "Show solution to puzzler's quest",
         category = "Other"
@@ -107,24 +114,6 @@ public class Config extends Vigilant {
     public static boolean puzzlerSolver = true;
 
     // PERSISTENT DATA
-
-    @Property(
-        type = PropertyType.NUMBER,
-        name = "Saved Index",
-        category = "Dev",
-        min = 0,
-        max = Integer.MAX_VALUE,
-        hidden = true
-    )
-    public static int savedIndex = 0;
-
-    @Property(
-        type = PropertyType.TEXT,
-        name = "Saved Indices",
-        category = "Dev",
-        hidden = true
-    )
-    public static String activeIndices = "";
 
     @Property(
         type = PropertyType.TEXT,
@@ -239,11 +228,6 @@ public class Config extends Vigilant {
         );
         
         initialize();
-
-        registerListener("guide", (state) -> {
-            if ((boolean) state) ActiveSteps.activateAll();
-            else ActiveSteps.deactivateAll();
-        });
     }
 
     public static void save() {

@@ -50,6 +50,8 @@ public class HasStep extends Step implements ClientTickEndEvent {
     public void onClientTickEnd(int tick) {
         if (!(CLIENT.player instanceof LocalPlayer player)) return;
         if (player.tickCount < 20) return;
-        if (items.hasAll()) complete();
+        if (!items.update()) return;
+        onProgress();
+        if (items.allDone()) complete();
     }
 }

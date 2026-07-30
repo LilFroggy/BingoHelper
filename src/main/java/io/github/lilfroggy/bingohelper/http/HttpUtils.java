@@ -7,7 +7,6 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
-import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.util.Logger;
 
 public class HttpUtils {
@@ -27,11 +26,11 @@ public class HttpUtils {
     
         sendAsync(builder.build(), response -> {
             if (response.statusCode() == 304) {
-                Logger.info("Data is §cunchanged§r for: §7" + url, !Config.debug);
+                Logger.debug("Data is §cunchanged§r for: §7" + url);
                 onUnchanged.run();
             }
             else if (response.statusCode() == 200) {
-                Logger.info("Data §achanged§r for: §7" + url, !Config.debug);
+                Logger.debug("Data §achanged§r for: §7" + url);
                 String newETag = response.headers().firstValue("ETag").orElse(null);
                 ETagResponseData data = new ETagResponseData(response, newETag, response.body());
                 onChanged.accept(data);
