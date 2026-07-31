@@ -113,15 +113,17 @@ public class ActiveSteps {
     }
 
     public static void removeAllEffectiveBefore(int index) {
-        active.stream()
-            .filter(step -> step.effectiveAt() < index)
-            .forEach(ActiveSteps::remove);
+        var toRemove = active.stream()
+            .filter(step -> step.effectiveAt() < index);
+            
+        toRemove.forEach(ActiveSteps::remove);
     }
 
     public static void removeAllRegisteredAfter(int index) {
-        active.stream()
-            .filter(step -> step.registrationIndex() > index)
-            .forEach(ActiveSteps::remove);
+        var toRemove = active.stream()
+            .filter(step -> step.registrationIndex() > index);
+        
+        toRemove.forEach(ActiveSteps::remove);
     }
 
     public static void activateAll() {
