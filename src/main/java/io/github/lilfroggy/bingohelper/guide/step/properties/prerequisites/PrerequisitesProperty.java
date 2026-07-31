@@ -1,5 +1,7 @@
 package io.github.lilfroggy.bingohelper.guide.step.properties.prerequisites;
 
+import org.jetbrains.annotations.Nullable;
+
 import io.github.lilfroggy.bingohelper.guide.ActiveSteps;
 import io.github.lilfroggy.bingohelper.guide.GuideSaver;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
@@ -72,7 +74,8 @@ public class PrerequisitesProperty {
         }
     }
 
+    @Nullable
     public String command() {
-        return current.command;
+        return current != null ? current.command : null;
     }
 }

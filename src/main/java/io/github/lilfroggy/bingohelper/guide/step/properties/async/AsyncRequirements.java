@@ -60,7 +60,7 @@ public class AsyncRequirements implements DwarvenEventStartEvent, DwarvenEventEn
 
         //Logger.info(step.globallyFormatted() + ": " + areMet);
         
-        if (areMet != wasMet) onChangePriority(areMet);
+        if (areMet != wasMet) onStateChange(areMet);
 
         if (isNotifying) return areMet;
         
@@ -74,8 +74,10 @@ public class AsyncRequirements implements DwarvenEventStartEvent, DwarvenEventEn
         return areMet;
     }
 
-    public void onChangePriority(boolean isPriority) {
-        ActiveSteps.setPriority(step, isPriority);
+    public void onStateChange(boolean isMet) {
+        ActiveSteps.setPriority(step, isMet);
+        if (isMet) step.registerListeners();
+        else step.unregisterListeners();
     }
 
     public boolean entityExists() {

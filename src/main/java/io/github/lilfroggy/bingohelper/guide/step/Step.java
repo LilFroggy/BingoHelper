@@ -98,6 +98,10 @@ public abstract class Step {
         return async != null && async.hasRequirements();
     }
 
+    public boolean meetsRequirements() {
+        return async == null || async.meetsRequirements();
+    }
+
     public boolean isPriority() {
         return isPriority;
     }
@@ -142,6 +146,7 @@ public abstract class Step {
 
     public final void complete() {
         if (isComplete) return;
+        
         isComplete = true;
 
         ActiveSteps.remove(this);
@@ -165,22 +170,41 @@ public abstract class Step {
         else Guide.advance();
     }
 
-    public final void activate() {
-        if (!Config.guide) return;
-        if (!Skyblock.inBingo()) return;
-        if (isActive) return;
-        isActive = true;
-        isComplete = false;
-
+    public final void registerListeners() {
         if (prerequisites != null) prerequisites.register(this);
-        if (navTo != null) navTo.register();
+        if (navTo != null) navTo.register(outlineEntities);
         if (outlineEntities != null) outlineEntities.forEach(p -> p.register());
         if (highlightSlots != null) highlightSlots.forEach(p -> p.register());
         if (waypoint != null) waypoint.register(outlineEntities);
         if (bingoRanks != null) bingoRanks.register(this);
+
+        onActivate();
+    }
+
+    public final void unregisterListeners() {
+        if (navTo != null) navTo.unregister();
+        if (outlineEntities != null) outlineEntities.forEach(OutlineEntitiesProperty::unregister);
+        if (highlightSlots != null) highlightSlots.forEach(HighlightSlotsProperty::unregister);
+        if (waypoint != null) waypoint.unregister();
+        if (bingoRanks != null) bingoRanks.unregister();
+        if (prerequisites != null) prerequisites.unregister();
+        GlowingEntities.clear();
+
+        onDeactivate();
+    }
+
+    public final void activate() {
+        if (!Config.guide) return;
+        if (!Skyblock.inBingo()) return;
+        if (isActive) return;
+
+        isActive = true;
+        isComplete = false;
+        startTimeMs = System.currentTimeMillis();
+
         if (async != null) async.register(this);
 
-        startTimeMs = System.currentTimeMillis();
+        if (!hasRequirements()) registerListeners();
 
         onActivate();
         Logger.debug("Activated: " + this.getClass().getSimpleName() + this.hashCode());
@@ -188,16 +212,12 @@ public abstract class Step {
 
     public final void deactivate() {
         if (!isActive) return;
+
         isActive = false;
 
-        if (navTo != null) navTo.unregister();
-        if (outlineEntities != null) outlineEntities.forEach(OutlineEntitiesProperty::unregister);
-        if (highlightSlots != null) highlightSlots.forEach(HighlightSlotsProperty::unregister);
-        if (waypoint != null) waypoint.unregister();
-        if (bingoRanks != null) bingoRanks.unregister();
         if (async != null) async.unregister();
-        if (prerequisites != null) prerequisites.unregister();
-        GlowingEntities.clear();
+        
+        unregisterListeners();
 
         onDeactivate();
         Logger.debug("Deactivated: " + this.getClass().getSimpleName() + this.hashCode());

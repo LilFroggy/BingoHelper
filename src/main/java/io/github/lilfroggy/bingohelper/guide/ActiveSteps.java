@@ -139,6 +139,10 @@ public class ActiveSteps {
         dirty = true;
     }
 
+    public static boolean isEmpty() {
+        return active.isEmpty();
+    }
+
     public static int priorityAmount() {
         return priority.size();
     }
@@ -186,13 +190,6 @@ public class ActiveSteps {
     public static String getCommand() {
         String command = getUnformattedCommand();
         return command != null ? command.replaceAll("%visitIsland%", Config.visitIsland) : null;
-    }
-
-    public static boolean anyOutlineEntityExists() {
-        return active.stream().anyMatch(step -> {
-            if (step.outlineEntities == null) return false;
-            return step.outlineEntities.stream().anyMatch(outlinEntity -> outlinEntity.hasMatch());
-        });
     }
 
     public static void clear() {

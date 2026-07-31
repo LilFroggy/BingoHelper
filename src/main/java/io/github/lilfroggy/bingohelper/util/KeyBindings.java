@@ -8,7 +8,6 @@ import io.github.lilfroggy.bingohelper.BingoHelper;
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.guide.ActiveSteps;
-import io.github.lilfroggy.bingohelper.guide.Guide;
 
 public class KeyBindings {
     public static final KeyMapping.Category BINGO_HELPER_CATEGORY = KeyMapping.Category.register(BingoHelper.id("main"));
@@ -30,7 +29,7 @@ public class KeyBindings {
     public static void onClientTickEnd(int tick) {
         if (!Skyblock.inBingo()) return;
         if (!Config.guide) return;
-        if (Guide.isCompleted()) return;
+        if (ActiveSteps.isEmpty()) return;
 
         String command = ActiveSteps.getCommand();
         if (command == null) return;

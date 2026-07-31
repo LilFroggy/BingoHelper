@@ -1,22 +1,27 @@
 package io.github.lilfroggy.bingohelper.guide.step.properties.navTo;
 
+import java.util.List;
+
 import io.github.lilfroggy.bingohelper.command.CommandHandler;
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.IslandChangeEvent;
-import io.github.lilfroggy.bingohelper.guide.ActiveSteps;
+import io.github.lilfroggy.bingohelper.guide.step.properties.outlineEntities.OutlineEntitiesProperty;
 import io.github.lilfroggy.bingohelper.util.ChatLib;
 
 public class NavToProperty implements ClientTickEndEvent, IslandChangeEvent {
     private static final String START_NAV_COMMAND = "shnav";
     private static final String STOP_NAV_COMMAND = "shstopnavigation";
 
+    public List<OutlineEntitiesProperty> outlineEntities;
     public String navTo;
 
     private boolean isNavigating = false;
     private int cooldown = 0;
 
-    public void register() {
+    public void register(List<OutlineEntitiesProperty> outlineEntities) {
+        this.outlineEntities = outlineEntities;
+
         if (!commandsExist()) {
             ChatLib.chat("§cInstall SkyHanni to enable navigation!");
             return;
@@ -34,11 +39,16 @@ public class NavToProperty implements ClientTickEndEvent, IslandChangeEvent {
         stopNav();
     }
 
+    private boolean outlineEntityExists() {
+        if (outlineEntities == null) return false;
+        return outlineEntities.stream().anyMatch(e -> e.hasMatch());
+    }
+
     public void updateNav() {
-        if (!isNavigating && !ActiveSteps.anyOutlineEntityExists()) {
+        if (!isNavigating && !outlineEntityExists()) {
             startNav();
         }
-        else if (isNavigating && ActiveSteps.anyOutlineEntityExists()) {
+        else if (isNavigating && outlineEntityExists()) {
             stopNav();
         }
     }
