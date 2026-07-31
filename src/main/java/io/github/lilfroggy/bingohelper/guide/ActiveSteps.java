@@ -114,7 +114,7 @@ public class ActiveSteps {
 
     public static void removeAllEffectiveBefore(int index) {
         active.stream()
-            .filter(step -> step.effectiveIndex() < index)
+            .filter(step -> step.effectiveAt() < index)
             .forEach(ActiveSteps::remove);
     }
 

@@ -5,10 +5,12 @@ import io.github.lilfroggy.bingohelper.guide.step.Step;
 
 public class AsyncProperty {
     
-    public Integer effectiveIndex = Integer.MAX_VALUE;
+    public Integer effectiveIn;
+    public Integer effectiveAt = Integer.MAX_VALUE;
     public AsyncRequirements requirements;
 
     public void register(Step step) {
+        if (effectiveIn != null) effectiveAt = step.index + effectiveIn;
         if (requirements != null) requirements.register(step);
     }
 
@@ -17,11 +19,11 @@ public class AsyncProperty {
     }
 
     public boolean isBlocking() {
-        return Guide.index() >= effectiveIndex();
+        return Guide.index() >= effectiveAt();
     }
 
-    public int effectiveIndex() {
-        return effectiveIndex == null ? Integer.MAX_VALUE : effectiveIndex;
+    public int effectiveAt() {
+        return effectiveAt;
     }
 
     public boolean hasRequirements() {

@@ -12,6 +12,7 @@ public class GuideImporter {
     public static void importGuide(String guide) {
         GuideData data = GuideParser.toGuideData(guide);
         if (data == null) return;
+        ActiveSteps.clear();
         GuideInfo old = new GuideInfo(Guide.name, Guide.version);
         setGuideData(data);
         GuideNavigator.reset();

@@ -46,17 +46,22 @@ public class HasList {
         boolean updated = false;
 
         for (var item : entrySet()) {
-            String id = item.getKey();
             HasInfo info = item.getValue();
-
-            info.count = ItemUtils.getCount(id);
 
             if (info.done()) continue;
 
-            if (info.hasEnough()) {
-                info.done = true;
-                updated = true;
-            }
+            String id = item.getKey();
+
+            int previous = info.count;
+            int count = ItemUtils.getCount(id);
+            if (count == previous) continue;
+            
+            updated = true;
+            info.count = count;
+
+            if (!info.hasEnough()) continue;
+            
+            info.done = true;
         }
         return updated;
     }

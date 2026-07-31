@@ -86,8 +86,8 @@ public abstract class Step {
         return index;
     }
 
-    public int effectiveIndex() {
-        return isAsync() ? async.effectiveIndex() : registrationIndex();
+    public int effectiveAt() {
+        return isAsync() ? async.effectiveAt() : registrationIndex();
     }
 
     public boolean isHidden() {
