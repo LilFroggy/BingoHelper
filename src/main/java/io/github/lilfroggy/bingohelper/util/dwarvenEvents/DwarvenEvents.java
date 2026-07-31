@@ -1,23 +1,34 @@
 package io.github.lilfroggy.bingohelper.util.dwarvenEvents;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import com.google.gson.Gson;
 
 import io.github.lilfroggy.bingohelper.Client;
 import io.github.lilfroggy.bingohelper.events.EventHandler;
+import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.http.HttpUtils;
 //import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.dwarvenEvents.interfaces.DwarvenEventEndEvent;
 import io.github.lilfroggy.bingohelper.util.dwarvenEvents.interfaces.DwarvenEventStartEvent;
 
 public class DwarvenEvents {
+    private static final Set<String> participated = new HashSet<>();
+
+    private static final String GOBLIN_RAID_SUCCESS = "WOW! All";
+    private static final String GOBLIN_RAID_FAIL = "OOF! Players";
+    private static final String RAFFLE_PARTICIPATE = "COOL! You personally";
+
     public static final EventHandler<DwarvenEventStartEvent> ON_START = new EventHandler<>();
     public static final EventHandler<DwarvenEventEndEvent> ON_END = new EventHandler<>();
 
@@ -29,6 +40,7 @@ public class DwarvenEvents {
     private static long lastUpdate;
 
     static {
+        Events.MESSAGE.register(DwarvenEvents::onMessage);
         SCHEDULER.scheduleAtFixedRate(DwarvenEvents::update, 0, 60, TimeUnit.SECONDS);
     }
 
@@ -101,16 +113,21 @@ public class DwarvenEvents {
         HttpUtils.sendAsync("https://api.soopy.dev/skyblock/chevents/get", response -> {
             SoopyResponse res = GSON.fromJson(response.body(), SoopyResponse.class);
             Map<String, Event> data = res.data.event_datas.DWARVEN_MINES;
+
+            participated.removeIf(key -> !data.containsKey(key));
             
             active.keySet().removeIf(name -> {
                 boolean ended = data.keySet().stream().noneMatch(key -> key.equals(name));
-                if (ended) {
-                    ON_END.invoke(listener -> listener.onDwarvenEventEnd(name));
-                }
+                if (ended) ON_END.invoke(listener -> listener.onDwarvenEventEnd(name));
                 return ended;
             });
 
-            data.forEach((name, event) -> {
+            for (var entry : data.entrySet()) {
+                final String name = entry.getKey();
+                final Event event = entry.getValue();
+
+                if (participated.contains(name)) continue;
+
                 event.type = DwarvenEvent.fromString(name);
                 event.name = name;
                 event.displayName = event.type.displayName();
@@ -125,7 +142,7 @@ public class DwarvenEvents {
                 scheduleExpiration(event);
 
                 //Logger.debug("DwarvenEvent: " + event.toString());
-            });
+            }
 
             lastUpdate = System.currentTimeMillis();
         });
@@ -173,5 +190,19 @@ public class DwarvenEvents {
             display += "\n" + event.toString();
         }
         return display;
+    }
+
+    public static void onMessage(String formattedMsg, String unformattedMsg, CallbackInfo ci) {
+        String msg = unformattedMsg.strip();
+
+        if (msg.startsWith(GOBLIN_RAID_SUCCESS) || msg.startsWith(GOBLIN_RAID_FAIL)) {
+            participated.add(DwarvenEvent.GOBLIN_RAID.name());
+            endEvent(DwarvenEvent.GOBLIN_RAID.name());
+        }
+
+        else if (msg.startsWith(RAFFLE_PARTICIPATE)) {
+            participated.add(DwarvenEvent.RAFFLE.name());
+            endEvent(DwarvenEvent.RAFFLE.name());
+        }
     }
 }
