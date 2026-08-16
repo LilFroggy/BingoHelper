@@ -235,8 +235,7 @@ public class ActiveSteps {
         if (!dirty) return;
         dirty = false;
 
-        String newString = getDisplay();
-        display.setString(newString);
+        display.setString(getDisplay());
         Logger.debug("updated guide display");
     }
 

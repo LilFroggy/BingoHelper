@@ -128,19 +128,19 @@ public class ChatLib {
         showTitle(title, null);
     }
 
-    public static String formatDuration(long totalSeconds) {
-        long hours = totalSeconds / 3600;
-        long minutes = (totalSeconds % 3600) / 60;
-        long seconds = totalSeconds % 60;
+    public static String formatSeconds(long seconds) {
+        long h = seconds / 3600;
+        long m = (seconds % 3600) / 60;
+        long s = seconds % 60;
 
         StringBuilder timeString = new StringBuilder();
-        if (hours > 0) {
-            timeString.append(hours).append("h ");
+        if (h > 0) {
+            timeString.append(h).append("h ");
         }
-        if (minutes > 0 || hours > 0) {
-            timeString.append(minutes).append("m ");
+        if (m > 0 || h > 0) {
+            timeString.append(m).append("m ");
         }
-        timeString.append(seconds).append("s");
+        timeString.append(s).append("s");
 
         return timeString.toString().trim();
     }

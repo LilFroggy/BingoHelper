@@ -157,7 +157,7 @@ public abstract class Step {
 
         String message = Messages.STEP_COMPLETE.formatted(
             ChatLib.replaceAmpersands(globallyFormatted().replaceAll("\n", " ")), 
-            ChatLib.formatDuration(elapsedSeconds)
+            ChatLib.formatSeconds(elapsedSeconds)
         );
 
         Scheduler.SCHEDULER.schedule(() -> {
