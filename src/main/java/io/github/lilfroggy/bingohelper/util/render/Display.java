@@ -117,7 +117,7 @@ public class Display {
         this.rectW = (maxWidth + (padding * 2)) * scale;
         this.rectH = ((lineCount * lineHeight) - LINE_SPACING + (padding * 2)) * scale;
 
-        if (background) drawBackground(graphics, 0x40000000);
+        if (background) drawBackground(graphics, 0x80000000);
 
         graphics.pose().pushMatrix();
         graphics.pose().translate((float) x, (float) y);

@@ -9,25 +9,32 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.google.gson.Gson;
 
 import io.github.lilfroggy.bingohelper.Client;
+import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.EventHandler;
 import io.github.lilfroggy.bingohelper.events.Events;
+import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
+import io.github.lilfroggy.bingohelper.events.interfaces.RenderHudEvent;
 import io.github.lilfroggy.bingohelper.http.HttpUtils;
-//import io.github.lilfroggy.bingohelper.util.Logger;
+import io.github.lilfroggy.bingohelper.hud.HudDisplay;
+import io.github.lilfroggy.bingohelper.util.Logger;
+import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.dwarvenEvents.interfaces.DwarvenEventEndEvent;
 import io.github.lilfroggy.bingohelper.util.dwarvenEvents.interfaces.DwarvenEventStartEvent;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class DwarvenEvents {
-    private static final Set<String> participated = new HashSet<>();
+    private static final ClientTickEndEvent CLIENT_TICK_END = DwarvenEvents::onClientTickEnd;
+    private static final RenderHudEvent RENDER_HUD = DwarvenEvents::onRenderHud;
 
-    private static final String GOBLIN_RAID_SUCCESS = "WOW! All";
-    private static final String GOBLIN_RAID_FAIL = "OOF! Players";
-    private static final String RAFFLE_PARTICIPATE = "COOL! You personally";
+    private static final Set<String> participated = new HashSet<>();
 
     public static final EventHandler<DwarvenEventStartEvent> ON_START = new EventHandler<>();
     public static final EventHandler<DwarvenEventEndEvent> ON_END = new EventHandler<>();
@@ -35,89 +42,41 @@ public class DwarvenEvents {
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
     private static final Gson GSON = new Gson();
 
+    private static final HudDisplay display = new HudDisplay("", "dwarvenEvents", () -> Config.dwarvenEvents);
     private static final Map<String, Event> active = new LinkedHashMap<>();
     private static final Map<String, ScheduledFuture<?>> expirationTasks = new HashMap<>();
+    private static final int UPDATE_INTERVAL_MS = 60000;
     private static long lastUpdate;
 
     static {
-        Events.MESSAGE.register(DwarvenEvents::onMessage);
-        SCHEDULER.scheduleAtFixedRate(DwarvenEvents::update, 0, 60, TimeUnit.SECONDS);
-    }
-
-    public class SoopyResponse {
-        public SoopyData data;
-    }
-    
-    public class SoopyData {
-        public EventDatas event_datas;
-    }
-    
-    public class EventDatas {
-        public Map<String, Event> DWARVEN_MINES;
-    }
-    
-    public class Event {
-        transient public DwarvenEvent type;
-        transient public String name;
-        transient public String displayName;
-        public long starts_at_max;
-        public long ends_at_max;
-
-        public String displayTime() {
-            long now = System.currentTimeMillis();
-            
-            if (now < starts_at_max) {
-                long remaining = (starts_at_max - now) / 1000;
-                return "§a" + formatTime(remaining);
-            }
-            else if (now < ends_at_max) {
-                long remaining = (ends_at_max - now) / 1000;
-                return "§6" + formatTime(remaining);
-            } 
-            else {
-                return "§cEnded";
-            }
+        if (Config.dwarvenEvents) {
+            Events.CLIENT_TICK_END.register(CLIENT_TICK_END);
+            Events.RENDER_HUD.register(RENDER_HUD);
         }
 
-        private String formatTime(long seconds) {
-            long minutes = seconds / 60;
-            long remainingSeconds = seconds % 60;
-            
-            if (minutes > 0) {
-                return minutes + "m " + remainingSeconds + "s";
+        Config.INSTANCE.registerListener("dwarvenEvents", state -> {
+            if ((boolean) state) {
+                Events.RENDER_HUD.register(RENDER_HUD);
+                Events.CLIENT_TICK_END.register(CLIENT_TICK_END);
             } else {
-                return remainingSeconds + "s";
+                Events.RENDER_HUD.unregister(RENDER_HUD);
+                Events.CLIENT_TICK_END.unregister(CLIENT_TICK_END);
             }
-        }
+        });
 
-        public String displayString() {
-            return displayName + " &r&7(" + displayTime() + "&r&7)"; 
-        }
-
-        public boolean isRunning() {
-            return System.currentTimeMillis() < ends_at_max;
-        }
-
-        public String toString() {
-            return "{" +
-                    "\n  type: " + type.toString() +
-                    "\n  name: " + name +
-                    "\n  displayName: " + displayName +
-                    "\n  starts_in_max: " + formatTime((starts_at_max - System.currentTimeMillis()) / 1000) +
-                    "\n  ends_in_max: " + formatTime((ends_at_max - System.currentTimeMillis()) / 1000) +
-                    "\n}";
-        }
+        Events.MESSAGE.register(DwarvenEvents::onMessage);
+        SCHEDULER.scheduleAtFixedRate(DwarvenEvents::update, 0, UPDATE_INTERVAL_MS, TimeUnit.MILLISECONDS);
     }
 
     public static void update() {
         HttpUtils.sendAsync("https://api.soopy.dev/skyblock/chevents/get", response -> {
-            SoopyResponse res = GSON.fromJson(response.body(), SoopyResponse.class);
+            Response res = GSON.fromJson(response.body(), Response.class);
             Map<String, Event> data = res.data.event_datas.DWARVEN_MINES;
 
             participated.removeIf(key -> !data.containsKey(key));
             
             active.keySet().removeIf(name -> {
-                boolean ended = data.keySet().stream().noneMatch(key -> key.equals(name));
+                boolean ended = !data.containsKey(name);
                 if (ended) ON_END.invoke(listener -> listener.onDwarvenEventEnd(name));
                 return ended;
             });
@@ -128,7 +87,7 @@ public class DwarvenEvents {
 
                 if (participated.contains(name)) continue;
 
-                event.type = DwarvenEvent.fromString(name);
+                event.type = Type.of(name);
                 event.name = name;
                 event.displayName = event.type.displayName();
 
@@ -139,17 +98,17 @@ public class DwarvenEvents {
 
                 active.put(name, event);
 
-                scheduleExpiration(event);
+                scheduleRemoval(event);
 
-                //Logger.debug("DwarvenEvent: " + event.toString());
+                //Logger.debug("Received Dwarven Event: " + event.toString());
             }
 
             lastUpdate = System.currentTimeMillis();
         });
     }
 
-    private static void scheduleExpiration(Event event) {
-        cancelExpirationTask(event.name);
+    private static void scheduleRemoval(Event event) {
+        cancelRemoval(event.name);
 
         long delay = event.ends_at_max - System.currentTimeMillis();
         if (delay <= 0) {
@@ -166,7 +125,7 @@ public class DwarvenEvents {
         expirationTasks.put(event.name, future);
     }
 
-    private static void cancelExpirationTask(String name) {
+    private static void cancelRemoval(String name) {
         ScheduledFuture<?> existingTask = expirationTasks.remove(name);
         if (existingTask == null) return;
         existingTask.cancel(false);
@@ -176,33 +135,70 @@ public class DwarvenEvents {
         active.remove(name);
         expirationTasks.remove(name);
         ON_END.invoke(listener -> listener.onDwarvenEventEnd(name));
+        updateDisplay();
     }
 
     public static boolean isActive(String name) {
-        if (name == null) return false;
-        Event event = active.get(name);
-        return event != null && event.isRunning();
+        return active.containsKey(name);
     }
 
-    public static String getActive() {
-        String display = "Update in: &a" + ((lastUpdate + 60000 - System.currentTimeMillis()) / 1000) + "s&r";
-        for (var event : active.values()) {
-            display += "\n" + event.toString();
-        }
-        return display;
+    public static boolean isActive(Type type) {
+        return active.containsKey(type.name());
     }
 
     public static void onMessage(String formattedMsg, String unformattedMsg, CallbackInfo ci) {
+        if (!"Dwarven Mines".equals(Skyblock.area())) return;
+
         String msg = unformattedMsg.strip();
 
-        if (msg.startsWith(GOBLIN_RAID_SUCCESS) || msg.startsWith(GOBLIN_RAID_FAIL)) {
-            participated.add(DwarvenEvent.GOBLIN_RAID.name());
-            endEvent(DwarvenEvent.GOBLIN_RAID.name());
+        for (var type : Type.active()) {
+            for (var participationMessage : type.participationMessages()) {
+                if (msg.startsWith(participationMessage)) {
+                    participated.add(type.name());
+                    endEvent(type.name());
+                    return;
+                }
+            }
         }
+    }
 
-        else if (msg.startsWith(RAFFLE_PARTICIPATE)) {
-            participated.add(DwarvenEvent.RAFFLE.name());
-            endEvent(DwarvenEvent.RAFFLE.name());
+    public static void onClientTickEnd(int tick) {
+        if (tick % 20 != 0) return;
+        if (!Config.debug && active.isEmpty()) return;
+
+        updateDisplay();
+    }
+
+    public static long secondsTillUpdate() {
+        return (lastUpdate + UPDATE_INTERVAL_MS - System.currentTimeMillis()) / 1000;
+    }
+
+    private static final StringBuilder body = new StringBuilder();
+
+    public static String getDisplay() {
+        body.setLength(0);
+
+        if (Config.debug) {
+            body.append("Update in: &a").append(secondsTillUpdate());
+            if (!active.isEmpty()) body.append("\n");
         }
+        
+        String result = active.values().stream()
+            .map(Event::displayString)
+            .collect(Collectors.joining("\n"));
+
+        body.append(result);
+
+        return body.toString();
+    }
+
+    public static void updateDisplay() {
+        display.setString(getDisplay());
+
+        Logger.debug("updated dwarven events display");
+    }
+
+    public static void onRenderHud(GuiGraphicsExtractor graphics, DeltaTracker tickDelta) {
+        display.draw(graphics);
     }
 }

@@ -107,6 +107,14 @@ public class Config extends Vigilant {
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Dwarven Events",
+        description = "Displays information about active dwarven events",
+        category = "Other"
+    )
+    public static boolean dwarvenEvents = false;
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Puzzler Solver",
         description = "Show solution to puzzler's quest",
         category = "Other"
