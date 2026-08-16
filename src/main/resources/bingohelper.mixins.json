@@ -8,7 +8,6 @@
 		"ConnectionMixin",
 		"LevelChunkMixin",
 		"ClientPacketListenerMixin",
-		"ChatInterceptorMixin",
 		"AbstractContainerScreenMixin",
 		"EntityRendererMixin",
 		"EntityMixin",
