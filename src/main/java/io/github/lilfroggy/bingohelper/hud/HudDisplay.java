@@ -96,8 +96,8 @@ public class HudDisplay extends Display {
         setAlign(align);
         int outline = selected ? 0xFFFFFF00 : 0xFFFFFFFF;
         int thickness = selected ? 2 : 1;
-        drawOutline(graphics, outline, thickness);
         draw(graphics, x, y);
+        drawOutline(graphics, outline, thickness);
     }
 
     public void load() {
