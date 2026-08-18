@@ -18,6 +18,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.function.Predicate;
 
 import org.jetbrains.annotations.Nullable;
@@ -59,6 +60,10 @@ public class ActiveSteps {
         Events.CLIENT_TICK_END.unregister(CLIENT_TICK_END);
         Events.RENDER_HUD.unregister(RENDER_HUD);
         deactivateAll();
+    }
+
+    public static List<Step> active() {
+        return List.copyOf(active);
     }
 
     public static void save() {
@@ -114,14 +119,16 @@ public class ActiveSteps {
 
     public static void removeAllEffectiveBefore(int index) {
         var toRemove = active.stream()
-            .filter(step -> step.effectiveAt() < index);
+            .filter(step -> step.effectiveAt() < index)
+            .toList();
             
         toRemove.forEach(ActiveSteps::remove);
     }
 
     public static void removeAllRegisteredAfter(int index) {
         var toRemove = active.stream()
-            .filter(step -> step.registrationIndex() > index);
+            .filter(step -> step.registrationIndex() > index)
+            .toList();
         
         toRemove.forEach(ActiveSteps::remove);
     }

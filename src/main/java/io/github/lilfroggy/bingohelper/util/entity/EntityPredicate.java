@@ -105,7 +105,7 @@ public class EntityPredicate {
 
         boolean newState = !cache.isEmpty();
         if (hasMatch == newState) return;
-        
+
         hasMatch = newState;
         for (var action : callbacks) {
             action.accept(hasMatch);
@@ -159,5 +159,21 @@ public class EntityPredicate {
     @Override
     public int hashCode() {
         return Objects.hash(type, position, skin);
+    }
+
+    @Override
+    public String toString() {
+        EntityPredicate actual = delegate();
+        return "EntityPredicate{" +
+                "type='" + type + '\'' +
+                ", position=" + position +
+                ", skin='" + skin + '\'' +
+                ", line=" + line +
+                ", hasMatch=" + actual.hasMatch() +
+                ", matchesCount=" + actual.getMatches().size() +
+                ", refCount=" + refCount +
+                ", callback=" + actual.callback +
+                ", callbacks=" + actual.callbacks +
+                '}';
     }
 }

@@ -160,7 +160,7 @@ public abstract class Step {
             ChatLib.formatSeconds(elapsedSeconds)
         );
 
-        Scheduler.SCHEDULER.schedule(() -> {
+        Scheduler.schedule(() -> {
             CLIENT.execute(() -> {
                 ChatLib.chat(message);
             });
@@ -232,5 +232,29 @@ public abstract class Step {
         }
         
         return state;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append((this.getClass().getSimpleName())).append("{");
+        
+        if (instruction != null && !instruction.isEmpty()) {
+            sb.append("instruction='").append(instruction).append('\'');
+        }
+        if (command != null) {
+            sb.append(", command='").append(command).append('\'');
+        }
+        
+        if (navTo != null) sb.append(", navTo=").append(navTo);
+        if (waypoint != null) sb.append(", waypoint=").append(waypoint);
+        if (outlineEntities != null && !outlineEntities.isEmpty()) sb.append(", outlineEntities=").append(outlineEntities);
+        if (highlightSlots != null && !highlightSlots.isEmpty()) sb.append(", highlightSlots=").append(highlightSlots);
+        if (bingoRanks != null) sb.append(", bingoRanks=").append(bingoRanks);
+        if (async != null) sb.append(", async=").append(async);
+        if (prerequisites != null) sb.append(", prerequisites=").append(prerequisites);
+        
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -1,9 +1,10 @@
 package io.github.lilfroggy.bingohelper.guide.step.properties.async;
 
 import io.github.lilfroggy.bingohelper.guide.Guide;
+import io.github.lilfroggy.bingohelper.guide.step.Property;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
 
-public class AsyncProperty {
+public class AsyncProperty implements Property {
     
     public Integer effectiveIn;
     public Integer effectiveAt = Integer.MAX_VALUE;
@@ -14,7 +15,7 @@ public class AsyncProperty {
         if (requirements != null) requirements.register(step);
     }
 
-    public void unregister() {
+    public void unregister(Step step) {
         if (requirements != null) requirements.unregister();
     }
 
@@ -36,5 +37,18 @@ public class AsyncProperty {
 
     public boolean isHidden() {
         return !isBlocking() && !meetsRequirements();
+    }
+
+    @Override
+    public String toString() {
+        return "AsyncProperty{" +
+                "effectiveIn=" + effectiveIn +
+                ", effectiveAt=" + effectiveAt +
+                ", isBlocking=" + isBlocking() +
+                ", hasRequirements=" + hasRequirements() +
+                ", meetsRequirements=" + meetsRequirements() +
+                ", isHidden=" + isHidden() +
+                ", requirements=" + requirements +
+                '}';
     }
 }

@@ -48,4 +48,12 @@ public class OutlineEntitiesProperty extends EntityPredicate implements ClientTi
         if (entity == null) return;
         RenderLib.renderLineFromCursor(context, EntityUtils.getEntityMid(entity), DEFAULT_LINE_COLOR);
     }
+
+    @Override
+    public String toString() {
+        return "OutlineEntitiesProperty{" +
+                "matches=" + getMatches().size() +
+                ", lineMode=" + super.line() +
+                '}';
+    }
 }

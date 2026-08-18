@@ -26,4 +26,12 @@ public class HighlightSlotsProperty extends SlotPredicate implements RenderScree
             RenderLib.highlightSlot(graphics, slot, highlightColor());
         });
     }
+
+    @Override
+    public String toString() {
+        return "HighlightSlotsProperty{" +
+                "matches=" + getMatches().size() +
+                ", highlightColor=" + highlightColor() +
+                '}';
+    }
 }

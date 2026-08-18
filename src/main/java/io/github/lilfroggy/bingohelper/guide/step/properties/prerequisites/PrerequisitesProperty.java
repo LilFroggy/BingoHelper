@@ -1,5 +1,7 @@
 package io.github.lilfroggy.bingohelper.guide.step.properties.prerequisites;
 
+import java.util.Arrays;
+
 import org.jetbrains.annotations.Nullable;
 
 import io.github.lilfroggy.bingohelper.guide.ActiveSteps;
@@ -77,5 +79,13 @@ public class PrerequisitesProperty {
     @Nullable
     public String command() {
         return current != null ? current.command : null;
+    }
+
+    @Override
+    public String toString() {
+        return "PrerequisitesProperty{" +
+                "index=" + index +
+                ", steps=" + Arrays.toString(steps) +
+                '}';
     }
 }

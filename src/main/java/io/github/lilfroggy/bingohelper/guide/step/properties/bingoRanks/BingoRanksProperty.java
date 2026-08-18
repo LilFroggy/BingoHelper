@@ -31,4 +31,12 @@ public class BingoRanksProperty implements ClientTickEndEvent {
         }
         if (!ranks.contains(rank)) step.complete();
     }
+
+    @Override
+    public String toString() {
+        return "BingoRanksProperty{" +
+                "ranks=" + ranks +
+                ", userRank=" + Bingo.rank() +
+                '}';
+    }
 }

@@ -1,5 +1,6 @@
 package io.github.lilfroggy.bingohelper.guide.step.properties.waypoint;
 
+import java.util.Arrays;
 import java.util.List;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -65,5 +66,14 @@ public class WaypointProperty implements RenderingEvent {
         }
 
         entry.render(context);
+    }
+
+    @Override
+    public String toString() {
+        return "WaypointProperty{" +
+                "index=" + index +
+                ", isOnLast=" + isOnLast() +
+                ", list=" + Arrays.toString(list) +
+                '}';
     }
 }

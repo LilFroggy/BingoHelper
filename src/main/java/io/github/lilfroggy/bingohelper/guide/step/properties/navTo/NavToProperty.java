@@ -82,4 +82,14 @@ public class NavToProperty implements ClientTickEndEvent, IslandChangeEvent {
     public boolean commandsExist() {
         return CommandHandler.exists(START_NAV_COMMAND) && CommandHandler.exists(STOP_NAV_COMMAND);
     }
+
+    @Override
+    public String toString() {
+        return "NavToProperty{" +
+                "navTo='" + navTo + '\'' +
+                ", isNavigating=" + isNavigating +
+                ", cooldown=" + cooldown +
+                ", commandsExist=" + commandsExist() +
+                '}';
+    }
 }

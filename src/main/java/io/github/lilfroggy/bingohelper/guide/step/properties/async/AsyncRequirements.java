@@ -1,16 +1,19 @@
 package io.github.lilfroggy.bingohelper.guide.step.properties.async;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.github.lilfroggy.bingohelper.config.Config;
 import io.github.lilfroggy.bingohelper.events.Events;
 import io.github.lilfroggy.bingohelper.events.interfaces.RenderHudEvent;
-import io.github.lilfroggy.bingohelper.events.interfaces.SkyblockLevelChangeEvent;
 import io.github.lilfroggy.bingohelper.guide.ActiveSteps;
 import io.github.lilfroggy.bingohelper.guide.step.Step;
-//import io.github.lilfroggy.bingohelper.util.Logger;
-import io.github.lilfroggy.bingohelper.util.Skyblock;
-import io.github.lilfroggy.bingohelper.util.dwarvenEvents.DwarvenEvents;
-import io.github.lilfroggy.bingohelper.util.dwarvenEvents.interfaces.DwarvenEventEndEvent;
-import io.github.lilfroggy.bingohelper.util.dwarvenEvents.interfaces.DwarvenEventStartEvent;
+import io.github.lilfroggy.bingohelper.guide.step.properties.async.requirements.DwarvenEventRequirement;
+import io.github.lilfroggy.bingohelper.guide.step.properties.async.requirements.EntityRequirement;
+import io.github.lilfroggy.bingohelper.guide.step.properties.async.requirements.Requirement;
+import io.github.lilfroggy.bingohelper.guide.step.properties.async.requirements.SkyblockLevelRequirement;
+import io.github.lilfroggy.bingohelper.guide.step.properties.async.requirements.WaitSecondsRequirement;
+import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.entity.EntityPredicate;
 import io.github.lilfroggy.bingohelper.util.render.AnimatedTitle;
 import io.github.lilfroggy.bingohelper.util.render.Display;
@@ -19,8 +22,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.sounds.SoundEvents;
 
-public class AsyncRequirements implements DwarvenEventStartEvent, DwarvenEventEndEvent, SkyblockLevelChangeEvent, RenderHudEvent {
+public class AsyncRequirements implements RenderHudEvent {
     private static final Minecraft CLIENT = Minecraft.getInstance();
+
+    private final List<Requirement> requirements = new ArrayList<>();
 
     public Step step;
     private AnimatedTitle activeTitle;
@@ -32,6 +37,7 @@ public class AsyncRequirements implements DwarvenEventStartEvent, DwarvenEventEn
     public EntityPredicate entity;
     public String dwarvenEvent;
     public Integer skyblockLevel;
+    public Integer waitSeconds;
 
     private long lastNotified = 0;
     private static final long COOLDOWN_MS = 10000;
@@ -39,24 +45,28 @@ public class AsyncRequirements implements DwarvenEventStartEvent, DwarvenEventEn
     public void register(Step step) {
         this.areMet = false;
         this.step = step;
-        if (entity != null) entity.register(hasMatch -> check());
-        if (dwarvenEvent != null) DwarvenEvents.ON_START.register(this);
-        if (dwarvenEvent != null) DwarvenEvents.ON_END.register(this);
-        if (skyblockLevel != null) Events.SKYBLOCK_LEVEL_CHANGE.register(this);
+
+        if (entity != null) requirements.add(new EntityRequirement(entity));
+        if (dwarvenEvent != null) requirements.add(new DwarvenEventRequirement(dwarvenEvent));
+        if (skyblockLevel != null) requirements.add(new SkyblockLevelRequirement(skyblockLevel));
+        if (waitSeconds != null) requirements.add(new WaitSecondsRequirement(waitSeconds));
+
+        requirements.forEach(requirement -> requirement.register(this::check));
+
         check(); // Initial check
     }
 
     public void unregister() {
-        if (entity != null) entity.unregister();
-        if (dwarvenEvent != null) DwarvenEvents.ON_START.unregister(this);
-        if (dwarvenEvent != null) DwarvenEvents.ON_END.unregister(this);
-        if (skyblockLevel != null) Events.SKYBLOCK_LEVEL_CHANGE.unregister(this);
+        requirements.forEach(requirement -> requirement.unregister());
+        requirements.clear();
     }
 
     public boolean check() {
+        ChatLib.chat("checking async requirements");
+
         boolean wasMet = areMet;
         
-        areMet = entityExists() && dwarvenEventActive() && isSkyblockLevel();
+        areMet = requirements.stream().allMatch(requirement -> requirement.isMet());
 
         //Logger.info(step.globallyFormatted() + ": " + areMet);
         
@@ -74,22 +84,10 @@ public class AsyncRequirements implements DwarvenEventStartEvent, DwarvenEventEn
         return areMet;
     }
 
-    public void onStateChange(boolean isMet) {
-        ActiveSteps.setPriority(step, isMet);
-        if (isMet) step.registerListeners();
+    public void onStateChange(boolean meetsRequirements) {
+        ActiveSteps.setPriority(step, meetsRequirements);
+        if (meetsRequirements) step.registerListeners();
         else step.unregisterListeners();
-    }
-
-    public boolean entityExists() {
-        return entity == null || entity.hasMatch();
-    }
-
-    public boolean dwarvenEventActive() {
-        return dwarvenEvent == null || DwarvenEvents.isActive(dwarvenEvent);
-    }
-
-    public boolean isSkyblockLevel() {
-        return skyblockLevel == null || Skyblock.level() >= skyblockLevel;
     }
 
     public boolean areMet() {
@@ -134,17 +132,10 @@ public class AsyncRequirements implements DwarvenEventStartEvent, DwarvenEventEn
     }
 
     @Override
-    public void onDwarvenEventStart(String event) {
-        if (event.equals(dwarvenEvent)) check();
-    }
-
-    @Override
-    public void onDwarvenEventEnd(String event) {
-        if (event.equals(dwarvenEvent)) check();
-    }
-
-    @Override
-    public void onSkyblockLevelChange(int level) {
-        check();
+    public String toString() {
+        return "AsyncRequirements{" +
+                "areMet=" + areMet +
+                ", requirements=" + requirements +
+                '}';
     }
 }

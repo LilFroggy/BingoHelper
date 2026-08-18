@@ -64,4 +64,14 @@ public class WaypointEntry {
         renderLine(context);
         renderText(context);
     }
+
+    @Override
+    public String toString() {
+        return "WaypointEntry{" +
+                "text='" + text + '\'' +
+                ", position=" + position +
+                ", radius=" + radius +
+                ", isWithinRadius=" + isWithinRadius() +
+                '}';
+    }
 }

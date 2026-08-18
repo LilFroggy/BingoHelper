@@ -23,7 +23,6 @@ import io.github.lilfroggy.bingohelper.events.interfaces.ClientTickEndEvent;
 import io.github.lilfroggy.bingohelper.events.interfaces.RenderHudEvent;
 import io.github.lilfroggy.bingohelper.http.HttpUtils;
 import io.github.lilfroggy.bingohelper.hud.HudDisplay;
-import io.github.lilfroggy.bingohelper.util.Logger;
 import io.github.lilfroggy.bingohelper.util.Skyblock;
 import io.github.lilfroggy.bingohelper.util.dwarvenEvents.interfaces.DwarvenEventEndEvent;
 import io.github.lilfroggy.bingohelper.util.dwarvenEvents.interfaces.DwarvenEventStartEvent;
@@ -195,7 +194,7 @@ public class DwarvenEvents {
     public static void updateDisplay() {
         display.setString(getDisplay());
 
-        Logger.debug("updated dwarven events display");
+        //Logger.debug("updated dwarven events display");
     }
 
     public static void onRenderHud(GuiGraphicsExtractor graphics, DeltaTracker tickDelta) {
