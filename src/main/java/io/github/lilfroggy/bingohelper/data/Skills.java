@@ -51,7 +51,7 @@ public class Skills {
     
         if (percentage.find()) {
             String name = percentage.group("name");
-            double percent = Double.parseDouble(percentage.group("percent"));
+            double percent = Double.parseDouble(percentage.group("percent").replace(",", ""));
             double currentIntLevel = Math.floor(getLevel(name));
             double preciseLevel = currentIntLevel + (percent / 100.0);
             set(name, preciseLevel);
