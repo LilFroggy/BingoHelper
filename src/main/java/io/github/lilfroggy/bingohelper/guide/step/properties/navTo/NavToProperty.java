@@ -11,7 +11,7 @@ import io.github.lilfroggy.bingohelper.util.ChatLib;
 
 public class NavToProperty implements ClientTickEndEvent, IslandChangeEvent {
     private static final String START_NAV_COMMAND = "shnav";
-    private static final String STOP_NAV_COMMAND = "shstopnavigation";
+    private static final String STOP_NAV_COMMAND = "shnav stop";
 
     public List<OutlineEntitiesProperty> outlineEntities;
     public String navTo;
