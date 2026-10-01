@@ -10,8 +10,7 @@ import io.github.lilfroggy.bingohelper.guide.step.properties.outlineEntities.Out
 import io.github.lilfroggy.bingohelper.util.ChatLib;
 
 public class NavToProperty implements ClientTickEndEvent, IslandChangeEvent {
-    private static final String START_NAV_COMMAND = "shnav";
-    private static final String STOP_NAV_COMMAND = "shnav stop";
+    private static final String NAV_COMMAND = "shnav";
 
     public List<OutlineEntitiesProperty> outlineEntities;
     public String navTo;
@@ -22,7 +21,7 @@ public class NavToProperty implements ClientTickEndEvent, IslandChangeEvent {
     public void register(List<OutlineEntitiesProperty> outlineEntities) {
         this.outlineEntities = outlineEntities;
 
-        if (!commandsExist()) {
+        if (!commandExists()) {
             ChatLib.chat("§cInstall SkyHanni to enable navigation!");
             return;
         }
@@ -32,7 +31,7 @@ public class NavToProperty implements ClientTickEndEvent, IslandChangeEvent {
     }
 
     public void unregister() {
-        if (!commandsExist()) return;
+        if (!commandExists()) return;
 
         Events.CLIENT_TICK_END.unregister(this);
         Events.CHANGE_ISLAND.unregister(this);
@@ -54,12 +53,12 @@ public class NavToProperty implements ClientTickEndEvent, IslandChangeEvent {
     }
 
     public void startNav() {
-        ChatLib.command(START_NAV_COMMAND + " " + navTo);
+        ChatLib.command(NAV_COMMAND + " " + navTo);
         isNavigating = true;
     }
 
     public void stopNav() {
-        ChatLib.command(STOP_NAV_COMMAND);
+        ChatLib.command(NAV_COMMAND + " stop");
         isNavigating = false;
     }
 
@@ -79,8 +78,8 @@ public class NavToProperty implements ClientTickEndEvent, IslandChangeEvent {
         cooldown = 5; // SkyHanni checks every meaningful tick so waiting 5 should be safe
     }
 
-    public boolean commandsExist() {
-        return CommandHandler.exists(START_NAV_COMMAND) && CommandHandler.exists(STOP_NAV_COMMAND);
+    public boolean commandExists() {
+        return CommandHandler.exists(NAV_COMMAND);
     }
 
     @Override
@@ -89,7 +88,7 @@ public class NavToProperty implements ClientTickEndEvent, IslandChangeEvent {
                 "navTo='" + navTo + '\'' +
                 ", isNavigating=" + isNavigating +
                 ", cooldown=" + cooldown +
-                ", commandsExist=" + commandsExist() +
+                ", commandExists=" + commandExists() +
                 '}';
     }
 }
