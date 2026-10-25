@@ -61,6 +61,8 @@ public class AsyncRequirements implements RenderHudEvent {
     }
 
     public boolean check() {
+        if (!step.isActive()) return false;
+
         boolean wasMet = areMet;
         
         areMet = requirements.stream().allMatch(requirement -> requirement.isMet());

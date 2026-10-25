@@ -1,6 +1,5 @@
 package io.github.lilfroggy.bingohelper.guide.step.properties.async.requirements;
 
-import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.entity.EntityPredicate;
 
 public class EntityRequirement implements Requirement {
@@ -19,7 +18,6 @@ public class EntityRequirement implements Requirement {
 
     @Override
     public void unregister() {
-        ChatLib.chat("unregistering entity requirement");
         if (entity == null) return;
         entity.unregister();
     }
