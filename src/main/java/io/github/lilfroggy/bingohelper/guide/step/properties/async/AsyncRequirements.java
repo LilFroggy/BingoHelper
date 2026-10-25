@@ -13,7 +13,6 @@ import io.github.lilfroggy.bingohelper.guide.step.properties.async.requirements.
 import io.github.lilfroggy.bingohelper.guide.step.properties.async.requirements.Requirement;
 import io.github.lilfroggy.bingohelper.guide.step.properties.async.requirements.SkyblockLevelRequirement;
 import io.github.lilfroggy.bingohelper.guide.step.properties.async.requirements.WaitSecondsRequirement;
-import io.github.lilfroggy.bingohelper.util.ChatLib;
 import io.github.lilfroggy.bingohelper.util.entity.EntityPredicate;
 import io.github.lilfroggy.bingohelper.util.render.AnimatedTitle;
 import io.github.lilfroggy.bingohelper.util.render.Display;
@@ -62,8 +61,6 @@ public class AsyncRequirements implements RenderHudEvent {
     }
 
     public boolean check() {
-        ChatLib.chat("checking async requirements");
-
         boolean wasMet = areMet;
         
         areMet = requirements.stream().allMatch(requirement -> requirement.isMet());
