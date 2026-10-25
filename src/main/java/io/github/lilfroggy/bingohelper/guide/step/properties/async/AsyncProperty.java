@@ -7,10 +7,11 @@ import io.github.lilfroggy.bingohelper.guide.step.Step;
 public class AsyncProperty implements Property {
     
     public Integer effectiveIn;
-    public Integer effectiveAt = Integer.MAX_VALUE;
+    public Integer effectiveAt;
     public AsyncRequirements requirements;
 
     public void register(Step step) {
+        if (effectiveAt == null) effectiveAt = Integer.MAX_VALUE;
         if (effectiveIn != null) effectiveAt = step.index + effectiveIn;
         if (requirements != null) requirements.register(step);
     }
