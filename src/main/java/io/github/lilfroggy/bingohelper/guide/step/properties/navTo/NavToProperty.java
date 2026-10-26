@@ -31,11 +31,12 @@ public class NavToProperty implements ClientTickEndEvent, IslandChangeEvent {
     }
 
     public void unregister() {
-        if (!commandExists()) return;
-
         Events.CLIENT_TICK_END.unregister(this);
         Events.CHANGE_ISLAND.unregister(this);
-        stopNav();
+
+        if (commandExists()) {
+            stopNav();
+        }
     }
 
     private boolean outlineEntityExists() {

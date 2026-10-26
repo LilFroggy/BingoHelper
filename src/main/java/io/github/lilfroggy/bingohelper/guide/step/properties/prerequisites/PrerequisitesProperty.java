@@ -29,13 +29,13 @@ public class PrerequisitesProperty {
     }
 
     public void previous() {
-        current.deactivate();
+        if (current != parent) current.deactivate();
         setIndex(index - 1);
         setCurrent();
     }
 
     public void next() {
-        current.deactivate();
+        if (current != parent) current.deactivate();
         parent.lastProgressMs = System.currentTimeMillis();
         setIndex(index + 1);
         setCurrent();
@@ -54,6 +54,7 @@ public class PrerequisitesProperty {
 
     private void setCurrent() {
         current = current();
+        if (index >= steps.length) return;
         current.parent = parent;
         current.reset();
         current.activate();
