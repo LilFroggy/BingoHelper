@@ -8,33 +8,18 @@ public class Event {
     transient public String displayName;
     public long starts_at_max;
     public long ends_at_max;
-
-    public boolean isDying() {
-        return System.currentTimeMillis() > starts_at_max;
-    }
-
-    public long secondsTillLastStart() {
-        return (starts_at_max - System.currentTimeMillis()) / 1000;
-    }
+    public boolean participated;
 
     public long secondsTillLastEnd() {
         return (ends_at_max - System.currentTimeMillis()) / 1000;
     }
 
-    public String timeTillLastStart() {
-        return "§a" + ChatLib.formatSeconds(secondsTillLastStart());
-    }
-
-    public String timeTillLastEnd() {
-        return "§6" + ChatLib.formatSeconds(secondsTillLastEnd());
-    }
-
     public String time() {
-        return isDying() ? timeTillLastEnd() : timeTillLastStart();
+        return "§6" + ChatLib.formatSecondsShort(secondsTillLastEnd());
     }
 
     public String displayString() {
-        return type.isPassive() ? displayName + " §r§7(" + time() + "§r§7)" : displayName;
+        return type.isPassive() ? displayName + " §r§7(" + time() + "§r§7)" : participated ? "§7" + ChatLib.removeFormatting(displayName) + "§r" : displayName;
     }
 
     public String toString() {
@@ -42,7 +27,6 @@ public class Event {
                 "\n  type: " + type.toString() +
                 "\n  name: " + name +
                 "\n  displayName: " + displayName +
-                "\n  starts_in_max: " + secondsTillLastStart() +
                 "\n  ends_in_max: " + secondsTillLastEnd() +
                 "\n}";
     }

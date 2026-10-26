@@ -145,6 +145,20 @@ public class ChatLib {
         return timeString.toString().trim();
     }
 
+    public static String formatSecondsShort(long seconds) {
+        long h = seconds / 3600;
+        long m = (seconds % 3600) / 60;
+        long s = seconds % 60;
+    
+        if (h > 0) {
+            return h + "h";
+        } else if (m > 0) {
+            return m + "m";
+        } else {
+            return s + "s";
+        }
+    }
+
     /**
      * Converts Title Case to snake_case.
      * E.g. "Green Thumb" -> "green_thumb", "Zooming" -> "zooming"

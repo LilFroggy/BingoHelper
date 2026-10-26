@@ -1,10 +1,8 @@
 package io.github.lilfroggy.bingohelper.util.dwarvenEvents;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -32,8 +30,6 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 public class DwarvenEvents {
     private static final ClientTickEndEvent CLIENT_TICK_END = DwarvenEvents::onClientTickEnd;
     private static final RenderHudEvent RENDER_HUD = DwarvenEvents::onRenderHud;
-
-    private static final Set<String> participated = new HashSet<>();
 
     public static final EventHandler<DwarvenEventStartEvent> ON_START = new EventHandler<>();
     public static final EventHandler<DwarvenEventEndEvent> ON_END = new EventHandler<>();
@@ -71,8 +67,6 @@ public class DwarvenEvents {
         HttpUtils.sendAsync("https://api.soopy.dev/skyblock/chevents/get", response -> {
             Response res = GSON.fromJson(response.body(), Response.class);
             Map<String, Event> data = res.data.event_datas.DWARVEN_MINES;
-
-            participated.removeIf(key -> !data.containsKey(key));
             
             active.keySet().removeIf(name -> {
                 boolean ended = !data.containsKey(name);
@@ -84,19 +78,17 @@ public class DwarvenEvents {
                 final String name = entry.getKey();
                 final Event event = entry.getValue();
 
-                if (participated.contains(name)) continue;
-
                 event.type = Type.of(name);
                 event.name = name;
                 event.displayName = event.type.displayName();
 
-                boolean isNew = !active.containsKey(name);
-                if (isNew) {
+                if (active.containsKey(name)) {
+                    event.participated = active.get(name).participated;
+                } else {
                     ON_START.invoke(listener -> listener.onDwarvenEventStart(name));
                 }
 
                 active.put(name, event);
-
                 scheduleRemoval(event);
 
                 //Logger.debug("Received Dwarven Event: " + event.toString());
@@ -153,8 +145,12 @@ public class DwarvenEvents {
         for (var type : Type.active()) {
             for (var participationMessage : type.participationMessages()) {
                 if (msg.startsWith(participationMessage)) {
-                    participated.add(type.name());
-                    endEvent(type.name());
+                    Event event = active.get(type.name());
+                    if (event != null && !event.participated) {
+                        event.participated = true;
+                        ON_END.invoke(listener -> listener.onDwarvenEventEnd(type.name()));
+                        updateDisplay();
+                    }
                     return;
                 }
             }
@@ -178,15 +174,16 @@ public class DwarvenEvents {
         body.setLength(0);
 
         if (Config.debug) {
-            body.append("Update in: &a").append(secondsTillUpdate());
-            if (!active.isEmpty()) body.append("\n");
+            body.append("§7[§a").append(secondsTillUpdate()).append("§7]§r ");
         }
         
         String result = active.values().stream()
             .map(Event::displayString)
-            .collect(Collectors.joining("\n"));
+            .collect(Collectors.joining(" §8->§r "));
 
         body.append(result);
+
+        if (result.length() == 0) body.append("§7No active events");
 
         return body.toString();
     }
